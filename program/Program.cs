@@ -23,4 +23,17 @@
             
             return result;
         }
+void PrintArray(string[] array)
+        {
+            if(array.Length == 0)
+            {
+                Console.WriteLine("В массиве нет таких слов");
+            }
+            else
+            {
+                Array.ForEach(array, (str) => Console.Write($"{str} "));
+                Console.WriteLine();
+            }
+        }
+
         
