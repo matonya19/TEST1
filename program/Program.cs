@@ -36,4 +36,19 @@ void PrintArray(string[] array)
             }
         }
 
+void FinishPrint(string[] array)
+        {
+            Console.WriteLine("Исходный массив:");
+            PrintArray(array);
+            string[] shortArray = GetShortWordsArray(array);
+            Console.WriteLine($"Результат (слова с 3 символами): ");
+            PrintArray(shortArray);
+            Console.WriteLine();
+        }
+        
+        FinishPrint(arr1);
+        FinishPrint(arr2);
+        FinishPrint(arr3);
+
+
         
