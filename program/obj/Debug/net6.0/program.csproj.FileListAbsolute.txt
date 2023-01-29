@@ -1,0 +1,15 @@
+/Users/am/Desktop/УЧЕБА/TEST1/program/obj/Debug/net6.0/program.csproj.AssemblyReference.cache
+/Users/am/Desktop/УЧЕБА/TEST1/program/obj/Debug/net6.0/program.GeneratedMSBuildEditorConfig.editorconfig
+/Users/am/Desktop/УЧЕБА/TEST1/program/obj/Debug/net6.0/program.AssemblyInfoInputs.cache
+/Users/am/Desktop/УЧЕБА/TEST1/program/obj/Debug/net6.0/program.AssemblyInfo.cs
+/Users/am/Desktop/УЧЕБА/TEST1/program/obj/Debug/net6.0/program.csproj.CoreCompileInputs.cache
+/Users/am/Desktop/УЧЕБА/TEST1/program/bin/Debug/net6.0/program
+/Users/am/Desktop/УЧЕБА/TEST1/program/bin/Debug/net6.0/program.deps.json
+/Users/am/Desktop/УЧЕБА/TEST1/program/bin/Debug/net6.0/program.runtimeconfig.json
+/Users/am/Desktop/УЧЕБА/TEST1/program/bin/Debug/net6.0/program.dll
+/Users/am/Desktop/УЧЕБА/TEST1/program/bin/Debug/net6.0/program.pdb
+/Users/am/Desktop/УЧЕБА/TEST1/program/obj/Debug/net6.0/program.dll
+/Users/am/Desktop/УЧЕБА/TEST1/program/obj/Debug/net6.0/refint/program.dll
+/Users/am/Desktop/УЧЕБА/TEST1/program/obj/Debug/net6.0/program.pdb
+/Users/am/Desktop/УЧЕБА/TEST1/program/obj/Debug/net6.0/program.genruntimeconfig.cache
+/Users/am/Desktop/УЧЕБА/TEST1/program/obj/Debug/net6.0/ref/program.dll
