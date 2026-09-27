@@ -1,0 +1,83 @@
+import { useRef } from 'react';
+import { useApp } from '../AppContext.jsx';
+import { SCHEMA_VERSION } from '../storage.js';
+
+export default function DataPanel() {
+  const { dataPanelOpen, setDataPanelOpen, projects, posts, importData, setConfirmDialog, pushToast } = useApp();
+  const fileInputRef = useRef(null);
+
+  if (!dataPanelOpen) return null;
+
+  function handleExport() {
+    const data = { schemaVersion: SCHEMA_VERSION, exportedAt: new Date().toISOString(), projects, posts };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `content-plan-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleFileChosen(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed;
+      try {
+        parsed = JSON.parse(reader.result);
+      } catch {
+        pushToast({ text: 'Не удалось прочитать файл: он повреждён или это не JSON. Текущий план не изменён.' });
+        return;
+      }
+      setConfirmDialog({
+        title: 'Заменить текущие данные?',
+        message: `Импорт заменит весь текущий контент-план на данные из файла «${file.name}». Это действие нельзя отменить. Рекомендуем сначала сделать экспорт текущих данных.`,
+        confirmLabel: 'Заменить данные',
+        onConfirm: () => {
+          const err = importData(parsed);
+          if (err) pushToast({ text: err });
+          else pushToast({ text: 'Данные импортированы.' });
+        },
+      });
+    };
+    reader.onerror = () => {
+      pushToast({ text: 'Не удалось прочитать файл. Текущий план не изменён.' });
+    };
+    reader.readAsText(file);
+  }
+
+  return (
+    <div className="modal-overlay" onClick={() => setDataPanelOpen(false)}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal__header">
+          <h2>Хранение данных</h2>
+          <button type="button" className="modal__close" onClick={() => setDataPanelOpen(false)} aria-label="Закрыть">×</button>
+        </div>
+        <div className="modal__body">
+          <p className="data-panel__notice">
+            Все данные сохраняются только в этом браузере на этом устройстве (в localStorage) и не синхронизируются
+            между устройствами и браузерами. Очистка данных браузера или другой браузер/устройство — план будет пуст.
+            Делайте резервную копию через экспорт, если план для вас важен.
+          </p>
+          <div className="data-panel__actions">
+            <button type="button" className="btn-primary" onClick={handleExport}>Экспортировать данные (JSON)</button>
+            <button type="button" className="btn-muted" onClick={() => fileInputRef.current?.click()}>Импортировать данные из JSON…</button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/json,.json"
+              style={{ display: 'none' }}
+              onChange={handleFileChosen}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
