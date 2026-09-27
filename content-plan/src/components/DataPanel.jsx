@@ -8,14 +8,34 @@ export default function DataPanel() {
 
   if (!dataPanelOpen) return null;
 
-  function handleExport() {
+  async function handleExport() {
     const data = { schemaVersion: SCHEMA_VERSION, exportedAt: new Date().toISOString(), projects, posts };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const json = JSON.stringify(data, null, 2);
+    const stamp = new Date().toISOString().slice(0, 10);
+    const filename = `content-plan-${stamp}.json`;
+
+    // На странице, открытой как Artifact, обычная ссылка-скачивание не работает —
+    // там файл предлагается через отдельный runtime-API.
+    if (typeof window !== 'undefined' && window.claude && typeof window.claude.use === 'function') {
+      try {
+        const downloads = await window.claude.use('downloads');
+        if (downloads) {
+          await downloads.save({ filename, data: json });
+          pushToast({ text: 'Файл сохранён.' });
+          return;
+        }
+      } catch (err) {
+        if (err?.code === 'declined') return;
+        pushToast({ text: 'Не удалось сохранить файл. Попробуйте ещё раз.' });
+        return;
+      }
+    }
+
+    const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    const stamp = new Date().toISOString().slice(0, 10);
     a.href = url;
-    a.download = `content-plan-${stamp}.json`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     a.remove();
