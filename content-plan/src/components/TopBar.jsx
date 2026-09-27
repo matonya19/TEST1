@@ -11,6 +11,7 @@ export default function TopBar() {
     projects, activeProjectId, setActiveProjectId,
     view, setView, search, setSearch, section,
     setEditorTarget, setProjectManagerOpen, addPost,
+    mobileNavOpen, setMobileNavOpen,
   } = useApp();
 
   function handleAddPost() {
@@ -21,6 +22,14 @@ export default function TopBar() {
   return (
     <header className="topbar">
       <div className="topbar__row">
+        <button
+          type="button"
+          className="topbar__hamburger"
+          onClick={() => setMobileNavOpen((v) => !v)}
+          aria-label={mobileNavOpen ? 'Закрыть меню' : 'Открыть меню'}
+        >
+          ☰
+        </button>
         <select
           className="topbar__project-select"
           value={activeProjectId}

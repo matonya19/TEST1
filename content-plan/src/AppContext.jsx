@@ -226,6 +226,7 @@ export function AppProvider({ children }) {
   const [view, setView] = useState('week'); // 'week' | 'month' | 'status'
   const [section, setSection] = useState('plan'); // 'plan' | 'ideas' | 'archive'
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [weekAnchor, setWeekAnchor] = useState(() => new Date());
   const [monthAnchor, setMonthAnchor] = useState(() => new Date());
   const [activeProjectId, setActiveProjectId] = useState('all');
@@ -384,6 +385,7 @@ export function AppProvider({ children }) {
     view, setView,
     section, setSection,
     sidebarCollapsed, setSidebarCollapsed,
+    mobileNavOpen, setMobileNavOpen,
     weekAnchor, setWeekAnchor,
     monthAnchor, setMonthAnchor,
     activeProjectId, setActiveProjectId,
@@ -399,7 +401,7 @@ export function AppProvider({ children }) {
   }), [
     projects, posts, mode, shared.ready, addPost, updatePost, duplicatePost, requestDeletePost, hardDeletePost,
     pendingDeleteIds, archivePost, unarchivePost, createAdaptation, addProject, updateProject, clearDemoData,
-    importData, view, section, sidebarCollapsed, weekAnchor, monthAnchor, activeProjectId,
+    importData, view, section, sidebarCollapsed, mobileNavOpen, weekAnchor, monthAnchor, activeProjectId,
     search, filters, resetFilters, editorTarget, toasts, pushToast, dismissToast,
     confirmDialog, projectManagerOpen, dataPanelOpen,
   ]);

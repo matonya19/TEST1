@@ -127,6 +127,8 @@ a { color: var(--accent-dark); }
 
 .sidebar__toggle:hover { background: var(--border-soft); }
 
+.sidebar__toggle--close { font-size: 22px; line-height: 1; }
+
 .sidebar__nav {
   display: flex;
   flex-direction: column;
@@ -175,6 +177,20 @@ a { color: var(--accent-dark); }
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.topbar__hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  color: var(--text);
+  flex-shrink: 0;
 }
 
 .topbar__project-select {
@@ -1112,10 +1128,33 @@ a { color: var(--accent-dark); }
   .topbar { padding: 12px 14px 8px; }
   .filters-bar { padding: 10px 14px; }
 
+  .app-shell { display: block; }
+
+  .topbar__hamburger {
+    display: inline-flex;
+  }
+
   .sidebar {
     position: fixed;
-    z-index: 90;
+    inset: 0 auto 0 0;
+    z-index: 110;
     height: 100vh;
+    width: 240px !important;
+    max-width: 82vw;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .sidebar--mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 26, 15, 0.28);
+    z-index: 100;
   }
 
   .week-grid {
@@ -1130,7 +1169,8 @@ a { color: var(--accent-dark); }
 
   .month-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
   .month-day { min-height: 72px; padding: 4px; }
-  .month-item__topic { display: none; }
+  .month-item { padding: 3px 2px; justify-content: center; border-left: none; }
+  .month-item__topic, .month-item__time { display: none; }
 
   .status-board {
     grid-template-columns: 1fr;
@@ -1142,4 +1182,10 @@ a { color: var(--accent-dark); }
   .topbar__row { gap: 8px; }
   .topbar__search { max-width: none; order: 5; flex: 1 1 100%; }
   .topbar__add-btn { flex: 1 1 100%; }
+
+  /* Крупнее зона нажатия для мелких иконок-кнопок на сенсорном экране */
+  .card-menu__trigger { min-width: 32px; min-height: 32px; font-size: 18px; }
+  .drawer__close, .modal__close { min-width: 36px; min-height: 36px; }
+  .idea-row__delete { min-width: 32px; min-height: 32px; }
+  .period-nav__btn { width: 36px; height: 36px; }
 }
