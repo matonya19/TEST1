@@ -79,20 +79,70 @@ function domainReducer(state, action) {
     case 'DELETE_POST':
       return { ...state, posts: state.posts.filter((p) => p.id !== action.id) };
 
-    case 'DUPLICATE_POST': {
-      const src = state.posts.find((p) => p.id === action.id);
-      if (!src) return state;
-      const now = Date.now();
-      const clone = { ...src, id: makeId('post'), topic: `${src.topic} (копия)`, isDemo: false, createdAt: now, updatedAt: now };
-      return { ...state, posts: [...state.posts, clone] };
-    }
-
     default:
       return state;
   }
 }
 
+// Обёртка над Artifact-возможностью `db`: при её доступности данные общие
+// (несколько устройств, ссылка для просмотра); иначе всё работает как раньше — только в localStorage.
+function useSharedDb() {
+  const [ready, setReady] = useState(false);
+  const [available, setAvailable] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const dbRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    let unsubProjects = () => {};
+    let unsubPosts = () => {};
+
+    (async () => {
+      if (typeof window === 'undefined' || typeof window.claude?.use !== 'function') {
+        setReady(true);
+        return;
+      }
+      let db = null;
+      try {
+        db = await window.claude.use('db');
+      } catch {
+        db = null;
+      }
+      if (cancelled) return;
+      if (!db) {
+        setReady(true);
+        return;
+      }
+      dbRef.current = db;
+      setAvailable(true);
+      unsubProjects = db.collection('projects').onSnapshot(
+        (snap) => {
+          setProjects(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+          setReady(true);
+        },
+        () => setReady(true),
+      );
+      unsubPosts = db.collection('posts').onSnapshot(
+        (snap) => setPosts(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+        () => {},
+      );
+    })();
+
+    return () => {
+      cancelled = true;
+      unsubProjects();
+      unsubPosts();
+    };
+  }, []);
+
+  return { ready, available, projects, posts, db: dbRef };
+}
+
 export function AppProvider({ children }) {
+  const shared = useSharedDb();
+  const mode = shared.available ? 'db' : 'local';
+
   const [domain, dispatch] = useReducer(domainReducer, undefined, () => {
     const loaded = loadState();
     if (loaded) return { schemaVersion: SCHEMA_VERSION, projects: loaded.projects, posts: loaded.posts };
@@ -100,39 +150,13 @@ export function AppProvider({ children }) {
   });
 
   useEffect(() => {
-    saveState(domain);
-  }, [domain]);
+    if (mode === 'local') saveState(domain);
+  }, [domain, mode]);
 
-  // --- UI-only state ---
-  const [view, setView] = useState('week'); // 'week' | 'month' | 'status'
-  const [section, setSection] = useState('plan'); // 'plan' | 'ideas' | 'archive'
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [weekAnchor, setWeekAnchor] = useState(() => new Date());
-  const [monthAnchor, setMonthAnchor] = useState(() => new Date());
-  const [activeProjectId, setActiveProjectId] = useState('all');
-  const [search, setSearch] = useState('');
-  const [filters, setFilters] = useState({ platforms: [], formats: [], statuses: [] });
-  const [editorTarget, setEditorTarget] = useState(null); // { mode: 'edit'|'create', id?, initial? }
+  const projects = mode === 'db' ? shared.projects : domain.projects;
+  const posts = mode === 'db' ? shared.posts : domain.posts;
+
   const [toasts, setToasts] = useState([]);
-  const pendingDeletesRef = useRef(new Map());
-  const [pendingDeleteIds, setPendingDeleteIds] = useState(() => new Set());
-  const [confirmDialog, setConfirmDialog] = useState(null);
-  const [projectManagerOpen, setProjectManagerOpen] = useState(false);
-  const [dataPanelOpen, setDataPanelOpen] = useState(false);
-
-  const addPost = useCallback((overrides) => {
-    const post = emptyPost(overrides);
-    dispatch({ type: 'ADD_POST', post });
-    return post;
-  }, []);
-
-  const updatePost = useCallback((id, patch) => {
-    dispatch({ type: 'UPDATE_POST', id, patch });
-  }, []);
-
-  const duplicatePost = useCallback((id) => {
-    dispatch({ type: 'DUPLICATE_POST', id });
-  }, []);
 
   const pushToast = useCallback((toast) => {
     const id = makeId('toast');
@@ -144,10 +168,98 @@ export function AppProvider({ children }) {
     setToasts((t) => t.filter((x) => x.id !== id));
   }, []);
 
+  const reportWriteError = useCallback((text) => {
+    pushToast({ text });
+  }, [pushToast]);
+
+  const writeNewPost = useCallback((post) => {
+    if (mode === 'db' && shared.db.current) {
+      shared.db.current.collection('posts').doc(post.id).set(post).catch(() => {
+        reportWriteError('Не удалось сохранить публикацию. Проверьте соединение или доступ на редактирование.');
+      });
+    } else {
+      dispatch({ type: 'ADD_POST', post });
+    }
+  }, [mode, shared.db, reportWriteError]);
+
+  const writePostPatch = useCallback((id, patch) => {
+    if (mode === 'db' && shared.db.current) {
+      shared.db.current.collection('posts').doc(id).update({ ...patch, updatedAt: Date.now() }).catch(() => {
+        reportWriteError('Изменения не сохранились. Проверьте соединение или доступ на редактирование.');
+      });
+    } else {
+      dispatch({ type: 'UPDATE_POST', id, patch });
+    }
+  }, [mode, shared.db, reportWriteError]);
+
+  const writeDeletePost = useCallback((id) => {
+    if (mode === 'db' && shared.db.current) {
+      shared.db.current.collection('posts').doc(id).delete().catch(() => {
+        reportWriteError('Не удалось удалить публикацию. Проверьте соединение или доступ на редактирование.');
+      });
+    } else {
+      dispatch({ type: 'DELETE_POST', id });
+    }
+  }, [mode, shared.db, reportWriteError]);
+
+  const writeNewProject = useCallback((project) => {
+    if (mode === 'db' && shared.db.current) {
+      shared.db.current.collection('projects').doc(project.id).set(project).catch(() => {
+        reportWriteError('Не удалось создать проект. Проверьте соединение или доступ на редактирование.');
+      });
+    } else {
+      dispatch({ type: 'ADD_PROJECT', project });
+    }
+  }, [mode, shared.db, reportWriteError]);
+
+  const writeProjectPatch = useCallback((id, patch) => {
+    if (mode === 'db' && shared.db.current) {
+      shared.db.current.collection('projects').doc(id).update(patch).catch(() => {
+        reportWriteError('Не удалось сохранить проект. Проверьте соединение или доступ на редактирование.');
+      });
+    } else {
+      dispatch({ type: 'UPDATE_PROJECT', id, patch });
+    }
+  }, [mode, shared.db, reportWriteError]);
+
+  // --- UI-only state (всегда локальное, не общее между устройствами) ---
+  const [view, setView] = useState('week'); // 'week' | 'month' | 'status'
+  const [section, setSection] = useState('plan'); // 'plan' | 'ideas' | 'archive'
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [weekAnchor, setWeekAnchor] = useState(() => new Date());
+  const [monthAnchor, setMonthAnchor] = useState(() => new Date());
+  const [activeProjectId, setActiveProjectId] = useState('all');
+  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState({ platforms: [], formats: [], statuses: [] });
+  const [editorTarget, setEditorTarget] = useState(null); // { mode: 'edit'|'create', id?, isNew? }
+  const pendingDeletesRef = useRef(new Map());
+  const [pendingDeleteIds, setPendingDeleteIds] = useState(() => new Set());
+  const [confirmDialog, setConfirmDialog] = useState(null);
+  const [projectManagerOpen, setProjectManagerOpen] = useState(false);
+  const [dataPanelOpen, setDataPanelOpen] = useState(false);
+
+  const addPost = useCallback((overrides) => {
+    const post = emptyPost(overrides);
+    writeNewPost(post);
+    return post;
+  }, [writeNewPost]);
+
+  const updatePost = useCallback((id, patch) => {
+    writePostPatch(id, patch);
+  }, [writePostPatch]);
+
+  const duplicatePost = useCallback((id) => {
+    const src = posts.find((p) => p.id === id);
+    if (!src) return;
+    const now = Date.now();
+    const clone = { ...src, id: makeId('post'), topic: `${src.topic} (копия)`, isDemo: false, createdAt: now, updatedAt: now };
+    writeNewPost(clone);
+  }, [posts, writeNewPost]);
+
   const requestDeletePost = useCallback((id, label) => {
     setPendingDeleteIds((s) => new Set(s).add(id));
     const timeoutId = setTimeout(() => {
-      dispatch({ type: 'DELETE_POST', id });
+      writeDeletePost(id);
       pendingDeletesRef.current.delete(id);
       setPendingDeleteIds((s) => {
         const next = new Set(s);
@@ -171,22 +283,26 @@ export function AppProvider({ children }) {
       },
     });
     setTimeout(() => dismissToast(toastId), 6200);
-  }, [pushToast, dismissToast]);
+  }, [pushToast, dismissToast, writeDeletePost]);
+
+  const hardDeletePost = useCallback((id) => {
+    writeDeletePost(id);
+  }, [writeDeletePost]);
 
   const archivePost = useCallback((id) => {
-    dispatch({ type: 'UPDATE_POST', id, patch: { isArchived: true } });
-  }, []);
+    writePostPatch(id, { isArchived: true });
+  }, [writePostPatch]);
 
   const unarchivePost = useCallback((id) => {
-    dispatch({ type: 'UPDATE_POST', id, patch: { isArchived: false } });
-  }, []);
+    writePostPatch(id, { isArchived: false });
+  }, [writePostPatch]);
 
   const createAdaptation = useCallback((sourceId, platform) => {
-    const src = domain.posts.find((p) => p.id === sourceId);
+    const src = posts.find((p) => p.id === sourceId);
     if (!src) return null;
     const groupId = src.linkedGroupId || makeId('group');
     if (!src.linkedGroupId) {
-      dispatch({ type: 'UPDATE_POST', id: src.id, patch: { linkedGroupId: groupId } });
+      writePostPatch(src.id, { linkedGroupId: groupId });
     }
     const adaptation = emptyPost({
       projectId: src.projectId,
@@ -197,31 +313,49 @@ export function AppProvider({ children }) {
       isIdea: false,
       status: 'Идея',
     });
-    dispatch({ type: 'ADD_POST', post: adaptation });
+    writeNewPost(adaptation);
     return adaptation;
-  }, [domain.posts]);
+  }, [posts, writePostPatch, writeNewPost]);
 
   const addProject = useCallback((name, color) => {
     const project = { id: makeId('project'), name, color, isDemo: false };
-    dispatch({ type: 'ADD_PROJECT', project });
+    writeNewProject(project);
     return project;
-  }, []);
+  }, [writeNewProject]);
 
   const updateProject = useCallback((id, patch) => {
-    dispatch({ type: 'UPDATE_PROJECT', id, patch });
-  }, []);
+    writeProjectPatch(id, patch);
+  }, [writeProjectPatch]);
 
   const clearDemoData = useCallback(() => {
-    dispatch({ type: 'CLEAR_DEMO' });
+    if (mode === 'db' && shared.db.current) {
+      const db = shared.db.current;
+      projects.filter((p) => p.isDemo).forEach((p) => db.collection('projects').doc(p.id).delete().catch(() => {}));
+      posts.filter((p) => p.isDemo).forEach((p) => db.collection('posts').doc(p.id).delete().catch(() => {}));
+    } else {
+      dispatch({ type: 'CLEAR_DEMO' });
+    }
     if (activeProjectId === DEMO_PROJECT_ID) setActiveProjectId('all');
-  }, [activeProjectId]);
+  }, [mode, shared.db, projects, posts, activeProjectId]);
 
-  const importData = useCallback((data) => {
+  const importData = useCallback(async (data) => {
     const err = validateImportedData(data);
     if (err) return err;
-    dispatch({ type: 'REPLACE_ALL', projects: data.projects, posts: data.posts });
+    if (mode === 'db' && shared.db.current) {
+      const db = shared.db.current;
+      try {
+        await Promise.all(projects.map((p) => db.collection('projects').doc(p.id).delete()));
+        await Promise.all(posts.map((p) => db.collection('posts').doc(p.id).delete()));
+        await Promise.all(data.projects.map((p) => db.collection('projects').doc(p.id).set(p)));
+        await Promise.all(data.posts.map((p) => db.collection('posts').doc(p.id).set(p)));
+      } catch {
+        return 'Не удалось импортировать данные (нет соединения или доступа на редактирование).';
+      }
+    } else {
+      dispatch({ type: 'REPLACE_ALL', projects: data.projects, posts: data.posts });
+    }
     return null;
-  }, []);
+  }, [mode, shared.db, projects, posts]);
 
   const resetFilters = useCallback(() => {
     setFilters({ platforms: [], formats: [], statuses: [] });
@@ -230,13 +364,15 @@ export function AppProvider({ children }) {
   }, []);
 
   const value = useMemo(() => ({
-    projects: domain.projects,
-    posts: domain.posts,
-    dispatch,
+    projects,
+    posts,
+    mode,
+    dataReady: shared.ready,
     addPost,
     updatePost,
     duplicatePost,
     requestDeletePost,
+    hardDeletePost,
     pendingDeleteIds,
     archivePost,
     unarchivePost,
@@ -261,8 +397,8 @@ export function AppProvider({ children }) {
     dataPanelOpen, setDataPanelOpen,
     todayISO: todayISO(),
   }), [
-    domain, addPost, updatePost, duplicatePost, requestDeletePost, pendingDeleteIds,
-    archivePost, unarchivePost, createAdaptation, addProject, updateProject, clearDemoData,
+    projects, posts, mode, shared.ready, addPost, updatePost, duplicatePost, requestDeletePost, hardDeletePost,
+    pendingDeleteIds, archivePost, unarchivePost, createAdaptation, addProject, updateProject, clearDemoData,
     importData, view, section, sidebarCollapsed, weekAnchor, monthAnchor, activeProjectId,
     search, filters, resetFilters, editorTarget, toasts, pushToast, dismissToast,
     confirmDialog, projectManagerOpen, dataPanelOpen,

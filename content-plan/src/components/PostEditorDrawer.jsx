@@ -5,7 +5,7 @@ import { makeId } from '../AppContext.jsx';
 
 export default function PostEditorDrawer() {
   const {
-    posts, projects, editorTarget, setEditorTarget, updatePost, dispatch,
+    posts, projects, editorTarget, setEditorTarget, updatePost, hardDeletePost,
     duplicatePost, archivePost, unarchivePost, requestDeletePost, createAdaptation, pushToast,
   } = useApp();
   const [adaptPlatform, setAdaptPlatform] = useState('');
@@ -22,7 +22,7 @@ export default function PostEditorDrawer() {
 
   function close() {
     if (editorTarget.isNew && !post.topic.trim()) {
-      dispatch({ type: 'DELETE_POST', id: post.id });
+      hardDeletePost(post.id);
     }
     setEditorTarget(null);
   }

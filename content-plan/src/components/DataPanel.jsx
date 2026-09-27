@@ -3,7 +3,7 @@ import { useApp } from '../AppContext.jsx';
 import { SCHEMA_VERSION } from '../storage.js';
 
 export default function DataPanel() {
-  const { dataPanelOpen, setDataPanelOpen, projects, posts, importData, setConfirmDialog, pushToast } = useApp();
+  const { dataPanelOpen, setDataPanelOpen, projects, posts, importData, setConfirmDialog, pushToast, mode } = useApp();
   const fileInputRef = useRef(null);
 
   if (!dataPanelOpen) return null;
@@ -59,8 +59,8 @@ export default function DataPanel() {
         title: 'Заменить текущие данные?',
         message: `Импорт заменит весь текущий контент-план на данные из файла «${file.name}». Это действие нельзя отменить. Рекомендуем сначала сделать экспорт текущих данных.`,
         confirmLabel: 'Заменить данные',
-        onConfirm: () => {
-          const err = importData(parsed);
+        onConfirm: async () => {
+          const err = await importData(parsed);
           if (err) pushToast({ text: err });
           else pushToast({ text: 'Данные импортированы.' });
         },
@@ -81,9 +81,20 @@ export default function DataPanel() {
         </div>
         <div className="modal__body">
           <p className="data-panel__notice">
-            Все данные сохраняются только в этом браузере на этом устройстве (в localStorage) и не синхронизируются
-            между устройствами и браузерами. Очистка данных браузера или другой браузер/устройство — план будет пуст.
-            Делайте резервную копию через экспорт, если план для вас важен.
+            {mode === 'db' ? (
+              <>
+                Эта ссылка хранит данные централизованно: они одинаковы на всех ваших устройствах (телефон, компьютер)
+                и видны всем, с кем вы поделились ссылкой. Открыть план могут только те, у кого есть доступ к ссылке
+                (настраивается через «Share» на самой странице) — по умолчанию они видят план, но не могут его менять.
+                Всё равно делайте резервную копию через экспорт на случай, если ссылка станет недоступна.
+              </>
+            ) : (
+              <>
+                Все данные сохраняются только в этом браузере на этом устройстве (в localStorage) и не синхронизируются
+                между устройствами и браузерами. Очистка данных браузера или другой браузер/устройство — план будет пуст.
+                Делайте резервную копию через экспорт, если план для вас важен.
+              </>
+            )}
           </p>
           <div className="data-panel__actions">
             <button type="button" className="btn-primary" onClick={handleExport}>Экспортировать данные (JSON)</button>

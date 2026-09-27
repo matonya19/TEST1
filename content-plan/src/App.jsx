@@ -16,8 +16,12 @@ import ConfirmDialog from './components/ConfirmDialog.jsx';
 import Toasts from './components/Toasts.jsx';
 
 function AppShell() {
-  const { projects, posts, section, view } = useApp();
+  const { projects, posts, section, view, dataReady } = useApp();
   const projectsById = useMemo(() => new Map(projects.map((p) => [p.id, p])), [projects]);
+
+  if (!dataReady) {
+    return <div className="app-loading">Загрузка контент-плана…</div>;
+  }
 
   return (
     <div className="app-shell">
