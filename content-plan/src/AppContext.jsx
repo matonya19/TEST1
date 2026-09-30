@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useReducer,
 import { loadState, saveState, SCHEMA_VERSION, validateImportedData } from './storage.js';
 import { buildDemoData, DEMO_PROJECT_ID } from './demoData.js';
 import { todayISO } from './utils/date.js';
+import { createFirestoreDb } from './firestoreAdapter.js';
 
 const AppCtx = createContext(null);
 
@@ -84,11 +85,14 @@ function domainReducer(state, action) {
   }
 }
 
-// Обёртка над Artifact-возможностью `db`: при её доступности данные общие
-// (несколько устройств, ссылка для просмотра); иначе всё работает как раньше — только в localStorage.
+// Общее хранилище данных — три источника, по приоритету:
+// 1) Firebase/Firestore (если сконфигурирован) — работает где угодно, без Claude;
+// 2) возможность `db` Claude-артефакта (если открыто как Artifact с этой капабилити);
+// 3) ничего — тогда приложение остаётся на localStorage (только этот браузер).
 function useSharedDb() {
   const [ready, setReady] = useState(false);
   const [available, setAvailable] = useState(false);
+  const [source, setSource] = useState(null); // 'firebase' | 'claude-db' | null
   const [projects, setProjects] = useState([]);
   const [posts, setPosts] = useState([]);
   const dbRef = useRef(null);
@@ -98,23 +102,9 @@ function useSharedDb() {
     let unsubProjects = () => {};
     let unsubPosts = () => {};
 
-    (async () => {
-      if (typeof window === 'undefined' || typeof window.claude?.use !== 'function') {
-        setReady(true);
-        return;
-      }
-      let db = null;
-      try {
-        db = await window.claude.use('db');
-      } catch {
-        db = null;
-      }
-      if (cancelled) return;
-      if (!db) {
-        setReady(true);
-        return;
-      }
+    function attach(db, sourceName) {
       dbRef.current = db;
+      setSource(sourceName);
       setAvailable(true);
       unsubProjects = db.collection('projects').onSnapshot(
         (snap) => {
@@ -127,6 +117,38 @@ function useSharedDb() {
         (snap) => setPosts(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
         () => {},
       );
+    }
+
+    (async () => {
+      // 1) Firebase — не зависит от Claude, работает на любом хостинге.
+      let firestoreDb = null;
+      try {
+        firestoreDb = createFirestoreDb();
+      } catch {
+        firestoreDb = null;
+      }
+      if (firestoreDb) {
+        attach(firestoreDb, 'firebase');
+        return;
+      }
+
+      // 2) Claude Artifact db-капабилити.
+      if (typeof window === 'undefined' || typeof window.claude?.use !== 'function') {
+        setReady(true);
+        return;
+      }
+      let claudeDb = null;
+      try {
+        claudeDb = await window.claude.use('db');
+      } catch {
+        claudeDb = null;
+      }
+      if (cancelled) return;
+      if (!claudeDb) {
+        setReady(true);
+        return;
+      }
+      attach(claudeDb, 'claude-db');
     })();
 
     return () => {
@@ -136,7 +158,7 @@ function useSharedDb() {
     };
   }, []);
 
-  return { ready, available, projects, posts, db: dbRef };
+  return { ready, available, source, projects, posts, db: dbRef };
 }
 
 export function AppProvider({ children }) {
@@ -368,6 +390,7 @@ export function AppProvider({ children }) {
     projects,
     posts,
     mode,
+    dataSource: shared.source,
     dataReady: shared.ready,
     addPost,
     updatePost,
@@ -399,7 +422,7 @@ export function AppProvider({ children }) {
     dataPanelOpen, setDataPanelOpen,
     todayISO: todayISO(),
   }), [
-    projects, posts, mode, shared.ready, addPost, updatePost, duplicatePost, requestDeletePost, hardDeletePost,
+    projects, posts, mode, shared.source, shared.ready, addPost, updatePost, duplicatePost, requestDeletePost, hardDeletePost,
     pendingDeleteIds, archivePost, unarchivePost, createAdaptation, addProject, updateProject, clearDemoData,
     importData, view, section, sidebarCollapsed, mobileNavOpen, weekAnchor, monthAnchor, activeProjectId,
     search, filters, resetFilters, editorTarget, toasts, pushToast, dismissToast,

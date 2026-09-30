@@ -3,7 +3,7 @@ import { useApp } from '../AppContext.jsx';
 import { SCHEMA_VERSION } from '../storage.js';
 
 export default function DataPanel() {
-  const { dataPanelOpen, setDataPanelOpen, projects, posts, importData, setConfirmDialog, pushToast, mode } = useApp();
+  const { dataPanelOpen, setDataPanelOpen, projects, posts, importData, setConfirmDialog, pushToast, mode, dataSource } = useApp();
   const fileInputRef = useRef(null);
 
   if (!dataPanelOpen) return null;
@@ -81,7 +81,13 @@ export default function DataPanel() {
         </div>
         <div className="modal__body">
           <p className="data-panel__notice">
-            {mode === 'db' ? (
+            {dataSource === 'firebase' ? (
+              <>
+                Эта страница хранит данные централизованно (через Firebase): они одинаковы на всех устройствах
+                и видны всем, у кого есть эта ссылка — без входа куда-либо. Всё равно делайте резервную копию
+                через экспорт на случай технических неполадок.
+              </>
+            ) : mode === 'db' ? (
               <>
                 Эта ссылка хранит данные централизованно: они одинаковы на всех ваших устройствах (телефон, компьютер)
                 и видны всем, с кем вы поделились ссылкой. Открыть план могут только те, у кого есть доступ к ссылке
