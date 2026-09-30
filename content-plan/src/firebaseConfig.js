@@ -7,12 +7,12 @@
 // Claude-артефакт, если он доступен.
 
 export const firebaseConfig = {
-  apiKey: '',
-  authDomain: '',
-  projectId: '',
-  storageBucket: '',
-  messagingSenderId: '',
-  appId: '',
+  apiKey: 'AIzaSyAgsPkZ1SWrPv3Ev_an8PQgd_nRb2gZjbE',
+  authDomain: 'smm-contentplan.firebaseapp.com',
+  projectId: 'smm-contentplan',
+  storageBucket: 'smm-contentplan.firebasestorage.app',
+  messagingSenderId: '271073901529',
+  appId: '1:271073901529:web:f65ba2639bdc2bb087f7c8',
 };
 
 export function isFirebaseConfigured() {

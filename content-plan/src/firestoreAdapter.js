@@ -1,18 +1,24 @@
 import { initializeApp } from 'firebase/app';
 import {
-  getFirestore, collection, doc, setDoc, updateDoc, deleteDoc, getDocs, onSnapshot,
+  initializeFirestore, collection, doc, setDoc, updateDoc, deleteDoc, getDocs, onSnapshot,
 } from 'firebase/firestore';
 import { firebaseConfig, isFirebaseConfigured } from './firebaseConfig.js';
+import { getWorkspaceId } from './workspace.js';
 
 // Тонкая обёртка над Firestore, повторяющая форму API Claude-артефактной базы
 // (collection(path).doc(id).set/update/delete, collection(path).onSnapshot/get),
 // чтобы остальной код приложения работал одинаково независимо от источника данных.
+// Коллекции живут под workspaces/<id>/..., так что несколько клиентских планов
+// могут делить один Firebase-проект, не смешивая данные.
 export function createFirestoreDb() {
   if (!isFirebaseConfigured()) return null;
   const app = initializeApp(firebaseConfig);
-  const firestore = getFirestore(app);
+  // Автоопределение long polling вместо потокового WebChannel — устойчивее за
+  // строгими прокси/файрволами, но не форсирует его без необходимости.
+  const firestore = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
 
-  function wrapCollection(path) {
+  function wrapCollection(name) {
+    const path = `workspaces/${getWorkspaceId()}/${name}`;
     const colRef = collection(firestore, path);
     return {
       doc(id) {
