@@ -3,6 +3,7 @@ import PlatformIcon from './PlatformIcon.jsx';
 import CardMenu from './CardMenu.jsx';
 import { useApp } from '../AppContext.jsx';
 import { isPastDay, parseISODate } from '../utils/date.js';
+import { hexToRgba } from '../utils/color.js';
 
 export default function PostCard({ post, project, onOpen, draggable = true, compact = false }) {
   const { updatePost, duplicatePost, archivePost, requestDeletePost } = useApp();
@@ -20,7 +21,10 @@ export default function PostCard({ post, project, onOpen, draggable = true, comp
       draggable={draggable}
       onDragStart={handleDragStart}
       onClick={onOpen}
-      style={{ borderLeftColor: project?.color || 'var(--border)' }}
+      style={{
+        borderLeftColor: project?.color || 'var(--border)',
+        backgroundColor: project?.color ? hexToRgba(project.color, 0.1) : undefined,
+      }}
     >
       <div className="post-card__top">
         <span className="post-card__time">{post.time || '—:—'}</span>

@@ -11,7 +11,11 @@ import { getWorkspaceId } from './workspace.js';
 // Коллекции живут под workspaces/<id>/..., так что несколько клиентских планов
 // могут делить один Firebase-проект, не смешивая данные.
 export function createFirestoreDb() {
-  if (!isFirebaseConfigured()) return null;
+  // Firebase включается только для сборок с явно заданным VITE_WORKSPACE_ID
+  // (страницы GitHub Pages). Обычная локальная сборка и версии для Claude
+  // Artifact не задают его и всегда остаются на своём обычном хранилище —
+  // иначе все сборки с одними и теми же ключами слились бы в одно пространство.
+  if (!isFirebaseConfigured() || !import.meta.env.VITE_WORKSPACE_ID) return null;
   const app = initializeApp(firebaseConfig);
   // Автоопределение long polling вместо потокового WebChannel — устойчивее за
   // строгими прокси/файрволами, но не форсирует его без необходимости.

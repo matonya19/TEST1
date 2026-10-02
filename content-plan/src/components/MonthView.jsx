@@ -4,6 +4,7 @@ import { formatMonthYear, getMonthGrid, isToday, toISODate } from '../utils/date
 import { matchesFilters } from '../utils/filters.js';
 import { STATUS_STYLES } from '../constants.js';
 import QuickAddInput from './QuickAddInput.jsx';
+import { hexToRgba } from '../utils/color.js';
 
 export default function MonthView({ posts, projectsById }) {
   const { monthAnchor, setMonthAnchor, activeProjectId, search, filters, addPost, setEditorTarget, pendingDeleteIds, updatePost } = useApp();
@@ -63,6 +64,7 @@ export default function MonthView({ posts, projectsById }) {
               <div className="month-day__items">
                 {dayPosts.slice(0, 4).map((post) => {
                   const style = STATUS_STYLES[post.status] || STATUS_STYLES['Идея'];
+                  const itemProject = projectsById.get(post.projectId);
                   return (
                     <button
                       type="button"
@@ -71,7 +73,10 @@ export default function MonthView({ posts, projectsById }) {
                       draggable
                       onDragStart={(e) => { e.dataTransfer.setData('text/post-id', post.id); }}
                       onClick={() => setEditorTarget({ mode: 'edit', id: post.id })}
-                      style={{ borderLeftColor: projectsById.get(post.projectId)?.color || style.dot }}
+                      style={{
+                        borderLeftColor: itemProject?.color || style.dot,
+                        backgroundColor: itemProject?.color ? hexToRgba(itemProject.color, 0.12) : undefined,
+                      }}
                       title={post.topic}
                     >
                       <span className="month-item__dot" style={{ background: style.dot }} />
