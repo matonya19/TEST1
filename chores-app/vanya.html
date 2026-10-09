@@ -1,0 +1,406 @@
+<title>Копилка Вани</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+  /* Layout: one phone-width column; big coin-jar header, then chunky tap targets. */
+  :root {
+    --bg: #eef6fb;
+    --surface: #ffffff;
+    --ink: #17324a;
+    --muted: #5f7a90;
+    --line: #d5e6f1;
+    --sun: #ffc531;
+    --sun-ink: #4a3500;
+    --sky: #2f8fd8;
+    --go: #2fa36b;
+    --stop: #d9534a;
+    --wait: #fff1c4;
+    --display: "Rubik", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --r: 20px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1e2b; --surface: #182c3d; --ink: #e8f2fa; --muted: #93adc2; --line: #284459;
+      --sun: #ffc531; --sun-ink: #3a2a00; --sky: #5aaef0; --go: #3cc082; --stop: #f07068; --wait: #4a3d14;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1e2b; --surface: #182c3d; --ink: #e8f2fa; --muted: #93adc2; --line: #284459;
+    --sun: #ffc531; --sun-ink: #3a2a00; --sky: #5aaef0; --go: #3cc082; --stop: #f07068; --wait: #4a3d14;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.4; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 16px 16px 48px; display: grid; gap: 20px; }
+
+  .jar {
+    background: var(--sun); color: var(--sun-ink); border-radius: 28px;
+    padding: 20px; display: grid; gap: 6px; text-align: center;
+  }
+  .jar .hi { font-family: var(--display); font-weight: 700; font-size: 20px; }
+  .jar .sum { font-family: var(--display); font-weight: 800; font-size: 56px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .jar .sum small { font-size: 24px; font-weight: 700; }
+  .jar.pop .sum { animation: pop .6s ease; }
+  @keyframes pop { 40% { transform: scale(1.18); } }
+  @media (prefers-reduced-motion: reduce) { .jar.pop .sum { animation: none; } }
+  .goal { font-weight: 700; font-size: 15px; display: grid; gap: 6px; }
+  .bar { height: 14px; border-radius: 8px; background: rgba(0,0,0,.12); overflow: hidden; }
+  .bar > div { height: 100%; background: var(--sun-ink); border-radius: 8px; }
+
+  .switch { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: var(--line); padding: 5px; border-radius: 16px; }
+  .switch button { background: transparent; color: var(--muted); }
+  .switch button[aria-pressed="true"] { background: var(--surface); color: var(--ink); }
+
+  h2 { font-family: var(--display); font-weight: 700; font-size: 21px; margin: 0; text-wrap: balance; }
+  section { display: grid; gap: 10px; }
+  .list { display: grid; gap: 10px; }
+
+  button {
+    font: inherit; font-weight: 800; border: 0; border-radius: 14px; padding: 12px 16px;
+    cursor: pointer; background: var(--line); color: var(--ink); min-height: 48px;
+  }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+  button:disabled { opacity: .5; cursor: default; }
+  .take { background: var(--sky); color: #fff; }
+  .ok { background: var(--go); color: #fff; }
+  .del { background: transparent; color: var(--stop); border: 2px solid var(--stop); }
+  .del.sure { background: var(--stop); color: #fff; }
+
+  .chore {
+    background: var(--surface); border: 2px solid var(--line); border-radius: var(--r);
+    padding: 12px; display: flex; align-items: center; gap: 12px;
+  }
+  .chore.waiting { background: var(--wait); border-color: var(--sun); }
+  .pic { font-size: 40px; width: 52px; text-align: center; flex-shrink: 0; line-height: 1; }
+  .what { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  .name { font-weight: 800; font-size: 18px; overflow-wrap: anywhere; }
+  .price { font-family: var(--display); font-weight: 800; color: var(--sky); font-variant-numeric: tabular-nums; }
+  .note { font-size: 14px; font-weight: 700; color: var(--muted); }
+  .acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+
+  .empty { color: var(--muted); text-align: center; padding: 14px; border: 2px dashed var(--line); border-radius: var(--r); }
+  .log { background: var(--surface); border-radius: var(--r); padding: 4px 14px; }
+  .row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .row .when { color: var(--muted); font-size: 14px; }
+  .plus { color: var(--go); font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .minus { color: var(--stop); font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  form { display: flex; flex-wrap: wrap; gap: 8px; }
+  input {
+    font: inherit; padding: 12px; border-radius: 14px; border: 2px solid var(--line);
+    background: var(--surface); color: var(--ink); min-width: 0; min-height: 48px;
+  }
+  .grow { flex: 1 1 170px; }
+  .small { width: 96px; }
+  .hint { color: var(--muted); font-size: 14px; margin: 0; }
+
+  .pin { background: var(--surface); border-radius: var(--r); padding: 18px; display: grid; gap: 14px; justify-items: center; }
+  .dots { display: flex; gap: 12px; }
+  .dots span { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--muted); }
+  .dots span.on { background: var(--ink); border-color: var(--ink); }
+  .keys { display: grid; grid-template-columns: repeat(3, 72px); gap: 10px; }
+  .keys button { font-size: 24px; }
+  .err { color: var(--stop); font-weight: 800; min-height: 1.4em; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+    background: var(--ink); color: var(--bg); padding: 12px 18px; border-radius: 14px; font-weight: 800;
+    max-width: calc(100% - 32px); opacity: 0; transition: opacity .25s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+  .status { text-align: center; color: var(--muted); padding: 24px 0; }
+</style>
+
+<div class="wrap">
+  <div class="jar" id="jar">
+    <div class="hi" id="hi">Копилка</div>
+    <div class="sum" id="sum">0 <small>лари</small></div>
+    <div class="goal" id="goal" hidden></div>
+  </div>
+
+  <div class="switch" role="group" aria-label="Кто пользуется">
+    <button id="as-kid" aria-pressed="true">Ваня</button>
+    <button id="as-parent" aria-pressed="false">Мама / папа</button>
+  </div>
+
+  <div class="status" id="status">Загружаю задания…</div>
+
+  <div id="kid" hidden>
+    <section>
+      <h2>Я делаю</h2>
+      <div class="list" id="mine"></div>
+    </section>
+    <section style="margin-top:20px">
+      <h2>Выбери работу</h2>
+      <div class="list" id="offer"></div>
+    </section>
+    <section style="margin-top:20px">
+      <h2>Что я заработал</h2>
+      <div class="log" id="log-kid"></div>
+    </section>
+  </div>
+
+  <div id="pin" class="pin" hidden>
+    <h2>Код родителя</h2>
+    <div class="dots" id="dots"></div>
+    <div class="keys" id="keys"></div>
+    <div class="err" id="pin-err"></div>
+  </div>
+
+  <div id="parent" hidden>
+    <section>
+      <h2>Ждут проверки</h2>
+      <div class="list" id="check"></div>
+    </section>
+    <section style="margin-top:20px">
+      <h2>Выдать деньги на руки</h2>
+      <form id="pay">
+        <input class="grow" id="pay-sum" type="number" min="1" inputmode="numeric" placeholder="Сколько лари" required>
+        <button class="del sure" type="submit">Выдать</button>
+      </form>
+    </section>
+    <section style="margin-top:20px">
+      <h2>Задания и цены</h2>
+      <div class="list" id="catalog"></div>
+      <form id="add">
+        <input class="small" id="add-pic" placeholder="🧽" maxlength="4" aria-label="Значок">
+        <input class="grow" id="add-name" placeholder="Новое задание" required aria-label="Название">
+        <input class="small" id="add-price" type="number" min="1" inputmode="numeric" placeholder="лари" required aria-label="Цена">
+        <button class="take" type="submit">Добавить</button>
+      </form>
+    </section>
+    <section style="margin-top:20px">
+      <h2>Цель и код</h2>
+      <form id="settings">
+        <input class="grow" id="set-goal" placeholder="На что копим (например, Лего)">
+        <input class="small" id="set-goal-sum" type="number" min="0" inputmode="numeric" placeholder="лари">
+        <input class="small" id="set-pin" inputmode="numeric" maxlength="6" placeholder="Новый код">
+        <button class="take" type="submit">Сохранить</button>
+      </form>
+      <p class="hint">Код по умолчанию 1234. Он защищает от случайных нажатий, а не от взлома.</p>
+    </section>
+    <section style="margin-top:20px">
+      <h2>История</h2>
+      <div class="log" id="log-parent"></div>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const lari = n => `${n} лари`;
+
+  let db = null;
+  let mode = 'kid';             // 'kid' | 'pin' | 'parent'
+  let settings = { name: 'Ваня', goalTitle: '', goalSum: 0, pin: '1234' };
+  let chores = [], tasks = [], ledger = [];
+  let loaded = { chores: false, tasks: false, ledger: false };
+  let lastBalance = null;
+  let pinTyped = '';
+  let armedDelete = null;
+
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._h);
+    t._h = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  async function safe(p, okMsg) {
+    try { await p; if (okMsg) toast(okMsg); }
+    catch (e) { toast(e && e.code === 'quota_exceeded' ? 'Хранилище заполнено' : 'Не получилось сохранить. Проверьте интернет.'); }
+  }
+
+  const balance = () => ledger.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+  const fmtDate = iso => { try { return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }); } catch { return ''; } };
+
+  function choreCard(c, acts, extra = '', cls = '') {
+    return `<div class="chore ${cls}">
+      <div class="pic" aria-hidden="true">${esc(c.emoji || '⭐')}</div>
+      <div class="what"><div class="name">${esc(c.title)}</div>
+        <div class="price">${lari(c.price)}</div>${extra}</div>
+      <div class="acts">${acts}</div></div>`;
+  }
+
+  function logHtml(limit) {
+    if (!ledger.length) return '<div class="empty" style="border:0">Пока пусто. Сделай первое задание!</div>';
+    return ledger.slice(0, limit).map(x => `<div class="row">
+      <div><div>${esc(x.text)}</div><div class="when">${fmtDate(x.at)}</div></div>
+      <div class="${x.amount >= 0 ? 'plus' : 'minus'}">${x.amount >= 0 ? '+' : '−'}${Math.abs(x.amount)}</div></div>`).join('');
+  }
+
+  function render() {
+    const bal = balance();
+    $('hi').textContent = `Копилка ${settings.name ? settings.name === 'Ваня' ? 'Вани' : settings.name : ''}`.trim();
+    $('sum').innerHTML = `${bal} <small>лари</small>`;
+    if (lastBalance !== null && bal > lastBalance) {
+      const j = $('jar'); j.classList.remove('pop'); void j.offsetWidth; j.classList.add('pop');
+    }
+    lastBalance = bal;
+
+    const g = $('goal');
+    if (settings.goalTitle && settings.goalSum > 0) {
+      const pct = Math.max(0, Math.min(100, Math.round(bal / settings.goalSum * 100)));
+      const left = Math.max(0, settings.goalSum - bal);
+      g.innerHTML = `<div>Копим на: ${esc(settings.goalTitle)} — ${left ? `осталось ${lari(left)}` : 'хватает! 🎉'}</div>
+        <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><div style="width:${pct}%"></div></div>`;
+      g.hidden = false;
+    } else g.hidden = true;
+
+    $('as-kid').setAttribute('aria-pressed', String(mode === 'kid'));
+    $('as-parent').setAttribute('aria-pressed', String(mode !== 'kid'));
+
+    const ready = db && loaded.chores && loaded.tasks && loaded.ledger;
+    $('status').hidden = !!ready;
+    $('kid').hidden = !ready || mode !== 'kid';
+    $('pin').hidden = !ready || mode !== 'pin';
+    $('parent').hidden = !ready || mode !== 'parent';
+    if (!ready) return;
+
+    // Ребёнок
+    $('mine').innerHTML = tasks.length
+      ? tasks.map(t => t.status === 'done'
+          ? choreCard(t, '', '<div class="note">⏳ Ждёт, когда мама или папа проверят</div>', 'waiting')
+          : choreCard(t, `<button class="ok" data-done="${t._id}">Сделал!</button><button data-drop="${t._id}" aria-label="Передумал">✕</button>`)).join('')
+      : '<div class="empty">Выбери работу ниже 👇</div>';
+    $('offer').innerHTML = chores.length
+      ? chores.map(c => choreCard(c, `<button class="take" data-take="${c._id}">Беру!</button>`)).join('')
+      : '<div class="empty">Мама или папа ещё не добавили задания</div>';
+    $('log-kid').innerHTML = logHtml(15);
+
+    // Родитель
+    const waiting = tasks.filter(t => t.status === 'done');
+    $('check').innerHTML = waiting.length
+      ? waiting.map(t => choreCard(t, `<button class="ok" data-approve="${t._id}">Принять</button><button data-redo="${t._id}">Переделать</button>`)).join('')
+      : '<div class="empty">Нечего проверять</div>';
+    $('catalog').innerHTML = chores.length
+      ? chores.map(c => choreCard(c, `<button class="del ${armedDelete === c._id ? 'sure' : ''}" data-del="${c._id}">${armedDelete === c._id ? 'Точно удалить?' : 'Удалить'}</button>`)).join('')
+      : '<div class="empty">Заданий пока нет. Добавьте первое ниже.</div>';
+    $('log-parent').innerHTML = logHtml(50);
+  }
+
+  function renderPin() {
+    $('dots').innerHTML = Array.from({ length: Math.max(4, settings.pin.length) }, (_, i) => `<span class="${i < pinTyped.length ? 'on' : ''}"></span>`).join('');
+  }
+  $('keys').innerHTML = ['1','2','3','4','5','6','7','8','9','✕','0','⌫'].map(k => `<button data-key="${k}" aria-label="${k === '⌫' ? 'Стереть' : k === '✕' ? 'Отмена' : k}">${k}</button>`).join('');
+
+  $('as-kid').onclick = () => { mode = 'kid'; render(); };
+  $('as-parent').onclick = () => {
+    if (mode !== 'kid') return;
+    mode = 'pin'; pinTyped = ''; $('pin-err').textContent = ''; renderPin(); render();
+  };
+
+  document.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || !db) return;
+    const d = b.dataset;
+    if (!d.del && armedDelete) { armedDelete = null; render(); }
+
+    if (d.key) {
+      if (d.key === '✕') { mode = 'kid'; render(); return; }
+      if (d.key === '⌫') pinTyped = pinTyped.slice(0, -1);
+      else if (pinTyped.length < 6) pinTyped += d.key;
+      $('pin-err').textContent = '';
+      if (pinTyped.length >= settings.pin.length) {
+        if (pinTyped === settings.pin) { mode = 'parent'; render(); return; }
+        $('pin-err').textContent = 'Неверный код'; pinTyped = '';
+      }
+      renderPin();
+    } else if (d.take) {
+      const c = chores.find(x => x._id === d.take);
+      if (!c) return;
+      safe(db.collection('tasks').add({ emoji: c.emoji, title: c.title, price: c.price, status: 'taken', at: new Date().toISOString() }),
+        `Ты взял: ${c.title}`);
+    } else if (d.done) {
+      safe(db.doc('tasks/' + d.done).update({ status: 'done' }), 'Молодец! Попроси маму или папу проверить');
+    } else if (d.drop) {
+      safe(db.doc('tasks/' + d.drop).delete());
+    } else if (d.approve) {
+      const t = tasks.find(x => x._id === d.approve);
+      if (!t) return;
+      b.disabled = true;
+      // Запись в истории с тем же id, что у задания: повторное нажатие не начислит дважды.
+      safe((async () => {
+        await db.doc('ledger/' + t._id).set({ text: t.title, amount: t.price, at: new Date().toISOString() });
+        await db.doc('tasks/' + t._id).delete();
+      })(), `+${lari(t.price)} в копилку`);
+    } else if (d.redo) {
+      safe(db.doc('tasks/' + d.redo).update({ status: 'taken' }), 'Вернули Ване');
+    } else if (d.del) {
+      if (armedDelete !== d.del) { armedDelete = d.del; render(); return; }
+      armedDelete = null;
+      safe(db.doc('chores/' + d.del).delete(), 'Задание удалено');
+    }
+  });
+
+  $('pay').onsubmit = e => {
+    e.preventDefault();
+    const n = parseInt($('pay-sum').value, 10);
+    if (!(n > 0)) return;
+    if (n > balance()) { toast(`В копилке только ${lari(balance())}`); return; }
+    safe(db.collection('ledger').add({ text: 'Выдано на руки', amount: -n, at: new Date().toISOString() }), `Выдано ${lari(n)}`);
+    e.target.reset();
+  };
+
+  $('add').onsubmit = e => {
+    e.preventDefault();
+    const price = parseInt($('add-price').value, 10);
+    const title = $('add-name').value.trim();
+    if (!(price > 0) || !title) return;
+    const order = chores.reduce((m, c) => Math.max(m, Number(c.order) || 0), 0) + 1;
+    safe(db.collection('chores').add({ emoji: $('add-pic').value.trim() || '⭐', title, price, order }), 'Задание добавлено');
+    e.target.reset();
+  };
+
+  $('settings').onsubmit = e => {
+    e.preventDefault();
+    const next = {
+      ...settings,
+      goalTitle: $('set-goal').value.trim(),
+      goalSum: parseInt($('set-goal-sum').value, 10) || 0,
+    };
+    const pin = $('set-pin').value.trim();
+    if (pin) {
+      if (!/^\d{4,6}$/.test(pin)) { toast('Код: от 4 до 6 цифр'); return; }
+      next.pin = pin;
+    }
+    $('set-pin').value = '';
+    safe(db.doc('app/settings').set(next), 'Сохранено');
+  };
+
+  const withIds = snap => snap.docs.map(d => ({ ...d.data(), _id: d.id }));
+
+  render();
+  (async () => {
+    db = window.claude ? await window.claude.use('db') : null;
+    if (!db) {
+      $('status').textContent = 'Чтобы копилка работала, откройте эту ссылку, войдя в свой аккаунт claude.ai.';
+      return;
+    }
+    const fail = () => { $('status').hidden = false; $('status').textContent = 'Нет связи с копилкой. Обновите страницу.'; };
+    db.doc('app/settings').onSnapshot(s => {
+      if (s.exists) settings = { ...settings, ...s.data() };
+      if (mode === 'parent') {
+        $('set-goal').value = settings.goalTitle || '';
+        $('set-goal-sum').value = settings.goalSum || '';
+      }
+      render();
+    }, fail);
+    db.collection('chores').orderBy('order').onSnapshot(s => { chores = withIds(s); loaded.chores = true; render(); }, fail);
+    db.collection('tasks').orderBy('at').onSnapshot(s => { tasks = withIds(s); loaded.tasks = true; render(); }, fail);
+    db.collection('ledger').orderBy('at', 'desc').limit(1000).onSnapshot(s => { ledger = withIds(s); loaded.ledger = true; render(); }, fail);
+  })();
+  $('as-parent').addEventListener('click', () => {
+    $('set-goal').value = settings.goalTitle || '';
+    $('set-goal-sum').value = settings.goalSum || '';
+  });
+})();
+</script>
