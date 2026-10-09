@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Учёт школьных сборов</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --panel: #ffffff;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --border: #e3e5e9;
+    --accent: #2f6fed;
+    --accent-dark: #2457c2;
+    --ok: #1a9c5b;
+    --ok-bg: #e5f7ee;
+    --bad: #d9432b;
+    --bad-bg: #fdecea;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .app {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+  header h1 {
+    font-size: 22px;
+    margin: 4px 0 16px;
+  }
+  nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    border: none;
+    background: none;
+    padding: 10px 14px;
+    font-size: 15px;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+  }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+  .tab { display: none; }
+  .tab.active { display: block; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .panel h2 {
+    margin-top: 0;
+    font-size: 17px;
+  }
+  form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  input[type="text"], input[type="number"], input[type="date"] {
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    flex: 1;
+    min-width: 140px;
+  }
+  button {
+    padding: 9px 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button:hover { background: var(--accent-dark); }
+  button.secondary {
+    background: none;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  button.secondary:hover { background: #eef3fe; }
+  button.danger {
+    background: none;
+    color: var(--bad);
+    border: 1px solid var(--bad);
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  button.danger:hover { background: var(--bad-bg); }
+  ul { list-style: none; padding: 0; margin: 0; }
+  #students-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  #students-list li:last-child { border-bottom: none; }
+  .empty {
+    color: var(--muted);
+    font-size: 14px;
+    padding: 10px 2px;
+  }
+  #collections-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  #collections-list li:hover { border-color: var(--accent); }
+  .collection-row-title { font-weight: 600; }
+  .collection-row-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .progress-pill {
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--ok-bg);
+    color: var(--ok);
+    white-space: nowrap;
+  }
+  #collection-detail[hidden] { display: none; }
+  .stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 12px 0 18px;
+  }
+  .stat-card {
+    flex: 1;
+    min-width: 120px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .stat-card .val { font-size: 20px; font-weight: 700; }
+  .stat-card .lbl { font-size: 12px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; }
+  .status-btn {
+    font-size: 13px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bad-bg);
+    color: var(--bad);
+  }
+  .status-btn.paid {
+    background: var(--ok-bg);
+    color: var(--ok);
+    border-color: var(--ok);
+  }
+  td input[type="number"] {
+    width: 90px;
+    padding: 5px 6px;
+  }
+  dialog {
+    border: none;
+    border-radius: var(--radius);
+    padding: 20px;
+    width: min(360px, 90vw);
+  }
+  dialog::backdrop { background: rgba(0,0,0,0.35); }
+  dialog label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  dialog label input { width: 100%; margin-top: 4px; }
+  .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+  .back-link {
+    background: none;
+    color: var(--accent);
+    padding: 0;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15171c;
+      --panel: #1d2026;
+      --text: #e7e9ee;
+      --muted: #9aa0ac;
+      --border: #2b2f38;
+      --accent: #5b8bf5;
+      --accent-dark: #7aa0f7;
+      --ok: #3fcf8e;
+      --ok-bg: #16302a;
+      --bad: #ef6a57;
+      --bad-bg: #352120;
+    }
+    button.secondary:hover { background: #22283a; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Учёт школьных сборов</h1>
+    <nav>
+      <button class="tab-btn active" data-tab="students">Ученики</button>
+      <button class="tab-btn" data-tab="collections">Сборы</button>
+    </nav>
+  </header>
+
+  <section id="tab-students" class="tab active">
+    <div class="panel">
+      <h2>Список учеников</h2>
+      <form id="add-student-form">
+        <input type="text" id="student-name-input" placeholder="Имя ученика" required>
+        <button type="submit">Добавить</button>
+      </form>
+      <ul id="students-list"></ul>
+    </div>
+  </section>
+
+  <section id="tab-collections" class="tab">
+    <div class="panel" id="collections-panel">
+      <h2>Сборы</h2>
+      <button id="new-collection-btn">+ Новый сбор</button>
+      <ul id="collections-list" style="margin-top:14px;"></ul>
+    </div>
+
+    <div class="panel" id="collection-detail" hidden>
+      <button class="back-link" id="back-to-collections">← Назад к сборам</button>
+      <h2 id="collection-title"></h2>
+      <div class="stats" id="collection-stats"></div>
+      <table>
+        <thead>
+          <tr><th>Ученик</th><th>Статус</th><th>Сумма</th></tr>
+        </thead>
+        <tbody id="payments-tbody"></tbody>
+      </table>
+      <button class="danger" id="delete-collection-btn" style="margin-top:16px;">Удалить сбор</button>
+    </div>
+  </section>
+
+  <dialog id="new-collection-dialog">
+    <form id="new-collection-form" method="dialog">
+      <h3 style="margin-top:0;">Новый сбор</h3>
+      <label>Название
+        <input type="text" id="collection-name-input" required placeholder="Например: Экскурсия">
+      </label>
+      <label>Сумма с одного ученика
+        <input type="number" id="collection-amount-input" min="0" step="0.01" required>
+      </label>
+      <label>Срок сдачи (необязательно)
+        <input type="date" id="collection-date-input">
+      </label>
+      <div class="dialog-actions">
+        <button type="button" class="secondary" id="cancel-new-collection">Отмена</button>
+        <button type="submit">Создать</button>
+      </div>
+    </form>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'schoolFeeTracker_v1';
+
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.students) && Array.isArray(parsed.collections)) {
+          return parsed;
+        }
+      }
+    } catch (e) {}
+    return { students: [], collections: [] };
+  }
+
+  let data = loadData();
+  let activeCollectionId = null;
+
+  function saveData() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+  }
+
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  function formatMoney(n) {
+    return (Math.round(n * 100) / 100).toLocaleString('ru-RU');
+  }
+
+  // ---------- Students ----------
+
+  function renderStudents() {
+    const list = document.getElementById('students-list');
+    list.innerHTML = '';
+    if (data.students.length === 0) {
+      list.innerHTML = '<li class="empty">Пока нет ни одного ученика. Добавьте первого выше.</li>';
+      return;
+    }
+    data.students.forEach(function (student) {
+      const li = document.createElement('li');
+      const name = document.createElement('span');
+      name.textContent = student.name;
+      const del = document.createElement('button');
+      del.className = 'danger';
+      del.textContent = 'Удалить';
+      del.addEventListener('click', function () {
+        if (!confirm('Удалить ученика "' + student.name + '"? Его записи об оплатах тоже будут удалены.')) return;
+        data.students = data.students.filter(function (s) { return s.id !== student.id; });
+        data.collections.forEach(function (c) { delete c.payments[student.id]; });
+        saveData();
+        renderStudents();
+        renderCollectionsList();
+        if (activeCollectionId) renderCollectionDetail(activeCollectionId);
+      });
+      li.appendChild(name);
+      li.appendChild(del);
+      list.appendChild(li);
+    });
+  }
+
+  document.getElementById('add-student-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const input = document.getElementById('student-name-input');
+    const name = input.value.trim();
+    if (!name) return;
+    data.students.push({ id: uid(), name: name });
+    input.value = '';
+    saveData();
+    renderStudents();
+    renderCollectionsList();
+  });
+
+  // ---------- Collections ----------
+
+  function collectionStats(collection) {
+    const total = data.students.length;
+    let paidCount = 0;
+    let collected = 0;
+    const expected = total * collection.amount;
+    data.students.forEach(function (s) {
+      const p = collection.payments[s.id];
+      if (p && p.paid) {
+        paidCount++;
+        collected += (typeof p.amount === 'number' ? p.amount : collection.amount);
+      }
+    });
+    return { total: total, paidCount: paidCount, collected: collected, expected: expected };
+  }
+
+  function renderCollectionsList() {
+    const list = document.getElementById('collections-list');
+    list.innerHTML = '';
+    if (data.collections.length === 0) {
+      list.innerHTML = '<li class="empty">Сборов ещё нет. Нажмите «+ Новый сбор», чтобы создать первый.</li>';
+      return;
+    }
+    const sorted = data.collections.slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
+    sorted.forEach(function (collection) {
+      const stats = collectionStats(collection);
+      const li = document.createElement('li');
+      const left = document.createElement('div');
+      const title = document.createElement('div');
+      title.className = 'collection-row-title';
+      title.textContent = collection.title;
+      const sub = document.createElement('div');
+      sub.className = 'collection-row-sub';
+      let subText = formatMoney(collection.amount) + ' с ученика';
+      if (collection.dueDate) subText += ' · срок до ' + collection.dueDate;
+      sub.textContent = subText;
+      left.appendChild(title);
+      left.appendChild(sub);
+
+      const pill = document.createElement('span');
+      pill.className = 'progress-pill';
+      pill.textContent = stats.paidCount + ' из ' + stats.total + ' сдали';
+
+      li.appendChild(left);
+      li.appendChild(pill);
+      li.addEventListener('click', function () { openCollectionDetail(collection.id); });
+      list.appendChild(li);
+    });
+  }
+
+  function openCollectionDetail(id) {
+    activeCollectionId = id;
+    document.getElementById('collections-panel').hidden = true;
+    document.getElementById('collection-detail').hidden = false;
+    renderCollectionDetail(id);
+  }
+
+  function closeCollectionDetail() {
+    activeCollectionId = null;
+    document.getElementById('collections-panel').hidden = false;
+    document.getElementById('collection-detail').hidden = true;
+  }
+
+  function renderCollectionDetail(id) {
+    const collection = data.collections.find(function (c) { return c.id === id; });
+    if (!collection) { closeCollectionDetail(); return; }
+
+    document.getElementById('collection-title').textContent = collection.title;
+
+    const stats = collectionStats(collection);
+    const statsEl = document.getElementById('collection-stats');
+    statsEl.innerHTML = '';
+    const cards = [
+      { lbl: 'Собрано', val: formatMoney(stats.collected) + ' из ' + formatMoney(stats.expected) },
+      { lbl: 'Сдали', val: stats.paidCount + ' из ' + stats.total },
+      { lbl: 'Не сдали', val: String(stats.total - stats.paidCount) }
+    ];
+    cards.forEach(function (c) {
+      const card = document.createElement('div');
+      card.className = 'stat-card';
+      card.innerHTML = '<div class="val">' + c.val + '</div><div class="lbl">' + c.lbl + '</div>';
+      statsEl.appendChild(card);
+    });
+
+    const tbody = document.getElementById('payments-tbody');
+    tbody.innerHTML = '';
+    if (data.students.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="empty">Сначала добавьте учеников на вкладке «Ученики».</td></tr>';
+      return;
+    }
+    data.students.forEach(function (student) {
+      const payment = collection.payments[student.id] || { paid: false, amount: collection.amount };
+      const tr = document.createElement('tr');
+
+      const nameTd = document.createElement('td');
+      nameTd.textContent = student.name;
+
+      const statusTd = document.createElement('td');
+      const statusBtn = document.createElement('button');
+      statusBtn.className = 'status-btn' + (payment.paid ? ' paid' : '');
+      statusBtn.textContent = payment.paid ? 'Сдал' : 'Не сдал';
+      statusBtn.addEventListener('click', function () {
+        const current = collection.payments[student.id] || { paid: false, amount: collection.amount };
+        current.paid = !current.paid;
+        if (current.paid && !current.amount) current.amount = collection.amount;
+        collection.payments[student.id] = current;
+        saveData();
+        renderCollectionDetail(collection.id);
+        renderCollectionsList();
+      });
+      statusTd.appendChild(statusBtn);
+
+      const amountTd = document.createElement('td');
+      const amountInput = document.createElement('input');
+      amountInput.type = 'number';
+      amountInput.min = '0';
+      amountInput.step = '0.01';
+      amountInput.value = typeof payment.amount === 'number' ? payment.amount : collection.amount;
+      amountInput.addEventListener('change', function () {
+        const current = collection.payments[student.id] || { paid: payment.paid, amount: collection.amount };
+        current.amount = parseFloat(amountInput.value) || 0;
+        collection.payments[student.id] = current;
+        saveData();
+        renderCollectionDetail(collection.id);
+        renderCollectionsList();
+      });
+      amountTd.appendChild(amountInput);
+
+      tr.appendChild(nameTd);
+      tr.appendChild(statusTd);
+      tr.appendChild(amountTd);
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('back-to-collections').addEventListener('click', closeCollectionDetail);
+
+  document.getElementById('delete-collection-btn').addEventListener('click', function () {
+    const collection = data.collections.find(function (c) { return c.id === activeCollectionId; });
+    if (!collection) return;
+    if (!confirm('Удалить сбор "' + collection.title + '"? Это действие нельзя отменить.')) return;
+    data.collections = data.collections.filter(function (c) { return c.id !== activeCollectionId; });
+    saveData();
+    closeCollectionDetail();
+    renderCollectionsList();
+  });
+
+  // ---------- New collection dialog ----------
+
+  const dialog = document.getElementById('new-collection-dialog');
+  document.getElementById('new-collection-btn').addEventListener('click', function () {
+    document.getElementById('collection-name-input').value = '';
+    document.getElementById('collection-amount-input').value = '';
+    document.getElementById('collection-date-input').value = '';
+    dialog.showModal();
+  });
+  document.getElementById('cancel-new-collection').addEventListener('click', function () {
+    dialog.close();
+  });
+  document.getElementById('new-collection-form').addEventListener('submit', function (e) {
+    const title = document.getElementById('collection-name-input').value.trim();
+    const amount = parseFloat(document.getElementById('collection-amount-input').value) || 0;
+    const dueDate = document.getElementById('collection-date-input').value;
+    if (!title) { e.preventDefault(); return; }
+    data.collections.push({
+      id: uid(),
+      title: title,
+      amount: amount,
+      dueDate: dueDate || null,
+      createdAt: Date.now(),
+      payments: {}
+    });
+    saveData();
+    renderCollectionsList();
+  });
+
+  // ---------- Tabs ----------
+
+  document.querySelectorAll('.tab-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Init ----------
+
+  renderStudents();
+  renderCollectionsList();
+})();
+</script>
+</body>
+</html>
