@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useApp } from '../AppContext.jsx';
 import { PROJECT_COLORS } from '../constants.js';
+import { SOURCE_WORKSPACES, splitMergedId } from '../workspace.js';
 
 export default function ProjectManagerModal() {
-  const { projects, projectManagerOpen, setProjectManagerOpen, addProject, updateProject, clearDemoData, posts } = useApp();
+  const { projects, projectManagerOpen, setProjectManagerOpen, addProject, updateProject, clearDemoData, posts, isCombined } = useApp();
   const [newName, setNewName] = useState('');
 
   if (!projectManagerOpen) return null;
@@ -27,42 +28,58 @@ export default function ProjectManagerModal() {
           <button type="button" className="modal__close" onClick={() => setProjectManagerOpen(false)} aria-label="Закрыть">×</button>
         </div>
         <div className="modal__body">
+          {isCombined && (
+            <p className="data-panel__notice" style={{ marginBottom: 14 }}>
+              Это общий список по всем клиентам. Цвет закреплён за источником и здесь не меняется;
+              новые проекты создаются на страничке нужного клиента.
+            </p>
+          )}
           <ul className="project-list">
-            {projects.map((project) => (
-              <li key={project.id} className="project-list__item">
-                <span className="project-list__color-dot" style={{ background: project.color }} />
-                <input
-                  type="text"
-                  className="project-list__name-input"
-                  value={project.name}
-                  onChange={(e) => updateProject(project.id, { name: e.target.value })}
-                />
-                {project.isDemo && <span className="project-list__demo-badge">пример</span>}
-                <div className="project-list__colors">
-                  {PROJECT_COLORS.map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      className={`color-swatch ${project.color === color ? 'color-swatch--active' : ''}`}
-                      style={{ background: color }}
-                      aria-label={`Цвет проекта ${color}`}
-                      onClick={() => updateProject(project.id, { color })}
-                    />
-                  ))}
-                </div>
-              </li>
-            ))}
+            {projects.map((project) => {
+              const sourceLabel = isCombined
+                ? SOURCE_WORKSPACES.find((w) => w.id === splitMergedId(project.id).workspaceId)?.label
+                : null;
+              return (
+                <li key={project.id} className="project-list__item">
+                  <span className="project-list__color-dot" style={{ background: project.color }} />
+                  <input
+                    type="text"
+                    className="project-list__name-input"
+                    value={project.name}
+                    onChange={(e) => updateProject(project.id, { name: e.target.value })}
+                  />
+                  {sourceLabel && <span className="project-list__demo-badge">{sourceLabel}</span>}
+                  {project.isDemo && <span className="project-list__demo-badge">пример</span>}
+                  {!isCombined && (
+                    <div className="project-list__colors">
+                      {PROJECT_COLORS.map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          className={`color-swatch ${project.color === color ? 'color-swatch--active' : ''}`}
+                          style={{ background: color }}
+                          aria-label={`Цвет проекта ${color}`}
+                          onClick={() => updateProject(project.id, { color })}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
-          <div className="project-list__add">
-            <input
-              type="text"
-              placeholder="Название нового проекта"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); }}
-            />
-            <button type="button" onClick={handleCreate}>Добавить проект</button>
-          </div>
+          {!isCombined && (
+            <div className="project-list__add">
+              <input
+                type="text"
+                placeholder="Название нового проекта"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); }}
+              />
+              <button type="button" onClick={handleCreate}>Добавить проект</button>
+            </div>
+          )}
           {hasDemo && (
             <div className="project-list__demo-cleanup">
               <p>В плане есть демонстрационный проект «Room Bloom» с примерами публикаций.</p>

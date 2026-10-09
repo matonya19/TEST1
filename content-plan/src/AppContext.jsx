@@ -3,6 +3,7 @@ import { loadState, saveState, SCHEMA_VERSION, validateImportedData } from './st
 import { buildDemoData, DEMO_PROJECT_ID } from './demoData.js';
 import { todayISO } from './utils/date.js';
 import { createFirestoreDb } from './firestoreAdapter.js';
+import { isCombinedWorkspace as checkIsCombinedWorkspace, splitMergedId, makeMergedId } from './workspace.js';
 
 const AppCtx = createContext(null);
 
@@ -11,10 +12,24 @@ function makeId(prefix) {
   return prefix ? `${prefix}-${rnd}` : rnd;
 }
 
+// В сводном режиме (combined) id документа должен сразу содержать префикс
+// рабочего пространства — тот же, что вернёт следующий снапшот после записи,
+// иначе локальное состояние (editorTarget.id и т.п.) перестанет совпадать
+// с данными. Пространство берём из projectId — он уже merged-id, потому что
+// выбирается из объединённого списка проектов.
+function newPostId(projectId) {
+  const plain = makeId('post');
+  if (checkIsCombinedWorkspace() && projectId) {
+    const { workspaceId } = splitMergedId(projectId);
+    if (workspaceId) return makeMergedId(workspaceId, plain);
+  }
+  return plain;
+}
+
 function emptyPost(overrides = {}) {
   const now = Date.now();
   return {
-    id: makeId('post'),
+    id: newPostId(overrides.projectId),
     projectId: null,
     topic: '',
     date: null,
@@ -275,7 +290,7 @@ export function AppProvider({ children }) {
     const src = posts.find((p) => p.id === id);
     if (!src) return;
     const now = Date.now();
-    const clone = { ...src, id: makeId('post'), topic: `${src.topic} (копия)`, isDemo: false, createdAt: now, updatedAt: now };
+    const clone = { ...src, id: newPostId(src.projectId), topic: `${src.topic} (копия)`, isDemo: false, createdAt: now, updatedAt: now };
     writeNewPost(clone);
   }, [posts, writeNewPost]);
 
@@ -341,10 +356,14 @@ export function AppProvider({ children }) {
   }, [posts, writePostPatch, writeNewPost]);
 
   const addProject = useCallback((name, color) => {
+    if (checkIsCombinedWorkspace()) {
+      pushToast({ text: 'Новые проекты создаются на страничке нужного клиента, не здесь.' });
+      return null;
+    }
     const project = { id: makeId('project'), name, color, isDemo: false };
     writeNewProject(project);
     return project;
-  }, [writeNewProject]);
+  }, [writeNewProject, pushToast]);
 
   const updateProject = useCallback((id, patch) => {
     writeProjectPatch(id, patch);
@@ -392,6 +411,7 @@ export function AppProvider({ children }) {
     mode,
     dataSource: shared.source,
     dataReady: shared.ready,
+    isCombined: checkIsCombinedWorkspace(),
     addPost,
     updatePost,
     duplicatePost,

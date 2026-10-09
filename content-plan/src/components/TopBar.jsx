@@ -11,10 +11,13 @@ export default function TopBar() {
     projects, activeProjectId, setActiveProjectId,
     view, setView, search, setSearch, section,
     setEditorTarget, setProjectManagerOpen, addPost,
-    mobileNavOpen, setMobileNavOpen,
+    mobileNavOpen, setMobileNavOpen, isCombined,
   } = useApp();
 
+  const needsProjectFirst = isCombined && activeProjectId === 'all';
+
   function handleAddPost() {
+    if (needsProjectFirst) return;
     const created = addPost({ projectId: activeProjectId !== 'all' ? activeProjectId : null });
     setEditorTarget({ mode: 'edit', id: created.id, isNew: true });
   }
@@ -77,6 +80,8 @@ export default function TopBar() {
           type="button"
           className="topbar__add-btn"
           onClick={handleAddPost}
+          disabled={needsProjectFirst}
+          title={needsProjectFirst ? 'Выберите конкретный проект сверху — так понятно, куда сохранить публикацию' : undefined}
         >
           + Добавить публикацию
         </button>

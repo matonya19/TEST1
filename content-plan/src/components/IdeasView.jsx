@@ -4,7 +4,8 @@ import { matchesFilters } from '../utils/filters.js';
 import QuickAddInput from './QuickAddInput.jsx';
 
 export default function IdeasView({ posts, projectsById }) {
-  const { activeProjectId, search, filters, addPost, updatePost, requestDeletePost, setEditorTarget, pendingDeleteIds } = useApp();
+  const { activeProjectId, search, filters, addPost, updatePost, requestDeletePost, setEditorTarget, pendingDeleteIds, isCombined } = useApp();
+  const needsProjectFirst = isCombined && activeProjectId === 'all';
 
   const ideas = useMemo(() => {
     return posts
@@ -23,6 +24,8 @@ export default function IdeasView({ posts, projectsById }) {
         alwaysOpen
         placeholder="Новая идея одной строкой…"
         buttonLabel="+ Добавить идею"
+        disabled={needsProjectFirst}
+        disabledTitle="Выберите конкретный проект сверху — так понятно, куда сохранить идею"
         onSubmit={(topic) => addPost({ topic, isIdea: true, projectId: activeProjectId !== 'all' ? activeProjectId : null })}
       />
       <ul className="ideas-list">

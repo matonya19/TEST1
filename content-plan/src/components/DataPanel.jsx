@@ -3,7 +3,7 @@ import { useApp } from '../AppContext.jsx';
 import { SCHEMA_VERSION } from '../storage.js';
 
 export default function DataPanel() {
-  const { dataPanelOpen, setDataPanelOpen, projects, posts, importData, setConfirmDialog, pushToast, mode, dataSource } = useApp();
+  const { dataPanelOpen, setDataPanelOpen, projects, posts, importData, setConfirmDialog, pushToast, mode, dataSource, isCombined } = useApp();
   const fileInputRef = useRef(null);
 
   if (!dataPanelOpen) return null;
@@ -81,7 +81,13 @@ export default function DataPanel() {
         </div>
         <div className="modal__body">
           <p className="data-panel__notice">
-            {dataSource === 'firebase' ? (
+            {isCombined ? (
+              <>
+                Это сводная страница: публикации подтягиваются напрямую с Room Bloom, Школы и Ульяны и
+                редактируются здесь по-настоящему (правки уходят на исходную страничку). Импорт здесь отключён,
+                чтобы случайно не перемешать данные клиентов, — делайте его на страничке конкретного клиента.
+              </>
+            ) : dataSource === 'firebase' ? (
               <>
                 Эта страница хранит данные централизованно (через Firebase): они одинаковы на всех устройствах
                 и видны всем, у кого есть эта ссылка — без входа куда-либо. Всё равно делайте резервную копию
@@ -104,14 +110,18 @@ export default function DataPanel() {
           </p>
           <div className="data-panel__actions">
             <button type="button" className="btn-primary" onClick={handleExport}>Экспортировать данные (JSON)</button>
-            <button type="button" className="btn-muted" onClick={() => fileInputRef.current?.click()}>Импортировать данные из JSON…</button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="application/json,.json"
-              style={{ display: 'none' }}
-              onChange={handleFileChosen}
-            />
+            {!isCombined && (
+              <>
+                <button type="button" className="btn-muted" onClick={() => fileInputRef.current?.click()}>Импортировать данные из JSON…</button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="application/json,.json"
+                  style={{ display: 'none' }}
+                  onChange={handleFileChosen}
+                />
+              </>
+            )}
           </div>
         </div>
       </div>

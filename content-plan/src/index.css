@@ -266,6 +266,7 @@ a { color: var(--accent-dark); }
 }
 
 .topbar__add-btn:hover { background: var(--accent-dark); }
+.topbar__add-btn:disabled { background: var(--border); color: var(--text-faint); cursor: not-allowed; }
 
 /* ---------- Filters bar ---------- */
 
@@ -627,6 +628,8 @@ a { color: var(--accent-dark); }
   font-size: 15px;
 }
 .quick-add__trigger:hover { border-color: var(--accent); color: var(--accent-dark); }
+.quick-add__trigger:disabled { cursor: not-allowed; opacity: 0.5; }
+.quick-add__trigger:disabled:hover { border-color: var(--border); color: var(--text-faint); }
 
 .quick-add { display: flex; gap: 6px; }
 .quick-add__input { flex: 1; }

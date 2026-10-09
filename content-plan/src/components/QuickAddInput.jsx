@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-export default function QuickAddInput({ placeholder = 'Тема публикации…', alwaysOpen = false, onSubmit, buttonLabel = '+', buttonTitle = 'Добавить' }) {
+export default function QuickAddInput({ placeholder = 'Тема публикации…', alwaysOpen = false, onSubmit, buttonLabel = '+', buttonTitle = 'Добавить', disabled = false, disabledTitle }) {
   const [open, setOpen] = useState(alwaysOpen);
   const [value, setValue] = useState('');
   const inputRef = useRef(null);
@@ -18,6 +18,22 @@ export default function QuickAddInput({ placeholder = 'Тема публикац
     } else {
       inputRef.current?.focus();
     }
+  }
+
+  if (disabled) {
+    if (alwaysOpen) {
+      return (
+        <div className="quick-add" title={disabledTitle}>
+          <input type="text" className="quick-add__input" placeholder={disabledTitle || placeholder} disabled />
+          <button type="button" className="quick-add__submit" disabled>Добавить</button>
+        </div>
+      );
+    }
+    return (
+      <button type="button" className="quick-add__trigger" disabled title={disabledTitle || buttonTitle}>
+        {buttonLabel}
+      </button>
+    );
   }
 
   if (!open) {

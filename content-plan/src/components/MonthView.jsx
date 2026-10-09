@@ -7,7 +7,8 @@ import QuickAddInput from './QuickAddInput.jsx';
 import { hexToRgba } from '../utils/color.js';
 
 export default function MonthView({ posts, projectsById }) {
-  const { monthAnchor, setMonthAnchor, activeProjectId, search, filters, addPost, setEditorTarget, pendingDeleteIds, updatePost } = useApp();
+  const { monthAnchor, setMonthAnchor, activeProjectId, search, filters, addPost, setEditorTarget, pendingDeleteIds, updatePost, isCombined } = useApp();
+  const needsProjectFirst = isCombined && activeProjectId === 'all';
   const [dragOverDay, setDragOverDay] = useState(null);
   const weeks = useMemo(() => getMonthGrid(monthAnchor), [monthAnchor]);
 
@@ -91,6 +92,8 @@ export default function MonthView({ posts, projectsById }) {
               </div>
               <QuickAddInput
                 buttonTitle="Добавить публикацию"
+                disabled={needsProjectFirst}
+                disabledTitle="Выберите конкретный проект сверху — так понятно, куда сохранить публикацию"
                 onSubmit={(topic) => {
                   const created = addPost({ topic, date: dateStr, projectId: activeProjectId !== 'all' ? activeProjectId : null });
                   setEditorTarget({ mode: 'edit', id: created.id });

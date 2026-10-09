@@ -6,7 +6,8 @@ import QuickAddInput from './QuickAddInput.jsx';
 import { matchesFilters } from '../utils/filters.js';
 
 export default function WeekView({ posts, projectsById }) {
-  const { weekAnchor, setWeekAnchor, activeProjectId, search, filters, addPost, setEditorTarget, pendingDeleteIds, updatePost } = useApp();
+  const { weekAnchor, setWeekAnchor, activeProjectId, search, filters, addPost, setEditorTarget, pendingDeleteIds, updatePost, isCombined } = useApp();
+  const needsProjectFirst = isCombined && activeProjectId === 'all';
   const [dragOverDay, setDragOverDay] = useState(null);
   const weekStart = startOfWeek(weekAnchor);
   const days = useMemo(() => getWeekDays(weekStart), [weekStart]);
@@ -72,6 +73,8 @@ export default function WeekView({ posts, projectsById }) {
               </div>
               <QuickAddInput
                 buttonTitle="Добавить публикацию в этот день"
+                disabled={needsProjectFirst}
+                disabledTitle="Выберите конкретный проект сверху — так понятно, куда сохранить публикацию"
                 onSubmit={(topic) => {
                   const created = addPost({
                     topic,

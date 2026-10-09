@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react';
 import { useApp } from '../AppContext.jsx';
 import { PLATFORMS, FORMATS, STATUSES } from '../constants.js';
 import { makeId } from '../AppContext.jsx';
+import { splitMergedId } from '../workspace.js';
 
 export default function PostEditorDrawer() {
   const {
     posts, projects, editorTarget, setEditorTarget, updatePost, hardDeletePost,
-    duplicatePost, archivePost, unarchivePost, requestDeletePost, createAdaptation, pushToast,
+    duplicatePost, archivePost, unarchivePost, requestDeletePost, createAdaptation, pushToast, isCombined,
   } = useApp();
   const [adaptPlatform, setAdaptPlatform] = useState('');
   const [checklistInput, setChecklistInput] = useState('');
@@ -17,6 +18,12 @@ export default function PostEditorDrawer() {
     if (!post?.linkedGroupId) return [];
     return posts.filter((p) => p.linkedGroupId === post.linkedGroupId && p.id !== post.id);
   }, [posts, post]);
+
+  const projectOptions = useMemo(() => {
+    if (!isCombined || !post) return projects;
+    const ownWorkspace = splitMergedId(post.id).workspaceId;
+    return projects.filter((p) => splitMergedId(p.id).workspaceId === ownWorkspace);
+  }, [projects, isCombined, post]);
 
   if (!editorTarget || !post) return null;
 
@@ -93,7 +100,7 @@ export default function PostEditorDrawer() {
               <span className="field__label">Проект</span>
               <select value={post.projectId || ''} onChange={(e) => set({ projectId: e.target.value || null })}>
                 <option value="">Без проекта</option>
-                {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                {projectOptions.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
             </label>
 
