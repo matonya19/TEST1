@@ -121,15 +121,21 @@ function useSharedDb() {
       dbRef.current = db;
       setSource(sourceName);
       setAvailable(true);
+      // d.id — настоящий ключ документа по мнению адаптера (с префиксом рабочего
+      // пространства в сводном режиме). Он должен побеждать: сам документ, помимо
+      // этого, хранит и собственное поле id (так исторически писались публикации),
+      // и в сводном режиме оно всегда «старое», без префикса — спред должен идти
+      // первым, а id: d.id — после него, иначе объекты рассинхронизируются с
+      // projectsById/editorTarget.
       unsubProjects = db.collection('projects').onSnapshot(
         (snap) => {
-          setProjects(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+          setProjects(snap.docs.map((d) => ({ ...d.data(), id: d.id })));
           setReady(true);
         },
         () => setReady(true),
       );
       unsubPosts = db.collection('posts').onSnapshot(
-        (snap) => setPosts(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+        (snap) => setPosts(snap.docs.map((d) => ({ ...d.data(), id: d.id }))),
         () => {},
       );
     }
@@ -266,6 +272,7 @@ export function AppProvider({ children }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [weekAnchor, setWeekAnchor] = useState(() => new Date());
   const [monthAnchor, setMonthAnchor] = useState(() => new Date());
+  const [dayAnchor, setDayAnchor] = useState(() => new Date());
   const [activeProjectId, setActiveProjectId] = useState('all');
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({ platforms: [], formats: [], statuses: [] });
@@ -431,6 +438,7 @@ export function AppProvider({ children }) {
     mobileNavOpen, setMobileNavOpen,
     weekAnchor, setWeekAnchor,
     monthAnchor, setMonthAnchor,
+    dayAnchor, setDayAnchor,
     activeProjectId, setActiveProjectId,
     search, setSearch,
     filters, setFilters,
@@ -444,7 +452,7 @@ export function AppProvider({ children }) {
   }), [
     projects, posts, mode, shared.source, shared.ready, addPost, updatePost, duplicatePost, requestDeletePost, hardDeletePost,
     pendingDeleteIds, archivePost, unarchivePost, createAdaptation, addProject, updateProject, clearDemoData,
-    importData, view, section, sidebarCollapsed, mobileNavOpen, weekAnchor, monthAnchor, activeProjectId,
+    importData, view, section, sidebarCollapsed, mobileNavOpen, weekAnchor, monthAnchor, dayAnchor, activeProjectId,
     search, filters, resetFilters, editorTarget, toasts, pushToast, dismissToast,
     confirmDialog, projectManagerOpen, dataPanelOpen,
   ]);

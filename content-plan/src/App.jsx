@@ -7,6 +7,7 @@ import NoDateShelf from './components/NoDateShelf.jsx';
 import WeekView from './components/WeekView.jsx';
 import MonthView from './components/MonthView.jsx';
 import StatusBoardView from './components/StatusBoardView.jsx';
+import DailyFeedView from './components/DailyFeedView.jsx';
 import IdeasView from './components/IdeasView.jsx';
 import ArchiveView from './components/ArchiveView.jsx';
 import PostEditorDrawer from './components/PostEditorDrawer.jsx';
@@ -16,7 +17,7 @@ import ConfirmDialog from './components/ConfirmDialog.jsx';
 import Toasts from './components/Toasts.jsx';
 
 function AppShell() {
-  const { projects, posts, section, view, dataReady } = useApp();
+  const { projects, posts, section, view, dataReady, isCombined } = useApp();
   const projectsById = useMemo(() => new Map(projects.map((p) => [p.id, p])), [projects]);
 
   if (!dataReady) {
@@ -24,18 +25,19 @@ function AppShell() {
   }
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${isCombined ? 'app-shell--combined' : ''}`}>
       <Sidebar />
       <div className="app-main">
         <TopBar />
-        {section === 'plan' && <FiltersBar posts={posts} />}
+        {section === 'plan' && !isCombined && <FiltersBar posts={posts} />}
         <div className="app-content">
           {section === 'plan' && (
             <>
-              {view !== 'status' && <NoDateShelf posts={posts} projectsById={projectsById} />}
-              {view === 'week' && <WeekView posts={posts} projectsById={projectsById} />}
-              {view === 'month' && <MonthView posts={posts} projectsById={projectsById} />}
-              {view === 'status' && <StatusBoardView posts={posts} projectsById={projectsById} />}
+              {isCombined && <DailyFeedView posts={posts} projectsById={projectsById} />}
+              {!isCombined && view !== 'status' && <NoDateShelf posts={posts} projectsById={projectsById} />}
+              {!isCombined && view === 'week' && <WeekView posts={posts} projectsById={projectsById} />}
+              {!isCombined && view === 'month' && <MonthView posts={posts} projectsById={projectsById} />}
+              {!isCombined && view === 'status' && <StatusBoardView posts={posts} projectsById={projectsById} />}
             </>
           )}
           {section === 'ideas' && <IdeasView posts={posts} projectsById={projectsById} />}

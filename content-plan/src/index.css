@@ -1192,4 +1192,157 @@ a { color: var(--accent-dark); }
   .drawer__close, .modal__close { min-width: 36px; min-height: 36px; }
   .idea-row__delete { min-width: 32px; min-height: 32px; }
   .period-nav__btn { width: 36px; height: 36px; }
+
+  .daily-feed__header { padding: 14px 16px; }
+  .daily-feed__date { font-size: 18px; }
+  .daily-feed__swipe-area { padding: 12px 10px 24px; }
 }
+
+/* ---------- Сводная страница (все клиенты): суточная лента ---------- */
+
+.app-shell--combined .app-content { padding: 0; }
+
+.daily-feed {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.daily-feed__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 22px 20px;
+  background: linear-gradient(135deg, #2f3b3a 0%, #3c4a48 60%, #2a3433 100%);
+  color: #fdfbf6;
+  box-shadow: var(--shadow);
+}
+
+.daily-feed__nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(253, 251, 246, 0.25);
+  background: rgba(253, 251, 246, 0.08);
+  color: #fdfbf6;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.daily-feed__nav-btn:hover { background: rgba(253, 251, 246, 0.18); }
+
+.daily-feed__date-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 220px;
+}
+
+.daily-feed__date {
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+.daily-feed__today-btn {
+  border: none;
+  background: rgba(253, 251, 246, 0.16);
+  color: #fdfbf6;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.daily-feed__today-btn:hover { background: rgba(253, 251, 246, 0.26); }
+
+.daily-feed__swipe-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 22px 24px 40px;
+  touch-action: pan-y;
+}
+
+.daily-feed__list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 640px;
+  margin: 0 auto;
+  transition: transform 0.15s ease;
+}
+
+.daily-feed__empty {
+  text-align: center;
+  color: var(--text-faint);
+  padding: 60px 20px;
+  font-size: 15px;
+}
+
+.daily-feed__card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-soft);
+  border-left: 6px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+.daily-feed__card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+
+.daily-feed__card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.daily-feed__client-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  padding: 3px 9px;
+  border-radius: 999px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+.daily-feed__time {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.daily-feed__card-topic {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.daily-feed__card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.daily-feed__quick-done {
+  margin-top: 12px;
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.daily-feed__quick-done:hover { background: var(--accent); color: #fff; }

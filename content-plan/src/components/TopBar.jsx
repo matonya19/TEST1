@@ -48,7 +48,7 @@ export default function TopBar() {
           Проекты…
         </button>
 
-        {section === 'plan' && (
+        {section === 'plan' && !isCombined && (
           <div className="topbar__view-switch" role="tablist" aria-label="Режим отображения">
             {VIEWS.map((v) => (
               <button
