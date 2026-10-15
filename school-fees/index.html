@@ -231,6 +231,7 @@
     font-size: 14.5px;
     line-height: 1.7;
     overflow-wrap: anywhere;
+    white-space: pre-line;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -551,8 +552,8 @@
 
     document.getElementById('paid-count').textContent = String(paidNames.length);
     document.getElementById('unpaid-count').textContent = String(unpaidNames.length);
-    document.getElementById('paid-names').textContent = paidNames.length ? paidNames.join(', ') : 'Пока никто не сдал.';
-    document.getElementById('unpaid-names').textContent = unpaidNames.length ? unpaidNames.join(', ') : 'Все сдали!';
+    document.getElementById('paid-names').textContent = paidNames.length ? paidNames.join('\n') : 'Пока никто не сдал.';
+    document.getElementById('unpaid-names').textContent = unpaidNames.length ? unpaidNames.join('\n') : 'Все сдали!';
     currentPaidNames = paidNames;
     currentUnpaidNames = unpaidNames;
   }
@@ -584,10 +585,10 @@
   }
 
   document.getElementById('copy-paid-btn').addEventListener('click', function () {
-    copyToClipboard(currentPaidNames.join(', '), this);
+    copyToClipboard(currentPaidNames.join('\n'), this);
   });
   document.getElementById('copy-unpaid-btn').addEventListener('click', function () {
-    copyToClipboard(currentUnpaidNames.join(', '), this);
+    copyToClipboard(currentUnpaidNames.join('\n'), this);
   });
 
   document.getElementById('back-to-collections').addEventListener('click', closeCollectionDetail);
