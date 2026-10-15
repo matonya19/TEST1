@@ -195,6 +195,43 @@
     margin-bottom: 12px;
     font-size: 14px;
   }
+  .summary-section {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .summary-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .summary-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .summary-title { font-weight: 600; font-size: 14px; }
+  .summary-title.ok { color: var(--ok); }
+  .summary-title.bad { color: var(--bad); }
+  .copy-btn {
+    background: none;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 5px 10px;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+  .summary-names {
+    font-size: 14.5px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #15171c;
@@ -251,6 +288,24 @@
         </thead>
         <tbody id="payments-tbody"></tbody>
       </table>
+
+      <div class="summary-section" id="summary-section">
+        <div class="summary-block">
+          <div class="summary-head">
+            <span class="summary-title ok">✅ Сдали (<span id="paid-count">0</span>)</span>
+            <button type="button" class="copy-btn" id="copy-paid-btn">Копировать</button>
+          </div>
+          <div class="summary-names" id="paid-names"></div>
+        </div>
+        <div class="summary-block">
+          <div class="summary-head">
+            <span class="summary-title bad">❌ Не сдали (<span id="unpaid-count">0</span>)</span>
+            <button type="button" class="copy-btn" id="copy-unpaid-btn">Копировать</button>
+          </div>
+          <div class="summary-names" id="unpaid-names"></div>
+        </div>
+      </div>
+
       <button class="danger" id="delete-collection-btn" style="margin-top:16px;">Удалить сбор</button>
     </div>
   </section>
@@ -294,6 +349,8 @@
 
   let data = loadData();
   let activeCollectionId = null;
+  let currentPaidNames = [];
+  let currentUnpaidNames = [];
 
   function saveData() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
@@ -439,10 +496,17 @@
     tbody.innerHTML = '';
     if (data.students.length === 0) {
       tbody.innerHTML = '<tr><td colspan="3" class="empty">Сначала добавьте учеников на вкладке «Ученики».</td></tr>';
+      document.getElementById('summary-section').hidden = true;
       return;
     }
+    document.getElementById('summary-section').hidden = false;
+
+    const paidNames = [];
+    const unpaidNames = [];
+
     data.students.forEach(function (student) {
       const payment = collection.payments[student.id] || { paid: false, amount: collection.amount };
+      (payment.paid ? paidNames : unpaidNames).push(student.name);
       const tr = document.createElement('tr');
 
       const nameTd = document.createElement('td');
@@ -484,7 +548,47 @@
       tr.appendChild(amountTd);
       tbody.appendChild(tr);
     });
+
+    document.getElementById('paid-count').textContent = String(paidNames.length);
+    document.getElementById('unpaid-count').textContent = String(unpaidNames.length);
+    document.getElementById('paid-names').textContent = paidNames.length ? paidNames.join(', ') : 'Пока никто не сдал.';
+    document.getElementById('unpaid-names').textContent = unpaidNames.length ? unpaidNames.join(', ') : 'Все сдали!';
+    currentPaidNames = paidNames;
+    currentUnpaidNames = unpaidNames;
   }
+
+  function copyToClipboard(text, btn) {
+    const original = btn.textContent;
+    function flash(ok) {
+      btn.textContent = ok ? 'Скопировано!' : 'Выделите вручную';
+      setTimeout(function () { btn.textContent = original; }, 1500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { flash(true); }).catch(function () {
+        selectTextFallback(btn);
+        flash(false);
+      });
+    } else {
+      selectTextFallback(btn);
+      flash(false);
+    }
+  }
+
+  function selectTextFallback(btn) {
+    const target = btn.closest('.summary-block').querySelector('.summary-names');
+    const range = document.createRange();
+    range.selectNodeContents(target);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  document.getElementById('copy-paid-btn').addEventListener('click', function () {
+    copyToClipboard(currentPaidNames.join(', '), this);
+  });
+  document.getElementById('copy-unpaid-btn').addEventListener('click', function () {
+    copyToClipboard(currentUnpaidNames.join(', '), this);
+  });
 
   document.getElementById('back-to-collections').addEventListener('click', closeCollectionDetail);
 
