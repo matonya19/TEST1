@@ -169,10 +169,16 @@
     color: var(--ok);
     border-color: var(--ok);
   }
+  .status-btn.excused {
+    background: var(--bg);
+    color: var(--muted);
+    border-color: var(--border);
+  }
   td input[type="number"] {
     width: 90px;
     padding: 5px 6px;
   }
+  td input[type="number"]:disabled { opacity: 0.45; }
   dialog {
     border: none;
     border-radius: var(--radius);
@@ -219,6 +225,7 @@
   .summary-title { font-weight: 600; font-size: 14px; }
   .summary-title.ok { color: var(--ok); }
   .summary-title.bad { color: var(--bad); }
+  .summary-title.muted { color: var(--muted); }
   .copy-btn {
     background: none;
     color: var(--accent);
@@ -305,6 +312,13 @@
           </div>
           <div class="summary-names" id="unpaid-names"></div>
         </div>
+        <div class="summary-block">
+          <div class="summary-head">
+            <span class="summary-title muted">⏸️ Не идёт (<span id="excused-count">0</span>)</span>
+            <button type="button" class="copy-btn" id="copy-excused-btn">Копировать</button>
+          </div>
+          <div class="summary-names" id="excused-names"></div>
+        </div>
       </div>
 
       <button class="danger" id="delete-collection-btn" style="margin-top:16px;">Удалить сбор</button>
@@ -352,6 +366,7 @@
   let activeCollectionId = null;
   let currentPaidNames = [];
   let currentUnpaidNames = [];
+  let currentExcusedNames = [];
 
   function saveData() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
@@ -410,19 +425,29 @@
 
   // ---------- Collections ----------
 
+  // 'unpaid' | 'paid' | 'excused' ("не идёт" — this student isn't part of this collection)
+  function paymentStatus(payment) {
+    if (!payment) return 'unpaid';
+    if (payment.status) return payment.status;
+    return payment.paid ? 'paid' : 'unpaid';
+  }
+
   function collectionStats(collection) {
-    const total = data.students.length;
     let paidCount = 0;
+    let excusedCount = 0;
     let collected = 0;
-    const expected = total * collection.amount;
     data.students.forEach(function (s) {
       const p = collection.payments[s.id];
-      if (p && p.paid) {
+      const status = paymentStatus(p);
+      if (status === 'excused') {
+        excusedCount++;
+      } else if (status === 'paid') {
         paidCount++;
-        collected += (typeof p.amount === 'number' ? p.amount : collection.amount);
+        collected += (p && typeof p.amount === 'number' ? p.amount : collection.amount);
       }
     });
-    return { total: total, paidCount: paidCount, collected: collected, expected: expected };
+    const total = data.students.length - excusedCount;
+    return { total: total, paidCount: paidCount, excusedCount: excusedCount, collected: collected, expected: total * collection.amount };
   }
 
   function renderCollectionsList() {
@@ -484,7 +509,8 @@
     const cards = [
       { lbl: 'Собрано', val: formatMoney(stats.collected) + ' из ' + formatMoney(stats.expected) },
       { lbl: 'Сдали', val: stats.paidCount + ' из ' + stats.total },
-      { lbl: 'Не сдали', val: String(stats.total - stats.paidCount) }
+      { lbl: 'Не сдали', val: String(stats.total - stats.paidCount) },
+      { lbl: 'Не идёт', val: String(stats.excusedCount) }
     ];
     cards.forEach(function (c) {
       const card = document.createElement('div');
@@ -502,12 +528,21 @@
     }
     document.getElementById('summary-section').hidden = false;
 
+    const STATUS_ORDER = ['unpaid', 'paid', 'excused'];
+    const STATUS_LABEL = { unpaid: 'Не сдал', paid: 'Сдал', excused: 'Не идёт' };
+
     const paidNames = [];
     const unpaidNames = [];
+    const excusedNames = [];
 
     data.students.forEach(function (student) {
-      const payment = collection.payments[student.id] || { paid: false, amount: collection.amount };
-      (payment.paid ? paidNames : unpaidNames).push(student.name);
+      const payment = collection.payments[student.id] || null;
+      const status = paymentStatus(payment);
+      const amount = payment && typeof payment.amount === 'number' ? payment.amount : collection.amount;
+      if (status === 'paid') paidNames.push(student.name);
+      else if (status === 'excused') excusedNames.push(student.name);
+      else unpaidNames.push(student.name);
+
       const tr = document.createElement('tr');
 
       const nameTd = document.createElement('td');
@@ -515,12 +550,13 @@
 
       const statusTd = document.createElement('td');
       const statusBtn = document.createElement('button');
-      statusBtn.className = 'status-btn' + (payment.paid ? ' paid' : '');
-      statusBtn.textContent = payment.paid ? 'Сдал' : 'Не сдал';
+      statusBtn.className = 'status-btn' + (status !== 'unpaid' ? ' ' + status : '');
+      statusBtn.textContent = STATUS_LABEL[status];
       statusBtn.addEventListener('click', function () {
-        const current = collection.payments[student.id] || { paid: false, amount: collection.amount };
-        current.paid = !current.paid;
-        if (current.paid && !current.amount) current.amount = collection.amount;
+        const next = STATUS_ORDER[(STATUS_ORDER.indexOf(status) + 1) % STATUS_ORDER.length];
+        const current = collection.payments[student.id] || { status: 'unpaid', amount: collection.amount };
+        current.status = next;
+        delete current.paid;
         collection.payments[student.id] = current;
         saveData();
         renderCollectionDetail(collection.id);
@@ -533,9 +569,10 @@
       amountInput.type = 'number';
       amountInput.min = '0';
       amountInput.step = '0.01';
-      amountInput.value = typeof payment.amount === 'number' ? payment.amount : collection.amount;
+      amountInput.value = amount;
+      amountInput.disabled = status === 'excused';
       amountInput.addEventListener('change', function () {
-        const current = collection.payments[student.id] || { paid: payment.paid, amount: collection.amount };
+        const current = collection.payments[student.id] || { status: status, amount: collection.amount };
         current.amount = parseFloat(amountInput.value) || 0;
         collection.payments[student.id] = current;
         saveData();
@@ -552,10 +589,13 @@
 
     document.getElementById('paid-count').textContent = String(paidNames.length);
     document.getElementById('unpaid-count').textContent = String(unpaidNames.length);
+    document.getElementById('excused-count').textContent = String(excusedNames.length);
     document.getElementById('paid-names').textContent = paidNames.length ? paidNames.join('\n') : 'Пока никто не сдал.';
     document.getElementById('unpaid-names').textContent = unpaidNames.length ? unpaidNames.join('\n') : 'Все сдали!';
+    document.getElementById('excused-names').textContent = excusedNames.length ? excusedNames.join('\n') : 'Таких нет.';
     currentPaidNames = paidNames;
     currentUnpaidNames = unpaidNames;
+    currentExcusedNames = excusedNames;
   }
 
   function copyToClipboard(text, btn) {
@@ -589,6 +629,9 @@
   });
   document.getElementById('copy-unpaid-btn').addEventListener('click', function () {
     copyToClipboard(currentUnpaidNames.join('\n'), this);
+  });
+  document.getElementById('copy-excused-btn').addEventListener('click', function () {
+    copyToClipboard(currentExcusedNames.join('\n'), this);
   });
 
   document.getElementById('back-to-collections').addEventListener('click', closeCollectionDetail);
