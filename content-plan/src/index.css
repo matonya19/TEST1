@@ -790,6 +790,23 @@ a { color: var(--accent-dark); }
 
 .idea-row__project, .archive-row__project { font-size: 12px; font-weight: 600; }
 
+.idea-row__date {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.idea-row__badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  padding: 3px 9px;
+  border-radius: 999px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
 .idea-row__actions, .archive-row__actions {
   display: flex;
   align-items: center;
