@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<title>Бизнес без собственника</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Черновик для согласования: убрать noindex после запуска -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Практический семинар для владельцев бизнеса: структура компании, ответственность, руководители, показатели и план выхода из операционки. Батуми, ноябрь 2026.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Бизнес без собственника | Семинар Ульяны Павловой в Батуми">
+<meta property="og:description" content="Как выйти из операционки без потери контроля над компанией. Однодневный офлайн-семинар в Батуми.">
+<meta property="og:image" content="img/og.jpg">
+<meta property="og:locale" content="ru_RU">
+<meta name="theme-color" content="#3D2A23">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: молочная страница с шоколадными полосами; крупная плотная типографика, тонкие линии, фото Ульяны без обработки.
+   Единая светлая тема бренда (по брифу), цвета заданы явно. */
+:root{
+  --choc:#3D2A23;      /* Шоколад */
+  --coffee:#AA7650;    /* Кофе: акценты, линии */
+  --coffee-deep:#85583A; /* Кофе для мелкого текста на светлом */
+  --sand:#E8D7C6;      /* Песок */
+  --milk:#FCF8F3;      /* Молочный */
+  --ink:#31241F;       /* Текст */
+  --muted:#6B574C;
+  --line:#E2D2C3;
+  --line-dark:#5A4339;
+  --milk-soft:#D9C8B8;
+  --error:#9B2C1F;
+  --font:'Manrope','Gilroy','Segoe UI',Arial,sans-serif;
+  --wrap:1200px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--milk);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--milk)}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--coffee);outline-offset:3px}
+.wrap{max-width:calc(var(--wrap) + 48px);margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+@media (min-width:768px){.wrap{padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}}
+
+/* type */
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:800;letter-spacing:-.03em}
+h1{font-size:clamp(34px,6.4vw,84px);line-height:.94;text-transform:uppercase}
+h2{font-size:clamp(28px,4.4vw,52px);line-height:1.02;text-transform:uppercase}
+h3{font-size:20px;line-height:1.25;letter-spacing:-.015em}
+p{margin:0}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--coffee-deep)}
+.lead{font-size:clamp(18px,1.7vw,21px);line-height:1.5;max-width:40ch}
+.muted{color:var(--muted)}
+.section{padding-block:clamp(64px,9vw,120px)}
+.section-head{display:grid;gap:18px;align-content:start;max-width:780px;margin-bottom:clamp(36px,5vw,56px)}
+.section-head p{max-width:60ch}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 24px;border:1px solid var(--choc);background:var(--choc);color:var(--milk);font:inherit;font-size:15px;font-weight:700;text-decoration:none;cursor:pointer;transition:background .2s,color .2s}
+.btn:hover{background:var(--ink)}
+.btn.ghost{background:transparent;color:var(--choc)}
+.btn.ghost:hover{background:var(--choc);color:var(--milk)}
+.on-dark .btn{background:var(--milk);color:var(--choc);border-color:var(--milk)}
+.on-dark .btn:hover{background:var(--sand)}
+.btn .arr{font-weight:500}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--milk);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:24px;min-height:68px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0}
+.brand-mark{flex:none;width:36px;height:36px;display:grid;place-items:center;background:var(--choc);color:var(--milk);font-weight:800;font-size:13px;letter-spacing:-.04em}
+.brand-text{font-weight:800;font-size:14px;line-height:1.2;letter-spacing:-.02em}
+.brand-text small{display:block;font-weight:600;font-size:11px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.nav-links{display:none;margin-left:auto;gap:30px}
+.nav-links a{font-size:14px;font-weight:700;text-decoration:none}
+.nav-links a:hover{color:var(--coffee-deep)}
+.nav .btn{margin-left:auto;flex:none;white-space:nowrap;min-height:42px;padding:0 16px;font-size:13px}
+@media (min-width:900px){.nav-links{display:flex}.nav .btn{margin-left:0}}
+@media (max-width:420px){.brand-text small{display:none}}
+
+/* hero */
+.hero{padding-block:clamp(36px,6vw,72px) clamp(56px,7vw,88px)}
+.hero-grid{display:grid;gap:40px}
+.hero-copy{display:grid;gap:24px;align-content:start;min-width:0}
+.hero h1 span{display:block}
+.hero .sub{font-size:clamp(20px,2.2vw,28px);font-weight:700;line-height:1.25;letter-spacing:-.02em;max-width:24ch}
+.hero .lead{color:var(--muted)}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px}
+.hero-photo{position:relative;margin:0;min-width:0}
+.hero-photo img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 18%;background:var(--sand)}
+.hero-photo figcaption{position:absolute;left:0;bottom:0;background:var(--milk);padding:12px 16px 0 0;font-size:13px;font-weight:700;line-height:1.3}
+.hero-photo figcaption small{display:block;font-weight:500;color:var(--muted)}
+@media (min-width:900px){
+  .hero-grid{grid-template-columns:minmax(0,1.35fr) minmax(0,.85fr);gap:56px;align-items:center}
+}
+/* ticket strip: факты мероприятия со статусом */
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--choc);margin-top:8px}
+.fact{padding:14px 12px 14px 0;border-bottom:1px solid var(--line);min-width:0}
+.fact:nth-child(odd){padding-right:16px;border-right:1px solid var(--line)}
+.fact:nth-child(even){padding-left:16px}
+.fact dt{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.fact dd{margin:4px 0 0;font-weight:700;font-size:16px;line-height:1.3}
+.tag{display:inline-block;margin-left:6px;padding:1px 7px;border:1px solid var(--coffee);color:var(--coffee-deep);font-size:11px;font-weight:700;letter-spacing:.02em;vertical-align:2px;white-space:nowrap}
+@media (min-width:640px){.facts{grid-template-columns:repeat(4,minmax(0,1fr))}.fact{border-right:1px solid var(--line);padding:14px 16px!important}.fact:first-child{padding-left:0!important}.fact:last-child{border-right:0}}
+
+/* dark band */
+.band{background:var(--choc);color:var(--milk)}
+.band .eyebrow{color:var(--sand)}
+.band .muted{color:var(--milk-soft)}
+.quote-row{display:grid;gap:0;border-top:1px solid var(--line-dark);margin-bottom:clamp(40px,5vw,64px)}
+.quote-row blockquote{margin:0;padding:18px 0;border-bottom:1px solid var(--line-dark);font-size:clamp(18px,1.8vw,22px);font-weight:600;line-height:1.35;letter-spacing:-.01em;color:var(--sand)}
+@media (min-width:768px){.quote-row{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px}}
+.pain-grid{display:grid;gap:1px;background:var(--line-dark);border:1px solid var(--line-dark)}
+.pain-grid li{background:var(--choc);padding:24px;font-size:18px;font-weight:600;line-height:1.4;min-width:0}
+@media (min-width:640px){.pain-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1024px){.pain-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+ul.plain{list-style:none;margin:0;padding:0}
+.conclusion{margin-top:clamp(36px,5vw,56px);display:grid;gap:24px;align-items:center}
+.conclusion p{font-size:clamp(19px,2vw,24px);font-weight:600;line-height:1.4;max-width:48ch}
+@media (min-width:900px){.conclusion{grid-template-columns:1fr auto}}
+
+/* audience */
+.aud-grid{display:grid;gap:48px}
+.check-list li{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:18px 0;border-bottom:1px solid var(--line);font-size:18px;font-weight:600;line-height:1.4}
+.check-list li:first-child{border-top:1px solid var(--choc)}
+.check-list li::before{content:"";width:18px;height:10px;margin-top:6px;border-left:2px solid var(--coffee);border-bottom:2px solid var(--coffee);transform:rotate(-45deg)}
+.note{background:var(--sand);padding:28px;display:grid;gap:12px;align-self:start}
+.note p{font-size:18px;line-height:1.5}
+@media (min-width:900px){.aud-grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:64px}}
+
+/* results */
+.results{background:var(--sand)}
+.results-grid{display:grid;gap:40px}
+.res-list{display:grid;gap:1px;background:var(--milk-soft);border:1px solid var(--milk-soft);align-content:start}
+.res-list li{background:var(--milk);padding:26px;display:grid;gap:8px;min-width:0}
+.res-list p{color:var(--muted)}
+.results figure{margin:0}
+.results figure img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:50% 30%}
+@media (min-width:640px){.res-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1024px){.results-grid{grid-template-columns:minmax(0,1fr) minmax(0,2fr);align-items:start}}
+
+/* program */
+.program{display:grid;border-top:1px solid var(--choc)}
+.prog{display:grid;gap:16px;padding:32px 0;border-bottom:1px solid var(--line)}
+.prog-num{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--coffee-deep)}
+.prog h3{font-size:clamp(22px,2.4vw,30px);letter-spacing:-.025em}
+.prog ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.prog li{position:relative;padding-left:22px;max-width:62ch}
+.prog li::before{content:"";position:absolute;left:0;top:.8em;width:10px;height:1px;background:var(--coffee)}
+@media (min-width:900px){.prog{grid-template-columns:120px minmax(0,1fr) minmax(0,1.2fr);gap:32px;align-items:start}}
+.small-note{font-size:14px;color:var(--muted);margin-top:24px;max-width:70ch}
+
+/* speaker */
+.speaker-grid{display:grid;gap:40px}
+.speaker figure{margin:0}
+.speaker figure img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 25%}
+.speaker-copy{display:grid;gap:22px;align-content:center;min-width:0}
+.speaker-copy .role{font-size:clamp(19px,1.9vw,23px);font-weight:600;line-height:1.4}
+.stat{display:flex;gap:20px;align-items:baseline;border-top:1px solid var(--line-dark);border-bottom:1px solid var(--line-dark);padding-block:20px}
+.stat b{font-size:clamp(48px,6vw,72px);font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--sand);font-variant-numeric:tabular-nums}
+.stat span{font-size:16px;line-height:1.45}
+@media (min-width:900px){.speaker-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:72px}}
+
+/* team / method */
+.chain{display:flex;flex-wrap:wrap;gap:8px 0;margin-top:32px;list-style:none;padding:0}
+.chain li{display:flex;align-items:center;font-weight:700;font-size:15px}
+.chain li span{border:1px solid var(--choc);padding:8px 14px;background:var(--milk)}
+.chain li:last-child span{background:var(--choc);color:var(--milk)}
+.chain li+li::before{content:"→";padding:0 10px;color:var(--coffee-deep)}
+.team-grid{display:grid;gap:40px}
+.team-grid .body{display:grid;gap:18px;max-width:62ch}
+@media (min-width:900px){.team-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}}
+
+/* format */
+.format-grid{display:grid;gap:40px}
+.format-table{width:100%;border-collapse:collapse;border-top:1px solid var(--choc)}
+.format-table th,.format-table td{text-align:left;vertical-align:top;padding:16px 0;border-bottom:1px solid var(--line)}
+.format-table th{width:38%;padding-right:16px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.format-table td{font-weight:600}
+.format-table td small{display:block;font-weight:500;color:var(--muted)}
+.format-grid figure{margin:0}
+.format-grid figure img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 70%}
+@media (min-width:900px){.format-grid{grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:64px;align-items:start}}
+
+/* pricing */
+.prices{display:grid;gap:16px}
+.price{border:1px solid var(--line);background:var(--milk);padding:28px;display:grid;gap:16px;grid-template-rows:auto auto 1fr auto;min-width:0}
+.price.feature{border-color:var(--choc);background:var(--choc);color:var(--milk)}
+.price.feature .muted{color:var(--milk-soft)}
+.price.feature .eyebrow{color:var(--sand)}
+.price .amount{font-size:clamp(48px,5vw,64px);font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.price .amount small{font-size:.4em;font-weight:700;letter-spacing:0;margin-left:6px}
+.price .btn{width:100%}
+.price.feature .btn{background:var(--milk);color:var(--choc);border-color:var(--milk)}
+.price.feature .btn:hover{background:var(--sand)}
+@media (min-width:900px){.prices{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.price-note{margin-top:24px;font-size:15px;color:var(--muted);max-width:70ch}
+
+/* faq */
+.faq-grid{display:grid;gap:40px}
+.faq{border-top:1px solid var(--choc)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:20px;padding:20px 0;font-size:18px;font-weight:700;line-height:1.35}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";flex:none;font-size:26px;font-weight:400;line-height:1;color:var(--coffee-deep);transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{padding:0 40px 22px 0;color:var(--muted);max-width:66ch}
+@media (min-width:900px){.faq-grid{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:64px}}
+
+/* final cta + form */
+.final-grid{display:grid;gap:48px}
+.final-copy{display:grid;gap:22px;align-content:start}
+form{display:grid;gap:18px;min-width:0}
+.field{display:grid;gap:8px}
+.field label{font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--sand)}
+.field label small{font-weight:500;color:var(--milk-soft)}
+.field input,.field select{width:100%;min-height:52px;padding:0 14px;border:1px solid var(--line-dark);background:var(--milk);color:var(--ink);font:inherit;font-size:16px;border-radius:0;appearance:none}
+.field select{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 15px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:40px}
+.field input:focus,.field select:focus{outline:2px solid var(--coffee);outline-offset:0}
+.consent{display:grid;grid-template-columns:22px 1fr;gap:12px;font-size:14px;line-height:1.5;color:var(--milk-soft);align-items:start}
+.consent input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--coffee)}
+.form-status{font-size:15px;line-height:1.5;padding:14px 16px;border:1px solid var(--line-dark)}
+.form-status.err{border-color:var(--sand);color:var(--milk)}
+.form-status.ok{background:var(--milk);color:var(--choc);border-color:var(--milk)}
+.preview-note{font-size:14px;line-height:1.5;color:var(--milk-soft);border-left:2px solid var(--coffee);padding-left:14px}
+@media (min-width:900px){.final-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:80px}}
+
+footer{border-top:1px solid var(--line-dark);background:var(--choc);color:var(--milk-soft);font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding-block:28px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="Бизнес без собственника, в начало">
+      <span class="brand-mark" aria-hidden="true">ББС</span>
+      <span class="brand-text">Бизнес без собственника<small>Ульяна Павлова · Батуми</small></span>
+    </a>
+    <nav class="nav-links" aria-label="Разделы">
+      <a href="#program">Программа</a>
+      <a href="#speaker">Спикер</a>
+      <a href="#price">Стоимость</a>
+      <a href="#faq">Вопросы</a>
+    </nav>
+    <a class="btn" href="#register" data-track="cta_click" data-cta="header" data-label-presale="Узнать об участии" data-label-sale="Купить билет">Узнать об участии</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- 1. Первый экран -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Однодневный офлайн-семинар для собственников</p>
+      <h1><span>Бизнес</span><span>без собственника</span></h1>
+      <p class="sub">Как выйти из операционки без потери контроля над компанией.</p>
+      <p class="lead">Разберём, почему сотрудники и руководители по-прежнему зависят от ваших решений, и составим план первых изменений в управлении.</p>
+      <div class="cta-row">
+        <a class="btn" href="#register" data-track="cta_click" data-cta="hero" data-label-presale="Узнать об участии" data-label-sale="Купить билет">Узнать об участии</a>
+        <a class="btn ghost" href="#program" data-track="cta_click" data-cta="hero_program">Посмотреть программу <span class="arr" aria-hidden="true">↓</span></a>
+      </div>
+      <dl class="facts">
+        <div class="fact"><dt>Город</dt><dd>Батуми</dd></div>
+        <div class="fact"><dt>Дата</dt><dd>13 ноября 2026 <span class="tag">предварительно</span></dd></div>
+        <div class="fact"><dt>Формат</dt><dd>Офлайн, 1 день</dd></div>
+        <div class="fact"><dt>Язык</dt><dd>Русский</dd></div>
+      </dl>
+    </div>
+    <figure class="hero-photo">
+      <img src="img/ulyana_street_look.webp" width="960" height="1440" alt="Ульяна Павлова на пешеходном переходе в городе" fetchpriority="high">
+      <figcaption>Ульяна Павлова<small>спикер семинара</small></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 2. Знакомые ситуации -->
+<section class="band on-dark section" id="pain">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Знакомые ситуации</p>
+      <h2>Сотрудники есть. Почему всё на вас?</h2>
+      <p class="muted">Кажется, людей становится больше, а свободного времени нет. Узнаёте себя?</p>
+    </div>
+    <div class="quote-row">
+      <blockquote>«Я нанял людей, а всё равно решаю почти всё сам».</blockquote>
+      <blockquote>«Стоит уехать на несколько дней, и рабочий телефон не замолкает».</blockquote>
+      <blockquote>«Директор есть, а времени стало не больше».</blockquote>
+      <blockquote>«Я хочу развивать бизнес, но день снова уходит на текучку».</blockquote>
+    </div>
+    <ul class="plain pain-grid">
+      <li>Даже в отпуске вы продолжаете отвечать на рабочие звонки.</li>
+      <li>Сотрудники ждут вашего согласования по обычным вопросам.</li>
+      <li>Управляющий есть, но сложные решения всё равно приходят к вам.</li>
+      <li>Вы каждый день проверяете задачи, вместо того чтобы видеть итоговый результат.</li>
+      <li>Найм новых людей не уменьшает вашу нагрузку.</li>
+      <li>На развитие компании снова не осталось времени.</li>
+    </ul>
+    <div class="conclusion">
+      <p>Если это знакомо, проблема может быть не в количестве сотрудников. Важно разобраться, как распределены функции, полномочия и ответственность за результат.</p>
+      <a class="btn" href="#program" data-track="cta_click" data-cta="pain_program">Смотреть программу</a>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Для кого -->
+<section class="section" id="audience">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Для кого</p>
+      <h2>Кому подойдёт семинар</h2>
+      <p class="lead">Вам, если у вас уже есть работающий бизнес и команда, но вы по-прежнему нужны почти для каждого важного решения.</p>
+    </div>
+    <div class="aud-grid">
+      <ul class="plain check-list">
+        <li>Вы собственник компании с командой примерно от 5–10 человек.</li>
+        <li>Хотите передать текущие задачи руководителям, но не понимаете, с чего начать.</li>
+        <li>Уже наняли директора или управляющего, но продолжаете работать за него.</li>
+        <li>Планируете масштабирование и понимаете, что текущая система не выдержит роста.</li>
+        <li>Хотите видеть результаты бизнеса, не контролируя каждое действие сотрудников.</li>
+      </ul>
+      <div class="note">
+        <p class="eyebrow">Важно</p>
+        <p>Семинар особенно полезен тем, кто готов не просто послушать лекцию, а посмотреть на собственную систему управления и принять решения о её изменении.</p>
+        <p class="muted" style="font-size:15px">Для бизнеса без сотрудников программа может быть преждевременной.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Что получите -->
+<section class="section results" id="results">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Что получите</p>
+      <h2>Один день для конкретных управленческих решений</h2>
+      <p>На семинаре вы будете разбирать свою компанию, а не абстрактные примеры.</p>
+    </div>
+    <div class="results-grid">
+      <figure>
+        <img src="img/ulyana_original_at_desk.webp" width="707" height="1258" alt="Ульяна Павлова за рабочим столом с ноутбуком" loading="lazy">
+      </figure>
+      <ul class="plain res-list">
+        <li><h3>Найти причину зависимости</h3><p>Определить, какие задачи и решения неизменно возвращаются к собственнику.</p></li>
+        <li><h3>Разобраться в структуре</h3><p>Увидеть размытые функции, полномочия и зоны ответственности.</p></li>
+        <li><h3>Оценить руководителей</h3><p>Понять, какие навыки, результаты и полномочия нужны людям на ключевых должностях.</p></li>
+        <li><h3>Наметить план</h3><p>Составить последовательность изменений, с которых стоит начать.</p></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Программа -->
+<section class="section" id="program">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Программа дня</p>
+      <h2>Четыре блока: от диагностики к плану</h2>
+    </div>
+    <div class="program">
+      <article class="prog">
+        <p class="prog-num">Блок 1</p>
+        <h3>Почему собственник остаётся в операционке</h3>
+        <ul>
+          <li>Какие сигналы показывают, что компания зависит от владельца.</li>
+          <li>Почему простая передача поручений не делает управление самостоятельным.</li>
+          <li>Как определить функции, которые собственник продолжает выполнять за команду.</li>
+        </ul>
+      </article>
+      <article class="prog">
+        <p class="prog-num">Блок 2</p>
+        <h3>Структура, функции и ответственность</h3>
+        <ul>
+          <li>Какая организационная структура нужна компании на её текущем этапе.</li>
+          <li>Как избежать «ничьих» задач и размытых полномочий.</li>
+          <li>Кто за что отвечает и какой конкретный результат нужен от каждой роли.</li>
+        </ul>
+      </article>
+      <article class="prog">
+        <p class="prog-num">Блок 3</p>
+        <h3>Результаты, показатели и руководители</h3>
+        <ul>
+          <li>Как контролировать состояние бизнеса по измеримым показателям.</li>
+          <li>Какие решения руководитель принимает сам, а какие согласовывает.</li>
+          <li>Как оценивать людей перед назначением на ключевые должности.</li>
+          <li>Где в системе может использоваться технология Performia.</li>
+        </ul>
+      </article>
+      <article class="prog">
+        <p class="prog-num">Блок 4</p>
+        <h3>План выхода из операционки</h3>
+        <ul>
+          <li>Какие функции передавать в первую очередь.</li>
+          <li>Какие изменения нужны в структуре и команде.</li>
+          <li>Как определить первые действия и точки контроля.</li>
+        </ul>
+      </article>
+    </div>
+    <p class="small-note">Расписание по часам и перерывы сообщим после утверждения площадки и времени.</p>
+  </div>
+</section>
+
+<!-- 6. Спикер -->
+<section class="band on-dark section speaker" id="speaker">
+  <div class="wrap speaker-grid">
+    <figure>
+      <img src="img/ulyana_dark_outfit.webp" width="960" height="1440" alt="Ульяна Павлова у здания со стеклянным фасадом" loading="lazy">
+    </figure>
+    <div class="speaker-copy">
+      <p class="eyebrow">Спикер</p>
+      <h2>Ульяна Павлова</h2>
+      <p class="role">Предприниматель, сооснователь трёх образовательных проектов, практик в построении управленческих команд.</p>
+      <div class="stat"><b>300+</b><span>сотрудников работают в образовательных проектах, которыми управляет команда Ульяны.</span></div>
+      <p>Сама Ульяна сегодня не занимается ежедневной операционной работой школ.</p>
+      <p class="muted">На семинаре она разберёт подходы к структуре, ответственности, оценке результатов и выбору руководителей, которые использует в управлении бизнесом.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Почему важна команда -->
+<section class="section" id="team">
+  <div class="wrap team-grid">
+    <div class="section-head" style="margin-bottom:0">
+      <p class="eyebrow">Люди в системе</p>
+      <h2>Структуру можно выстроить. Но кому передавать управление?</h2>
+    </div>
+    <div class="body">
+      <p class="lead">Даже понятные функции и показатели не работают сами по себе. На ключевых должностях должны быть люди, которые способны брать ответственность и давать результат.</p>
+      <p class="muted">Поэтому на семинаре мы отдельно разберём, как оценивать руководителей и выбирать людей, которым можно доверить важные функции. Подходы Performia будут одной из тем этого разговора.</p>
+      <ol class="chain" aria-label="Последовательность передачи управления">
+        <li><span>Структура</span></li>
+        <li><span>Функции и ответственность</span></li>
+        <li><span>Результаты</span></li>
+        <li><span>Подходящие люди</span></li>
+        <li><span>Передача управления</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 8. Формат -->
+<section class="section results" id="format">
+  <div class="wrap format-grid">
+    <div>
+      <div class="section-head">
+        <p class="eyebrow">Формат</p>
+        <h2>Как всё пройдёт</h2>
+      </div>
+      <table class="format-table">
+        <tbody>
+          <tr><th scope="row">Город</th><td>Батуми, Грузия</td></tr>
+          <tr><th scope="row">Дата</th><td>13 ноября 2026, пятница<small>Дата предварительная, подтвердим при открытии регистрации.</small></td></tr>
+          <tr><th scope="row">Формат</th><td>Однодневный практический офлайн-семинар</td></tr>
+          <tr><th scope="row">Язык</th><td>Русский</td></tr>
+          <tr><th scope="row">Место и время</th><td>Уточняются<small>Сообщим всем, кто оставит заявку.</small></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figure>
+      <img src="img/ulyana_old_town.webp" width="960" height="1440" alt="Ульяна Павлова на площади у исторического здания с красной крышей" loading="lazy">
+    </figure>
+  </div>
+</section>
+
+<!-- 9. Тарифы -->
+<section class="section" id="price">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Стоимость</p>
+      <h2>Участие в семинаре</h2>
+      <p>Выберите подходящий вариант. Онлайн-оплата пока не подключена: оставьте заявку, и мы сообщим, когда откроются продажи.</p>
+    </div>
+    <div class="prices">
+      <article class="price feature" data-tariff="early">
+        <p class="eyebrow">Ранняя регистрация</p>
+        <p class="amount">200<small>₾ GEL</small></p>
+        <p class="muted">Первый этап продаж. Дату завершения ранней цены сообщим отдельно.</p>
+        <a class="btn" href="#register" data-tariff-btn="early" data-track="cta_click" data-cta="price_early">Узнать о начале продаж</a>
+      </article>
+      <article class="price" data-tariff="standard">
+        <p class="eyebrow">Основная стоимость</p>
+        <p class="amount">250<small>₾ GEL</small></p>
+        <p class="muted">Стандартный билет на однодневный семинар.</p>
+        <a class="btn ghost" href="#register" data-tariff-btn="standard" data-track="cta_click" data-cta="price_standard">Узнать о начале продаж</a>
+      </article>
+      <article class="price" data-tariff="club">
+        <p class="eyebrow">Для членов бизнес-клуба</p>
+        <p class="amount">200<small>₾ GEL</small></p>
+        <p class="muted">Специальная стоимость после подтверждения членства. Правила подтверждения сообщим при регистрации.</p>
+        <a class="btn ghost" href="#register" data-tariff-btn="club" data-track="cta_click" data-cta="price_club">Узнать о начале продаж</a>
+      </article>
+    </div>
+    <p class="price-note">Условия возврата и переноса билета опубликуем до начала приёма оплаты.</p>
+  </div>
+</section>
+
+<!-- 10. FAQ -->
+<section class="section results" id="faq">
+  <div class="wrap faq-grid">
+    <div class="section-head">
+      <p class="eyebrow">Вопросы</p>
+      <h2>Частые вопросы</h2>
+    </div>
+    <div class="faq">
+      <details><summary>Кому подходит семинар?</summary><p>Собственникам действующего бизнеса, у которых уже есть сотрудники, но многие важные решения по-прежнему зависят от владельца. Особенно актуально для команд от 5–10 человек.</p></details>
+      <details><summary>Нужен ли мне действующий директор?</summary><p>Нет. Мы разберём в том числе требования к будущему руководителю и то, какие функции стоит передавать.</p></details>
+      <details><summary>Семинар будет только про найм?</summary><p>Нет. Разберём структуру компании, функции, ответственность, показатели и роль руководителей. Оценка людей, включая подходы Performia, станет одной из тем.</p></details>
+      <details><summary>Можно ли выйти из операционки сразу после семинара?</summary><p>Изменения в управлении требуют времени. За один день можно разобраться в препятствиях и наметить последовательность первых шагов.</p></details>
+      <details><summary>Подойдёт ли владельцу небольшого бизнеса?</summary><p>Да, если компания уже работает с командой и собственник планирует передавать функции. Для бизнеса без сотрудников программа может быть преждевременной.</p></details>
+      <details><summary>Где и во сколько проходит мероприятие?</summary><p>Планируется офлайн-семинар в Батуми 13 ноября 2026 года. Точный адрес и время появятся после подтверждения.</p></details>
+      <details><summary>На каком языке?</summary><p>На русском.</p></details>
+      <details><summary>Как оплатить участие?</summary><p>После подключения онлайн-оплаты на сайте появится переход на защищённую платёжную страницу банка. До этого можно оставить заявку и узнать об открытии продаж.</p></details>
+      <details><summary>Можно ли оплатить по клубной цене?</summary><p>Для членов бизнес-клуба предусмотрена специальная стоимость 200 ₾. Правила подтверждения членства сообщим при регистрации.</p></details>
+      <details><summary>Что делать, если планы изменятся?</summary><p>Условия возврата и переноса билета будут опубликованы до начала приёма оплаты. Сейчас они согласуются.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- 11. Финальный CTA + заявка -->
+<section class="band on-dark section" id="register">
+  <div class="wrap final-grid">
+    <div class="final-copy">
+      <p class="eyebrow">Заявка</p>
+      <h2>Узнайте о начале регистрации первыми</h2>
+      <p class="lead">Мы сообщим программу, точное место и начало продаж.</p>
+      <p class="muted">Батуми · 13 ноября 2026 (предварительно) · офлайн, один день</p>
+    </div>
+    <form id="lead-form" novalidate>
+      <p class="preview-note" id="preview-note" hidden>Версия для согласования: приём заявок ещё не подключён. Форма проверяет поля, но данные никуда не отправляются.</p>
+      <div class="field">
+        <label for="f-name">Имя</label>
+        <input id="f-name" name="name" type="text" autocomplete="name" required>
+      </div>
+      <div class="field">
+        <label for="f-contact">Telegram, телефон или email</label>
+        <input id="f-contact" name="contact" type="text" autocomplete="tel" required>
+      </div>
+      <div class="field">
+        <label for="f-company">Компания или сфера бизнеса <small>необязательно</small></label>
+        <input id="f-company" name="company" type="text" autocomplete="organization">
+      </div>
+      <div class="field">
+        <label for="f-tariff">Интересующий вариант</label>
+        <select id="f-tariff" name="tariff">
+          <option value="early">Ранняя регистрация · 200 ₾</option>
+          <option value="standard">Основная стоимость · 250 ₾</option>
+          <option value="club">Член бизнес-клуба · 200 ₾</option>
+          <option value="unsure" selected>Пока не определился</option>
+        </select>
+      </div>
+      <label class="consent" for="f-consent"><input id="f-consent" name="consent" type="checkbox" required><span>Согласен на обработку персональных данных для связи по поводу семинара.</span></label>
+      <button class="btn" type="submit" id="f-submit">Узнать о начале регистрации</button>
+      <p class="form-status" id="form-status" role="status" aria-live="polite" hidden></p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>«Бизнес без собственника» · семинар Ульяны Павловой</span>
+    <span>Батуми, 2026</span>
+  </div>
+</footer>
+
+<script>
+/* ===== Настройки сайта: всё, что меняется при запуске, собрано здесь ===== */
+var SITE_CONFIG = {
+  // Адрес приёма заявок (Google Apps Script, Formspree, CRM-вебхук). Пусто = приём не подключён,
+  // форма честно сообщает, что данные не отправлены.
+  leadEndpoint: "",
+  // false = анонс (кнопки «Узнать об участии»). true = продажи открыты: кнопки тарифов ведут на paymentUrl.
+  salesOpen: false,
+  // Ссылки на платёжные страницы Bank of Georgia (платёжная ссылка / checkout) для каждого тарифа.
+  // Подтверждение участия отправляется только после проверенного статуса оплаты от банка (на сервере),
+  // а не по возврату на страницу «Спасибо». Данные карт на сайте не собираются.
+  tariffs: {
+    early:    { title: "Ранняя регистрация", amount: 200, currency: "GEL", paymentUrl: "" },
+    standard: { title: "Основная стоимость", amount: 250, currency: "GEL", paymentUrl: "" },
+    club:     { title: "Член бизнес-клуба",  amount: 200, currency: "GEL", paymentUrl: "" }
+  }
+};
+
+/* ===== Аналитика: события уходят в dataLayer (GTM / GA4 / Метрика подключаются отдельно) ===== */
+window.dataLayer = window.dataLayer || [];
+var UTM = {};
+(function () {
+  var keys = ["utm_source","utm_medium","utm_campaign","utm_content","utm_term"];
+  try {
+    var q = new URLSearchParams(location.search);
+    keys.forEach(function (k) { if (q.get(k)) UTM[k] = q.get(k); });
+    if (Object.keys(UTM).length) sessionStorage.setItem("utm", JSON.stringify(UTM));
+    else UTM = JSON.parse(sessionStorage.getItem("utm") || "{}");
+  } catch (e) {}
+})();
+function track(event, data) {
+  var payload = Object.assign({ event: event }, UTM, data || {});
+  window.dataLayer.push(payload);
+}
+track("page_view");
+
+document.addEventListener("click", function (e) {
+  var el = e.target.closest("[data-track]");
+  if (el) track(el.getAttribute("data-track"), { cta: el.getAttribute("data-cta") });
+});
+
+/* Просмотр программы */
+(function () {
+  var prog = document.getElementById("program");
+  if (!("IntersectionObserver" in window) || !prog) return;
+  var io = new IntersectionObserver(function (entries) {
+    if (entries[0].isIntersecting) { track("program_view"); io.disconnect(); }
+  }, { threshold: 0.3 });
+  io.observe(prog);
+})();
+
+/* ===== Режим продаж ===== */
+(function () {
+  var sale = SITE_CONFIG.salesOpen;
+  document.querySelectorAll("[data-label-presale]").forEach(function (el) {
+    el.textContent = sale ? el.getAttribute("data-label-sale") : el.getAttribute("data-label-presale");
+    if (sale) el.setAttribute("href", "#price");
+  });
+  document.querySelectorAll("[data-tariff-btn]").forEach(function (btn) {
+    var key = btn.getAttribute("data-tariff-btn");
+    var t = SITE_CONFIG.tariffs[key];
+    if (sale && t && t.paymentUrl) {
+      btn.textContent = "Купить билет · " + t.amount + " ₾";
+      btn.setAttribute("href", t.paymentUrl);
+      btn.setAttribute("rel", "noopener");
+      btn.addEventListener("click", function () { track("checkout_start", { tariff: key, value: t.amount, currency: t.currency }); });
+    } else {
+      btn.addEventListener("click", function () {
+        var sel = document.getElementById("f-tariff");
+        if (sel) sel.value = key;
+      });
+    }
+  });
+})();
+
+/* ===== Форма заявки ===== */
+(function () {
+  var form = document.getElementById("lead-form");
+  var status = document.getElementById("form-status");
+  var submit = document.getElementById("f-submit");
+  var hasBackend = !!SITE_CONFIG.leadEndpoint;
+  document.getElementById("preview-note").hidden = hasBackend;
+  var started = false;
+
+  form.addEventListener("input", function () {
+    if (!started) { started = true; track("lead_start"); }
+  });
+
+  function show(msg, kind) {
+    status.textContent = msg;
+    status.className = "form-status" + (kind ? " " + kind : "");
+    status.hidden = false;
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var f = function (id) { return document.getElementById(id); };
+    var name = f("f-name").value.trim();
+    var contact = f("f-contact").value.trim();
+    if (!name || !contact) { show("Укажите имя и удобный способ связи.", "err"); f(name ? "f-contact" : "f-name").focus(); return; }
+    if (!f("f-consent").checked) { show("Отметьте согласие на обработку персональных данных.", "err"); f("f-consent").focus(); return; }
+
+    if (!hasBackend) {
+      show("Приём заявок пока не подключён, поэтому заявка не отправлена. Это версия сайта для согласования.", "err");
+      return;
+    }
+
+    var id = "L" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    var data = {
+      id: id,
+      name: name,
+      contact: contact,
+      company: f("f-company").value.trim(),
+      tariff: f("f-tariff").value,
+      consent: true,
+      page: location.href.split("#")[0],
+      created_at: new Date().toISOString(),
+      utm: UTM
+    };
+    submit.disabled = true;
+    show("Отправляем…");
+    fetch(SITE_CONFIG.leadEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      show("Заявка принята. Мы напишем, когда откроется регистрация.", "ok");
+      track("lead_submit", { tariff: data.tariff });
+      form.reset();
+    }).catch(function () {
+      show("Не удалось отправить заявку. Проверьте подключение к интернету и попробуйте ещё раз.", "err");
+      track("lead_error");
+    }).finally(function () { submit.disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>
