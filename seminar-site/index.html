@@ -18,265 +18,431 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
 <style>
-/* Layout: молочная страница с шоколадными полосами; крупная плотная типографика, тонкие линии, фото Ульяны без обработки.
-   Единая светлая тема бренда (по брифу), цвета заданы явно. */
+/* Layout: молочная страница, шоколадные «острова» со скруглением, фото в арке.
+   Главный образ: оргструктура, которая перестраивается со «всё через собственника» на «решения на своём уровне».
+   Единая светлая тема бренда (по брифу), все цвета заданы явно. */
 :root{
-  --choc:#3D2A23;      /* Шоколад */
-  --coffee:#AA7650;    /* Кофе: акценты, линии */
+  --choc:#3D2A23;        /* Шоколад */
+  --choc-2:#4A352C;      /* Шоколад светлее: карточки на тёмном */
+  --choc-3:#5A4339;      /* Линии на тёмном */
+  --coffee:#AA7650;      /* Кофе */
   --coffee-deep:#85583A; /* Кофе для мелкого текста на светлом */
-  --sand:#E8D7C6;      /* Песок */
-  --milk:#FCF8F3;      /* Молочный */
-  --ink:#31241F;       /* Текст */
+  --sand:#E8D7C6;        /* Песок */
+  --sand-2:#F2E6DA;      /* Песок светлый */
+  --milk:#FCF8F3;        /* Молочный */
+  --white:#FFFDFA;
+  --ink:#31241F;         /* Текст */
   --muted:#6B574C;
-  --line:#E2D2C3;
-  --line-dark:#5A4339;
+  --line:#E6D7C8;
   --milk-soft:#D9C8B8;
-  --error:#9B2C1F;
   --font:'Manrope','Gilroy','Segoe UI',Arial,sans-serif;
+  --r-xl:36px; --r-lg:26px; --r-md:18px; --r-sm:12px; --pill:999px;
+  --sh-sm:0 1px 2px rgba(61,42,35,.06),0 6px 18px -10px rgba(61,42,35,.22);
+  --sh-md:0 2px 4px rgba(61,42,35,.05),0 18px 40px -22px rgba(61,42,35,.38);
+  --sh-lg:0 4px 10px rgba(61,42,35,.06),0 40px 80px -40px rgba(61,42,35,.55);
+  --ease:cubic-bezier(.2,.7,.2,1);
   --wrap:1200px;
   color-scheme:light;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:84px}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
-body{margin:0;background:var(--milk);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth;scroll-padding-top:96px;overflow-x:clip}
+body{margin:0;background:var(--milk);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:clip}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--milk)}
 img{max-width:100%;height:auto;display:block}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--coffee);outline-offset:3px}
-.wrap{max-width:calc(var(--wrap) + 48px);margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
-@media (min-width:768px){.wrap{padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}}
-
-/* type */
-h1,h2,h3{margin:0;text-wrap:balance;font-weight:800;letter-spacing:-.03em}
-h1{font-size:clamp(34px,6.4vw,84px);line-height:.94;text-transform:uppercase}
-h2{font-size:clamp(28px,4.4vw,52px);line-height:1.02;text-transform:uppercase}
-h3{font-size:20px;line-height:1.25;letter-spacing:-.015em}
-p{margin:0}
-.eyebrow{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--coffee-deep)}
-.lead{font-size:clamp(18px,1.7vw,21px);line-height:1.5;max-width:40ch}
-.muted{color:var(--muted)}
-.section{padding-block:clamp(64px,9vw,120px)}
-.section-head{display:grid;gap:18px;align-content:start;max-width:780px;margin-bottom:clamp(36px,5vw,56px)}
-.section-head p{max-width:60ch}
-
-/* buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 24px;border:1px solid var(--choc);background:var(--choc);color:var(--milk);font:inherit;font-size:15px;font-weight:700;text-decoration:none;cursor:pointer;transition:background .2s,color .2s}
-.btn:hover{background:var(--ink)}
-.btn.ghost{background:transparent;color:var(--choc)}
-.btn.ghost:hover{background:var(--choc);color:var(--milk)}
-.on-dark .btn{background:var(--milk);color:var(--choc);border-color:var(--milk)}
-.on-dark .btn:hover{background:var(--sand)}
-.btn .arr{font-weight:500}
-
-/* header */
-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--milk);border-bottom:1px solid var(--line)}
-.nav{display:flex;align-items:center;gap:24px;min-height:68px}
-.brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0}
-.brand-mark{flex:none;width:36px;height:36px;display:grid;place-items:center;background:var(--choc);color:var(--milk);font-weight:800;font-size:13px;letter-spacing:-.04em}
-.brand-text{font-weight:800;font-size:14px;line-height:1.2;letter-spacing:-.02em}
-.brand-text small{display:block;font-weight:600;font-size:11px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
-.nav-links{display:none;margin-left:auto;gap:30px}
-.nav-links a{font-size:14px;font-weight:700;text-decoration:none}
-.nav-links a:hover{color:var(--coffee-deep)}
-.nav .btn{margin-left:auto;flex:none;white-space:nowrap;min-height:42px;padding:0 16px;font-size:13px}
-@media (min-width:900px){.nav-links{display:flex}.nav .btn{margin-left:0}}
-@media (max-width:420px){.brand-text small{display:none}}
-
-/* hero */
-.hero{padding-block:clamp(36px,6vw,72px) clamp(56px,7vw,88px)}
-.hero-grid{display:grid;gap:40px}
-.hero-copy{display:grid;gap:24px;align-content:start;min-width:0}
-.hero h1 span{display:block}
-.hero .sub{font-size:clamp(20px,2.2vw,28px);font-weight:700;line-height:1.25;letter-spacing:-.02em;max-width:24ch}
-.hero .lead{color:var(--muted)}
-.cta-row{display:flex;flex-wrap:wrap;gap:12px}
-.hero-photo{position:relative;margin:0;min-width:0}
-.hero-photo img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 30%;background:var(--sand)}
-.hero-photo figcaption{position:absolute;left:0;bottom:0;background:var(--milk);padding:12px 16px 0 0;font-size:13px;font-weight:700;line-height:1.3}
-.hero-photo figcaption small{display:block;font-weight:500;color:var(--muted)}
-@media (min-width:900px){
-  .hero-grid{grid-template-columns:minmax(0,1.35fr) minmax(0,.85fr);gap:56px;align-items:center}
-}
-/* ticket strip: факты мероприятия со статусом */
-.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--choc);margin-top:8px}
-.fact{padding:14px 12px 14px 0;border-bottom:1px solid var(--line);min-width:0}
-.fact:nth-child(odd){padding-right:16px;border-right:1px solid var(--line)}
-.fact:nth-child(even){padding-left:16px}
-.fact dt{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.fact dd{margin:4px 0 0;font-weight:700;font-size:16px;line-height:1.3}
-.tag{display:inline-block;margin-left:6px;padding:1px 7px;border:1px solid var(--coffee);color:var(--coffee-deep);font-size:11px;font-weight:700;letter-spacing:.02em;vertical-align:2px;white-space:nowrap}
-@media (min-width:640px){.facts{grid-template-columns:repeat(4,minmax(0,1fr))}.fact{border-right:1px solid var(--line);padding:14px 16px!important}.fact:first-child{padding-left:0!important}.fact:last-child{border-right:0}}
-
-/* dark band */
-.band{background:var(--choc);color:var(--milk)}
-.band .eyebrow{color:var(--sand)}
-.band .muted{color:var(--milk-soft)}
-.quote-row{display:grid;gap:0;border-top:1px solid var(--line-dark);margin-bottom:clamp(40px,5vw,64px)}
-.quote-row blockquote{margin:0;padding:18px 0;border-bottom:1px solid var(--line-dark);font-size:clamp(18px,1.8vw,22px);font-weight:600;line-height:1.35;letter-spacing:-.01em;color:var(--sand)}
-@media (min-width:768px){.quote-row{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px}}
-.pain-grid{display:grid;gap:1px;background:var(--line-dark);border:1px solid var(--line-dark)}
-.pain-grid li{background:var(--choc);padding:24px;font-size:18px;font-weight:600;line-height:1.4;min-width:0}
-@media (min-width:640px){.pain-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (min-width:1024px){.pain-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .plain{list-style:none;margin:0;padding:0}
 [hidden]{display:none!important}
-.conclusion{margin-top:clamp(36px,5vw,56px);display:grid;gap:24px;align-items:center}
-.conclusion p{font-size:clamp(19px,2vw,24px);font-weight:600;line-height:1.4;max-width:48ch}
+.wrap{max-width:calc(var(--wrap) + 48px);margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+@media (min-width:768px){.wrap{padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}}
+.ic{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* type */
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:800;letter-spacing:-.035em}
+h1{font-size:clamp(34px,5.6vw,78px);line-height:.92;text-transform:uppercase}
+h2{font-size:clamp(30px,4.6vw,56px);line-height:1;text-transform:uppercase}
+h3{font-size:20px;line-height:1.25;letter-spacing:-.015em}
+p{margin:0}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--coffee-deep)}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--coffee);box-shadow:0 0 0 4px rgba(170,118,80,.18)}
+.lead{font-size:clamp(18px,1.7vw,21px);line-height:1.5;max-width:42ch}
+.muted{color:var(--muted)}
+.section{padding-block:clamp(72px,10vw,132px)}
+.section-head{display:grid;gap:18px;align-content:start;max-width:800px;margin-bottom:clamp(40px,5vw,64px)}
+.section-head p:not(.eyebrow){max-width:60ch}
+.center{text-align:center;justify-items:center;margin-inline:auto}
+.hl{position:relative;white-space:nowrap;z-index:0}
+.hl::after{content:"";position:absolute;left:-.04em;right:-.04em;bottom:.06em;height:.2em;border-radius:var(--pill);background:var(--sand);z-index:-1;transform-origin:left;animation:grow .9s .5s var(--ease) both}
+.on-dark .hl::after{background:var(--coffee);opacity:.55}
+@keyframes grow{from{transform:scaleX(0)}}
+
+/* buttons */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:56px;padding:0 10px 0 26px;border:1px solid var(--choc);border-radius:var(--pill);background:var(--choc);color:var(--milk);font:inherit;font-size:15px;font-weight:700;text-decoration:none;cursor:pointer;box-shadow:var(--sh-sm);transition:transform .35s var(--ease),box-shadow .35s var(--ease),background .25s,color .25s}
+.btn .bi{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--milk);color:var(--choc);transition:transform .35s var(--ease)}
+.btn .bi .ic{width:18px;height:18px;stroke-width:2}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--sh-md)}
+.btn:hover .bi{transform:translateX(3px) rotate(-45deg)}
+.btn.ghost{background:transparent;color:var(--choc);box-shadow:none}
+.btn.ghost .bi{background:var(--sand);color:var(--choc)}
+.btn.ghost:hover{background:var(--white);box-shadow:var(--sh-sm)}
+.btn.plain-pad{padding:0 26px}
+.on-dark .btn{background:var(--milk);color:var(--choc);border-color:var(--milk)}
+.on-dark .btn .bi{background:var(--choc);color:var(--milk)}
+.on-dark .btn.ghost{background:transparent;color:var(--milk);border-color:var(--choc-3)}
+.on-dark .btn.ghost .bi{background:var(--choc-2);color:var(--sand)}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;padding-block:12px}
+.nav{display:flex;align-items:center;gap:16px;min-height:64px;padding:8px 8px 8px 14px;border-radius:var(--pill);background:rgba(252,248,243,.82);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border:1px solid rgba(230,215,200,.9);box-shadow:var(--sh-sm)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0}
+.brand-mark{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--choc);color:var(--milk);font-weight:800;font-size:12px;letter-spacing:-.02em}
+.brand-text{font-weight:800;font-size:14px;line-height:1.2;letter-spacing:-.02em}
+.brand-text small{display:block;font-weight:600;font-size:11px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.nav-links{display:none;margin-left:auto;gap:4px}
+.nav-links a{font-size:14px;font-weight:700;text-decoration:none;padding:10px 16px;border-radius:var(--pill);transition:background .2s}
+.nav-links a:hover{background:var(--sand-2)}
+.nav .btn{margin-left:auto;flex:none;white-space:nowrap;min-height:48px;padding:0 6px 0 18px;font-size:13px;gap:10px}
+.nav .btn .bi{width:34px;height:34px}
+@media (min-width:960px){.nav-links{display:flex}.nav .btn{margin-left:8px}}
+@media (max-width:440px){.brand-text small{display:none}.brand-text{font-size:13px}.nav .btn .bi{display:none}.nav .btn{padding:0 16px}}
+
+/* hero */
+.hero{position:relative;padding-block:clamp(20px,4vw,48px) clamp(56px,7vw,96px)}
+.hero::before{content:"";position:absolute;inset:-120px 0 auto;height:760px;background:radial-gradient(600px 380px at 85% 30%,rgba(232,215,198,.85),transparent 70%),radial-gradient(500px 300px at 10% 10%,rgba(242,230,218,.9),transparent 70%);z-index:-1;pointer-events:none}
+.hero-grid{display:grid;gap:48px}
+.hero-copy{display:grid;gap:26px;align-content:center;min-width:0}
+.hero h1>span{display:block}
+.hero .sub{font-size:clamp(20px,2.2vw,28px);font-weight:700;line-height:1.25;letter-spacing:-.02em;max-width:26ch}
+.hero .lead{color:var(--muted)}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px}
+.load>*{animation:up .8s var(--ease) both}
+.load>*:nth-child(2){animation-delay:.08s}.load>*:nth-child(3){animation-delay:.16s}.load>*:nth-child(4){animation-delay:.24s}.load>*:nth-child(5){animation-delay:.32s}.load>*:nth-child(6){animation-delay:.4s}
+@keyframes up{from{opacity:0;transform:translateY(22px)}}
+
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px}
+.fact{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:var(--r-md);background:var(--white);border:1px solid var(--line);box-shadow:var(--sh-sm);min-width:0}
+.fact .ib{width:40px;height:40px}
+.fact dt{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.fact dd{margin:0;font-weight:700;font-size:15px;line-height:1.3}
+@media (min-width:640px){.facts{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (min-width:960px) and (max-width:1180px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tag{display:inline-block;padding:2px 9px;border-radius:var(--pill);background:var(--sand-2);color:var(--coffee-deep);font-size:11px;font-weight:700;white-space:nowrap}
+.ib{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--sand-2);color:var(--coffee-deep)}
+.ib .ic{width:22px;height:22px}
+
+.hero-art{position:relative;min-width:0;max-width:520px;width:100%;justify-self:center;padding:18px}
+.arch{position:relative;margin:0;border-radius:999px 999px var(--r-xl) var(--r-xl);overflow:hidden;box-shadow:var(--sh-lg);background:var(--sand);animation:rise 1.1s .1s var(--ease) both}
+.arch img{width:100%;aspect-ratio:4/5.2;object-fit:cover;object-position:50% 34%}
+@keyframes rise{from{opacity:0;transform:translateY(30px) scale(.97)}}
+.ring{position:absolute;inset:0;border:1.5px dashed var(--coffee);border-radius:999px 999px 44px 44px;opacity:.45;pointer-events:none;transform:rotate(-3deg);animation:sway 9s ease-in-out infinite alternate}
+@keyframes sway{to{transform:rotate(3deg)}}
+.float{position:absolute;display:flex;align-items:center;gap:10px;padding:10px 16px 10px 10px;border-radius:var(--pill);background:rgba(255,253,250,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:var(--sh-md);font-size:13px;font-weight:700;line-height:1.25;animation:bob 6s ease-in-out infinite}
+.float small{display:block;font-weight:500;color:var(--muted)}
+.float .ib{width:38px;height:38px;background:var(--choc);color:var(--milk)}
+.float .ib .ic{width:18px;height:18px}
+.f1{left:-6px;bottom:22%}
+.f2{right:-6px;top:16%;animation-delay:-3s}
+.f2 .ib{background:var(--coffee)}
+@keyframes bob{50%{transform:translateY(-8px)}}
+@media (min-width:960px){
+  .hero-grid{grid-template-columns:minmax(0,1.3fr) minmax(0,.9fr);gap:48px;align-items:center}
+  .f1{left:-34px}.f2{right:-24px}
+}
+
+/* marquee */
+.marquee{overflow:hidden;background:var(--choc);color:var(--sand);padding-block:18px;transform:rotate(-1.2deg);margin-block:-8px 0;position:relative;z-index:2;box-shadow:var(--sh-md)}
+.marquee-track{display:flex;width:max-content;gap:0;animation:scroll 38s linear infinite}
+.marquee span{display:inline-flex;align-items:center;gap:22px;padding-right:22px;font-size:clamp(16px,2vw,22px);font-weight:800;letter-spacing:-.01em;text-transform:uppercase;white-space:nowrap}
+.marquee span::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--coffee)}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* dark island */
+.island{background:var(--choc);color:var(--milk);border-radius:var(--r-xl);margin-inline:max(8px,env(safe-area-inset-left,0px));position:relative;overflow:hidden}
+@media (min-width:768px){.island{margin-inline:16px;border-radius:48px}}
+.island .eyebrow{color:var(--sand)}
+.island .muted{color:var(--milk-soft)}
+.island::before{content:"";position:absolute;width:640px;height:640px;right:-220px;top:-260px;border-radius:50%;border:1px solid var(--choc-3);box-shadow:0 0 0 70px rgba(90,67,57,.18),0 0 0 140px rgba(90,67,57,.1);pointer-events:none}
+.island>.wrap{position:relative}
+
+/* pain */
+.bubbles{display:grid;gap:14px;margin-bottom:clamp(44px,5vw,72px)}
+.bubble{align-self:start;max-width:520px;padding:16px 22px;border-radius:24px 24px 24px 6px;background:var(--choc-2);border:1px solid var(--choc-3);font-size:clamp(17px,1.7vw,20px);font-weight:600;line-height:1.4;color:var(--sand);box-shadow:0 20px 40px -28px rgba(0,0,0,.6)}
+.bubble:nth-child(even){justify-self:end;border-radius:24px 24px 6px 24px;background:var(--milk);color:var(--choc);border-color:var(--milk)}
+@media (min-width:900px){.bubbles{grid-template-columns:1fr 1fr;column-gap:40px}.bubble:nth-child(even){margin-top:40px}}
+.cards{display:grid;gap:14px}
+.pain-card{display:grid;gap:18px;align-content:start;padding:26px;border-radius:var(--r-lg);background:var(--choc-2);border:1px solid var(--choc-3);font-size:18px;font-weight:600;line-height:1.4;transition:transform .4s var(--ease),background .3s;min-width:0}
+.pain-card:hover{transform:translateY(-4px);background:#523B31}
+.pain-card .ib{background:rgba(232,215,198,.12);color:var(--sand);border:1px solid var(--choc-3)}
+@media (max-width:639px){.pain-card{grid-template-columns:auto 1fr;align-items:center;gap:16px;padding:18px;font-size:16px}}
+@media (min-width:640px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1024px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.conclusion{margin-top:clamp(36px,5vw,56px);display:grid;gap:22px;align-items:center;padding:clamp(24px,3vw,40px);border-radius:var(--r-lg);background:var(--milk);color:var(--ink);box-shadow:0 30px 60px -30px rgba(0,0,0,.5)}
+.conclusion p{font-size:clamp(18px,1.9vw,23px);font-weight:600;line-height:1.4;max-width:50ch}
+.conclusion .btn{background:var(--choc);color:var(--milk);border-color:var(--choc)}
+.conclusion .btn .bi{background:var(--milk);color:var(--choc)}
 @media (min-width:900px){.conclusion{grid-template-columns:1fr auto}}
 
 /* audience */
-.aud-grid{display:grid;gap:48px}
-.check-list li{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:18px 0;border-bottom:1px solid var(--line);font-size:18px;font-weight:600;line-height:1.4}
-.check-list li:first-child{border-top:1px solid var(--choc)}
-.check-list li::before{content:"";width:18px;height:10px;margin-top:6px;border-left:2px solid var(--coffee);border-bottom:2px solid var(--coffee);transform:rotate(-45deg)}
-.note{background:var(--sand);padding:28px;display:grid;gap:12px;align-self:start}
-.note p{font-size:18px;line-height:1.5}
-@media (min-width:900px){.aud-grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:64px}}
+.aud-grid{display:grid;gap:40px}
+.check-list{display:grid;gap:10px}
+.check-list li{display:flex;gap:16px;align-items:center;padding:16px 20px 16px 16px;border-radius:var(--r-md);background:var(--white);border:1px solid var(--line);box-shadow:var(--sh-sm);font-size:17px;font-weight:600;line-height:1.4;transition:transform .35s var(--ease),box-shadow .35s}
+.check-list li:hover{transform:translateX(4px);box-shadow:var(--sh-md)}
+.check-list .ib{width:40px;height:40px;background:var(--choc);color:var(--milk)}
+.check-list .ib .ic{width:18px;height:18px;stroke-width:2.2}
+.note{position:relative;border-radius:var(--r-lg);background:var(--sand);padding:32px;display:grid;gap:14px;align-self:start;overflow:hidden}
+.note .big{font-size:clamp(64px,8vw,96px);font-weight:800;letter-spacing:-.05em;line-height:.9;color:var(--choc)}
+.note .big small{display:block;font-size:14px;letter-spacing:.02em;font-weight:700;color:var(--coffee-deep);margin-top:10px}
+.note p{font-size:17px;line-height:1.5}
+.note::after{content:"";position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;border:1px solid rgba(170,118,80,.5);box-shadow:0 0 0 24px rgba(170,118,80,.08)}
+@media (min-width:900px){.aud-grid{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:56px}}
 
 /* results */
-.results{background:var(--sand)}
-.results-grid{display:grid;gap:40px}
-.res-list{display:grid;gap:1px;background:var(--milk-soft);border:1px solid var(--milk-soft);align-content:start}
-.res-list li{background:var(--milk);padding:26px;display:grid;gap:8px;min-width:0}
-.res-list p{color:var(--muted)}
-.results figure{margin:0}
-.results figure img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:55% 45%}
+.tint{background:linear-gradient(180deg,var(--milk),var(--sand-2) 18%,var(--sand-2) 82%,var(--milk))}
+.results-grid{display:grid;gap:28px}
+.photo-card{position:relative;margin:0;border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--sh-lg)}
+.photo-card img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:55% 45%;transition:transform 1.2s var(--ease)}
+.photo-card:hover img{transform:scale(1.04)}
+.photo-card figcaption{position:absolute;left:14px;right:14px;bottom:14px;display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:var(--r-md);background:rgba(255,253,250,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:14px;font-weight:700;line-height:1.3;box-shadow:var(--sh-sm)}
+.photo-card figcaption .ib{width:36px;height:36px;background:var(--choc);color:var(--milk)}
+.photo-card figcaption .ib .ic{width:17px;height:17px}
+.res-list{display:grid;gap:14px;align-content:start}
+.res-card{position:relative;display:grid;gap:12px;align-content:start;padding:28px;border-radius:var(--r-lg);background:var(--white);border:1px solid var(--line);box-shadow:var(--sh-sm);transition:transform .4s var(--ease),box-shadow .4s;overflow:hidden;min-width:0}
+.res-card:hover{transform:translateY(-6px);box-shadow:var(--sh-lg)}
+.res-card .ib{width:56px;height:56px;margin-bottom:6px;background:var(--choc);color:var(--milk);transition:transform .5s var(--ease)}
+.res-card:hover .ib{transform:rotate(-10deg) scale(1.06)}
+.res-card p{color:var(--muted)}
+.res-card::after{content:"";position:absolute;right:-40px;bottom:-40px;width:120px;height:120px;border-radius:50%;background:var(--sand-2);z-index:0;transition:transform .6s var(--ease)}
+.res-card:hover::after{transform:scale(1.4)}
+.res-card>*{position:relative;z-index:1}
 @media (min-width:640px){.res-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (min-width:1024px){.results-grid{grid-template-columns:minmax(0,1fr) minmax(0,2fr);align-items:start}}
+@media (min-width:1024px){.results-grid{grid-template-columns:minmax(0,.85fr) minmax(0,2fr);align-items:stretch}.photo-card img{height:100%;aspect-ratio:auto}}
 
-/* program */
-.program{display:grid;border-top:1px solid var(--choc)}
-.prog{display:grid;gap:16px;padding:32px 0;border-bottom:1px solid var(--line)}
-.prog-num{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--coffee-deep)}
-.prog h3{font-size:clamp(22px,2.4vw,30px);letter-spacing:-.025em}
+/* program timeline */
+.timeline{position:relative;display:grid;gap:18px;padding-left:64px}
+.timeline::before{content:"";position:absolute;left:23px;top:24px;bottom:24px;width:2px;border-radius:2px;background:var(--line)}
+.timeline .fill{position:absolute;left:23px;top:24px;bottom:24px;width:2px;border-radius:2px;background:var(--coffee);transform-origin:top;transform:scaleY(1)}
+.prog{position:relative;display:grid;gap:16px;padding:28px;border-radius:var(--r-lg);background:var(--white);border:1px solid var(--line);box-shadow:var(--sh-sm);transition:box-shadow .4s,transform .4s var(--ease)}
+.prog:hover{box-shadow:var(--sh-md);transform:translateX(4px)}
+.prog-dot{position:absolute;left:-64px;top:22px;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--choc);color:var(--milk);font-weight:800;font-size:17px;box-shadow:0 0 0 6px var(--milk),var(--sh-md)}
+.prog-num{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--coffee-deep)}
+.prog h3{font-size:clamp(21px,2.3vw,28px);letter-spacing:-.025em;margin-top:4px}
 .prog ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-.prog li{position:relative;padding-left:22px;max-width:62ch}
-.prog li::before{content:"";position:absolute;left:0;top:.8em;width:10px;height:1px;background:var(--coffee)}
-@media (min-width:900px){.prog{grid-template-columns:120px minmax(0,1fr) minmax(0,1.2fr);gap:32px;align-items:start}}
-.small-note{font-size:14px;color:var(--muted);margin-top:24px;max-width:70ch}
+.prog li{position:relative;padding-left:26px;max-width:62ch}
+.prog li::before{content:"";position:absolute;left:0;top:.5em;width:12px;height:12px;border-radius:50%;border:2px solid var(--coffee)}
+.prog .perf{display:inline-block;padding:1px 10px;border-radius:var(--pill);background:var(--sand-2);font-weight:700;color:var(--coffee-deep)}
+@media (min-width:900px){.prog{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:40px;padding:34px 36px}.timeline{padding-left:84px}.prog-dot{left:-84px;width:56px;height:56px;top:30px}.timeline::before,.timeline .fill{left:27px}}
+@media (max-width:640px){.timeline{padding-left:0}.timeline::before,.timeline .fill{display:none}.prog-dot{position:static;width:44px;height:44px;box-shadow:none}.prog{padding:22px}}
+.small-note{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted);margin-top:24px}
+.small-note .ic{width:18px;height:18px;color:var(--coffee-deep)}
 
 /* speaker */
-.speaker-grid{display:grid;gap:40px}
-.speaker figure{margin:0}
-.speaker figure img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:60% 55%}
+.speaker-grid{display:grid;gap:48px;align-items:center}
+.sp-photo{position:relative;max-width:520px;width:100%;justify-self:center}
+.sp-photo figure{margin:0;border-radius:var(--r-xl);overflow:hidden;box-shadow:0 40px 80px -40px rgba(0,0,0,.7)}
+.sp-photo img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:60% 55%}
+.seal{position:absolute;right:-14px;bottom:-26px;width:150px;height:150px;border-radius:50%;background:var(--milk);color:var(--choc);display:grid;place-items:center;box-shadow:var(--sh-lg)}
+.seal svg{position:absolute;inset:0;width:100%;height:100%;animation:spin 24s linear infinite}
+.seal text{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;fill:var(--coffee-deep)}
+.seal b{font-size:40px;font-weight:800;letter-spacing:-.05em;line-height:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (min-width:900px){.seal{right:-40px;width:170px;height:170px}.seal b{font-size:46px}}
 .speaker-copy{display:grid;gap:22px;align-content:center;min-width:0}
 .speaker-copy .role{font-size:clamp(19px,1.9vw,23px);font-weight:600;line-height:1.4}
-.stat{display:flex;gap:20px;align-items:baseline;border-top:1px solid var(--line-dark);border-bottom:1px solid var(--line-dark);padding-block:20px}
-.stat b{font-size:clamp(48px,6vw,72px);font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--sand);font-variant-numeric:tabular-nums}
-.stat span{font-size:16px;line-height:1.45}
-@media (min-width:900px){.speaker-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:72px}}
+.sp-points{display:grid;gap:12px}
+.sp-points li{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:var(--r-md);background:var(--choc-2);border:1px solid var(--choc-3);line-height:1.5}
+.sp-points .ib{width:40px;height:40px;background:rgba(232,215,198,.12);color:var(--sand)}
+.sp-points .ib .ic{width:19px;height:19px}
+@media (min-width:900px){.speaker-grid{grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:88px}}
 
-/* team / method */
-.chain{display:flex;flex-wrap:wrap;gap:8px 0;margin-top:32px;list-style:none;padding:0}
-.chain li{display:flex;align-items:center;font-weight:700;font-size:15px}
-.chain li span{border:1px solid var(--choc);padding:8px 14px;background:var(--milk)}
-.chain li:last-child span{background:var(--choc);color:var(--milk)}
-.chain li+li::before{content:"→";padding:0 10px;color:var(--coffee-deep)}
-.team-grid{display:grid;gap:40px}
-.team-grid .body{display:grid;gap:18px;max-width:62ch}
-@media (min-width:900px){.team-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}}
+/* team: org structure */
+.team-grid{display:grid;gap:40px;align-items:center}
+.team-grid .body{display:grid;gap:20px;max-width:58ch}
+.chain{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;list-style:none;padding:0}
+.chain li{display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 8px;border-radius:var(--pill);background:var(--white);border:1px solid var(--line);font-weight:700;font-size:14px;box-shadow:var(--sh-sm)}
+.chain li span{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--sand-2);color:var(--coffee-deep);font-size:12px;font-weight:800}
+.chain li:last-child{background:var(--choc);color:var(--milk);border-color:var(--choc)}
+.chain li:last-child span{background:var(--coffee);color:var(--milk)}
+.org-card{border-radius:var(--r-xl);background:var(--white);border:1px solid var(--line);box-shadow:var(--sh-lg);padding:18px;display:grid;gap:12px;min-width:0}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:var(--pill);background:var(--sand-2)}
+.seg button{border:0;border-radius:var(--pill);background:transparent;padding:10px 12px;font:inherit;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;transition:background .3s,color .3s,box-shadow .3s}
+.seg button[aria-pressed="true"]{background:var(--choc);color:var(--milk);box-shadow:var(--sh-sm)}
+.org{width:100%;height:auto;display:block}
+.org line{stroke:var(--coffee);stroke-width:1.6;stroke-linecap:round}
+.org .g{transition:opacity .6s var(--ease)}
+.org[data-state="now"] .g-goal,.org[data-state="goal"] .g-now{opacity:0}
+.org .g line{stroke-dasharray:160;stroke-dashoffset:0}
+.org[data-state="now"] .g-now line,.org[data-state="goal"] .g-goal line{animation:draw 1s var(--ease) both}
+@keyframes draw{from{stroke-dashoffset:160}}
+.org .node{fill:var(--sand)}
+.org .lead-node{fill:var(--choc)}
+.org .owner{fill:var(--coffee)}
+.org .owner-out{fill:var(--white);stroke:var(--coffee);stroke-width:2}
+.org text{font-family:var(--font);font-size:11px;font-weight:800;fill:var(--milk);text-anchor:middle;dominant-baseline:central}
+.org text.dark{fill:var(--coffee-deep)}
+.org .pulse{fill:none;stroke:var(--coffee);stroke-width:1.5;transform-origin:180px 130px;animation:pulse 2.2s ease-out infinite}
+@keyframes pulse{from{transform:scale(1);opacity:.7}to{transform:scale(2.1);opacity:0}}
+.org-cap{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:var(--r-md);background:var(--sand-2);font-size:15px;font-weight:600;line-height:1.4;min-height:66px}
+.org-cap .ib{width:36px;height:36px;background:var(--choc);color:var(--milk)}
+.org-cap .ib .ic{width:17px;height:17px}
+@media (min-width:900px){.team-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:72px}}
 
 /* format */
-.format-grid{display:grid;gap:40px}
-.format-table{width:100%;border-collapse:collapse;border-top:1px solid var(--choc)}
-.format-table th,.format-table td{text-align:left;vertical-align:top;padding:16px 0;border-bottom:1px solid var(--line)}
-.format-table th{width:38%;padding-right:16px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.format-table td{font-weight:600}
-.format-table td small{display:block;font-weight:500;color:var(--muted)}
-.format-grid{max-width:820px}
+.format-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))}
+.f-card{display:grid;gap:14px;align-content:start;padding:24px;border-radius:var(--r-lg);background:var(--white);border:1px solid var(--line);box-shadow:var(--sh-sm);min-width:0}
+.f-card dt{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.f-card dd{margin:0;font-size:19px;font-weight:700;line-height:1.3;letter-spacing:-.01em}
+.f-card dd small{display:block;margin-top:6px;font-size:14px;font-weight:500;color:var(--muted);letter-spacing:0}
+.f-card .tag{margin-top:6px}
 
 /* pricing */
-.prices{display:grid;gap:16px}
-.price{border:1px solid var(--line);background:var(--milk);padding:28px;display:grid;gap:16px;grid-template-rows:auto auto 1fr auto;min-width:0}
-.price.feature{border-color:var(--choc);background:var(--choc);color:var(--milk)}
+.prices{display:grid;gap:16px;align-items:stretch}
+.price{position:relative;border-radius:var(--r-lg);border:1px solid var(--line);background:var(--white);box-shadow:var(--sh-sm);padding:30px;display:grid;gap:16px;grid-template-rows:auto auto 1fr auto;min-width:0;transition:transform .4s var(--ease),box-shadow .4s}
+.price:hover{transform:translateY(-6px);box-shadow:var(--sh-lg)}
+.price.feature{border-color:var(--choc);background:radial-gradient(420px 260px at 100% 0%,#5B4136,transparent 70%),var(--choc);color:var(--milk);box-shadow:var(--sh-lg)}
 .price.feature .muted{color:var(--milk-soft)}
 .price.feature .eyebrow{color:var(--sand)}
-.price .amount{font-size:clamp(48px,5vw,64px);font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
-.price .amount small{font-size:.4em;font-weight:700;letter-spacing:0;margin-left:6px}
-.price .btn{width:100%}
+.badge{position:absolute;top:22px;right:22px;padding:6px 12px;border-radius:var(--pill);background:var(--coffee);color:var(--milk);font-size:12px;font-weight:800;letter-spacing:.02em}
+.price .amount{font-size:clamp(56px,5.6vw,76px);font-weight:800;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums}
+.price .amount small{font-size:.36em;font-weight:700;letter-spacing:0;margin-left:8px;color:var(--coffee-deep)}
+.price.feature .amount small{color:var(--sand)}
+.price .btn{width:100%;justify-content:space-between}
 .price.feature .btn{background:var(--milk);color:var(--choc);border-color:var(--milk)}
-.price.feature .btn:hover{background:var(--sand)}
-@media (min-width:900px){.prices{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.price-note{margin-top:24px;font-size:15px;color:var(--muted);max-width:70ch}
+.price.feature .btn .bi{background:var(--choc);color:var(--milk)}
+@media (min-width:900px){.prices{grid-template-columns:repeat(3,minmax(0,1fr))}.price.feature{transform:translateY(-12px)}.price.feature:hover{transform:translateY(-18px)}}
+.price-note{display:flex;gap:10px;align-items:center;margin-top:28px;font-size:15px;color:var(--muted)}
+.price-note .ic{width:18px;height:18px;color:var(--coffee-deep)}
 
 /* faq */
 .faq-grid{display:grid;gap:40px}
-.faq{border-top:1px solid var(--choc)}
-.faq details{border-bottom:1px solid var(--line)}
-.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:20px;padding:20px 0;font-size:18px;font-weight:700;line-height:1.35}
+.faq{display:grid;gap:10px}
+.faq details{border-radius:var(--r-md);background:var(--white);border:1px solid var(--line);box-shadow:var(--sh-sm);transition:box-shadow .3s}
+.faq details[open]{box-shadow:var(--sh-md)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 18px 18px 22px;font-size:17px;font-weight:700;line-height:1.35;border-radius:var(--r-md)}
 .faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"+";flex:none;font-size:26px;font-weight:400;line-height:1;color:var(--coffee-deep);transition:transform .2s}
-.faq details[open] summary::after{transform:rotate(45deg)}
-.faq details p{padding:0 40px 22px 0;color:var(--muted);max-width:66ch}
-@media (min-width:900px){.faq-grid{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:64px}}
+.faq summary .pm{width:36px;height:36px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--sand-2);color:var(--choc);transition:transform .35s var(--ease),background .3s,color .3s}
+.faq summary .pm .ic{width:16px;height:16px;stroke-width:2.2}
+.faq details[open] summary .pm{transform:rotate(45deg);background:var(--choc);color:var(--milk)}
+.faq details p{padding:0 70px 22px 22px;color:var(--muted);max-width:66ch}
+.faq-side{display:grid;gap:22px;align-content:start}
+.faq-side .lead{color:var(--muted)}
+@media (min-width:900px){.faq-grid{grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);gap:72px}.faq-side{position:sticky;top:110px}}
 
-/* final cta + form */
-.final-grid{display:grid;gap:48px}
+/* register */
+.final-grid{display:grid;gap:44px;align-items:start}
 .final-copy{display:grid;gap:22px;align-content:start}
-form{display:grid;gap:22px;min-width:0}
-.field{display:grid;gap:8px}
-.field label{font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--sand)}
-.field label small{font-weight:500;color:var(--milk-soft)}
-.field input,.field select{width:100%;min-height:52px;padding:0 14px;border:1px solid var(--line-dark);background:var(--milk);color:var(--ink);font:inherit;font-size:16px;border-radius:0;appearance:none}
-.field select{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 15px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:40px}
-.field input:focus,.field select:focus{outline:2px solid var(--coffee);outline-offset:0}
-.consent{display:grid;grid-template-columns:22px 1fr;gap:12px;font-size:14px;line-height:1.5;color:var(--milk-soft);align-items:start}
-.consent input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--coffee)}
-.form-status{font-size:15px;line-height:1.5;padding:14px 16px;border:1px solid var(--line-dark)}
-.form-status.err{border-color:var(--sand);color:var(--milk)}
-.form-status.ok{background:var(--milk);color:var(--choc);border-color:var(--milk)}
-.preview-note{font-size:14px;line-height:1.5;color:var(--milk-soft);border-left:2px solid var(--coffee);padding-left:14px}
-.reg-steps{display:grid;gap:0;counter-reset:st;border-top:1px solid var(--line-dark);margin-top:8px}
-.reg-steps li{counter-increment:st;display:grid;grid-template-columns:40px 1fr;column-gap:12px;padding:16px 0;border-bottom:1px solid var(--line-dark)}
-.reg-steps li::before{content:counter(st);grid-row:span 2;width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--coffee);color:var(--sand);font-weight:800;font-size:14px}
+.reg-steps{display:grid;gap:12px;counter-reset:st}
+.reg-steps li{counter-increment:st;display:grid;grid-template-columns:44px 1fr;column-gap:14px;align-items:start;padding:16px;border-radius:var(--r-md);background:var(--choc-2);border:1px solid var(--choc-3)}
+.reg-steps li::before{content:counter(st);grid-row:span 2;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--milk);color:var(--choc);font-weight:800;font-size:16px}
 .reg-steps b{font-size:17px}
 .reg-steps span{color:var(--milk-soft);font-size:15px;line-height:1.5}
 .reg-price{font-size:15px}
-.reg-panel{display:grid;gap:20px;align-content:start;min-width:0}
-.stepper{display:flex;gap:8px}
-.stepper li{flex:1;display:flex;align-items:center;gap:10px;padding:10px 0;border-top:2px solid var(--line-dark);font-size:14px;font-weight:700;color:var(--milk-soft)}
-.stepper li span{width:24px;height:24px;display:grid;place-items:center;border:1px solid var(--line-dark);font-size:12px}
-.stepper li[aria-current="step"],.stepper li.done{border-top-color:var(--sand);color:var(--milk)}
-.stepper li[aria-current="step"] span{background:var(--sand);color:var(--choc);border-color:var(--sand)}
-.survey-intro{font-size:15px;color:var(--milk-soft)}
+.reg-panel{display:grid;gap:20px;align-content:start;min-width:0;padding:clamp(20px,3vw,36px);border-radius:var(--r-xl);background:var(--milk);color:var(--ink);box-shadow:0 40px 80px -40px rgba(0,0,0,.7)}
+.preview-note{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:var(--muted);padding:12px 14px;border-radius:var(--r-sm);background:var(--sand-2)}
+.preview-note .ic{width:18px;height:18px;margin-top:2px;color:var(--coffee-deep)}
+.stepper{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border-radius:var(--pill);background:var(--sand-2)}
+.stepper li{display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 10px;border-radius:var(--pill);font-size:14px;font-weight:700;color:var(--muted);transition:background .35s,color .35s}
+.stepper li span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:1.5px solid currentColor;font-size:12px}
+.stepper li[aria-current="step"]{background:var(--choc);color:var(--milk);box-shadow:var(--sh-sm)}
+.stepper li.done{color:var(--coffee-deep)}
+form{display:grid;gap:20px;min-width:0}
+.step-anim{animation:up .5s var(--ease) both}
+.field{display:grid;gap:8px}
+.field label,fieldset.choice legend{font-size:13px;font-weight:700;color:var(--ink)}
+.field label small,fieldset.choice legend small{font-weight:500;color:var(--muted)}
+.field input,.field select,.field textarea{width:100%;min-height:54px;padding:0 18px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--white);color:var(--ink);font:inherit;font-size:16px;appearance:none;transition:border-color .2s,box-shadow .2s}
+.field textarea{padding:14px 18px;resize:vertical;min-height:110px}
+.field select{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 22px) 50%,calc(100% - 17px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:44px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--coffee);box-shadow:0 0 0 4px rgba(170,118,80,.18)}
+.consent{display:grid;grid-template-columns:22px 1fr;gap:12px;font-size:14px;line-height:1.5;color:var(--muted);align-items:start;cursor:pointer}
+.consent input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--choc)}
+.survey-intro{font-size:15px;color:var(--muted)}
 fieldset.choice{border:0;margin:0;padding:0;display:grid;gap:10px;min-width:0}
-fieldset.choice legend{padding:0;margin-bottom:10px;font-size:13px;font-weight:700;color:var(--sand)}
-fieldset.choice legend small{font-weight:500;color:var(--milk-soft)}
+fieldset.choice legend{padding:0;margin-bottom:10px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips label{position:relative;cursor:pointer}
 .chips input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
-.chips span{display:inline-block;padding:10px 14px;border:1px solid var(--line-dark);font-size:15px;font-weight:600;line-height:1.2;color:var(--milk)}
-.chips input:checked+span{background:var(--milk);color:var(--choc);border-color:var(--milk)}
+.chips span{display:inline-block;padding:10px 16px;border-radius:var(--pill);border:1px solid var(--line);background:var(--white);font-size:15px;font-weight:600;line-height:1.2;transition:background .2s,color .2s,border-color .2s,transform .2s}
+.chips label:hover span{border-color:var(--coffee)}
+.chips input:checked+span{background:var(--choc);color:var(--milk);border-color:var(--choc);transform:scale(1.03)}
 .chips input:focus-visible+span{outline:2px solid var(--coffee);outline-offset:2px}
-.field textarea{width:100%;padding:12px 14px;border:1px solid var(--line-dark);background:var(--milk);color:var(--ink);font:inherit;font-size:16px;border-radius:0;resize:vertical}
-.field textarea:focus{outline:2px solid var(--coffee);outline-offset:0}
-.form-actions{display:flex;flex-wrap:wrap;gap:12px}
-.on-dark .btn.ghost{background:transparent;color:var(--milk);border-color:var(--milk-soft)}
-.on-dark .btn.ghost:hover{background:var(--milk);color:var(--choc)}
-.done{border:1px solid var(--sand);padding:28px;display:grid;gap:12px}
-.done p{color:var(--milk-soft)}
-@media (min-width:900px){.final-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:80px}}
+.form-actions{display:flex;flex-wrap:wrap;gap:10px}
+.form-status{font-size:15px;line-height:1.5;padding:12px 16px;border-radius:var(--r-sm)}
+.form-status.err{background:#F6E3DA;color:#7A2E1C}
+.form-status.ok{background:var(--sand-2);color:var(--choc)}
+.done{border-radius:var(--r-lg);background:var(--sand-2);padding:28px;display:grid;gap:12px;justify-items:start;animation:up .5s var(--ease) both}
+.done .ib{width:56px;height:56px;background:var(--choc);color:var(--milk)}
+.done p{color:var(--muted)}
+@media (min-width:900px){.final-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:64px}.final-copy{position:sticky;top:110px}}
 
-footer{border-top:1px solid var(--line-dark);background:var(--choc);color:var(--milk-soft);font-size:14px}
-footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding-block:28px}
+footer{padding-block:40px 32px;font-size:14px;color:var(--muted)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+footer .brand-mark{width:34px;height:34px;font-size:11px}
+
+/* mobile sticky CTA */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;justify-content:center;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));pointer-events:none;transform:translateY(130%);transition:transform .5s var(--ease)}
+.dock.show{transform:none}
+.dock .btn{pointer-events:auto;width:100%;max-width:420px;justify-content:space-between;box-shadow:var(--sh-lg)}
+@media (min-width:960px){.dock{display:none}}
+
+/* scroll reveal: контент виден по умолчанию; в поддерживающих браузерах мягко «доезжает» при прокрутке */
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .rv{animation:reveal linear both;animation-timeline:view();animation-range:entry 0% entry 70%}
+    .timeline .fill{animation:fillY linear both;animation-timeline:view();animation-range:entry 30% cover 70%}
+  }
+}
+@keyframes reveal{from{opacity:.15;transform:translateY(36px) scale(.985)}}
+@keyframes fillY{from{transform:scaleY(0)}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
 </style>
 </head>
 <body>
 
+<!-- Иконки -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18h2"/></symbol>
+  <symbol id="i-approve" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.2 3.6-6.5 8-6.5s8 2.3 8 6.5"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.8-7 10-7 10 7 10 7-3.8 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-users-plus" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-5.6 6.5-5.6s6.5 2 6.5 5.6M19 7.5v6M16 10.5h6"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></symbol>
+  <symbol id="i-tree" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="5" rx="1.5"/><rect x="3" y="16" width="6" height="5" rx="1.5"/><rect x="15" y="16" width="6" height="5" rx="1.5"/><path d="M12 8v4M6 16v-4h12v4"/></symbol>
+  <symbol id="i-user-check" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3.1-6.2 7-6.2s7 2.2 7 6.2M16 11l2 2 4-4"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7.5a3.5 3.5 0 0 0 0-7h-7a3.5 3.5 0 0 1 0-7H16"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.3-7-11.5a7 7 0 0 1 14 0C19 14.7 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-5 4.5V16"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16.5" cy="9" r="2.5"/><path d="M2.5 19.5c0-3.2 2.4-5 5.5-5s5.5 1.8 5.5 5M14 14.7c.8-.3 1.6-.4 2.5-.4 2.7 0 5 1.6 5 4.7"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+  <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 19h20"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></symbol>
+</svg>
+
 <header>
-  <div class="wrap nav">
-    <a class="brand" href="#top" aria-label="Бизнес без собственника, в начало">
-      <span class="brand-mark" aria-hidden="true">ББС</span>
-      <span class="brand-text">Бизнес без собственника<small>Ульяна Павлова · Батуми</small></span>
-    </a>
-    <nav class="nav-links" aria-label="Разделы">
-      <a href="#program">Программа</a>
-      <a href="#speaker">Спикер</a>
-      <a href="#price">Стоимость</a>
-      <a href="#faq">Вопросы</a>
-    </nav>
-    <a class="btn" href="#register" data-track="cta_click" data-cta="header" data-label-presale="Узнать об участии" data-label-sale="Купить билет">Узнать об участии</a>
+  <div class="wrap">
+    <div class="nav">
+      <a class="brand" href="#top" aria-label="Бизнес без собственника, в начало">
+        <span class="brand-mark" aria-hidden="true">ББС</span>
+        <span class="brand-text">Бизнес без собственника<small>Ульяна Павлова · Батуми</small></span>
+      </a>
+      <nav class="nav-links" aria-label="Разделы">
+        <a href="#program">Программа</a>
+        <a href="#speaker">Спикер</a>
+        <a href="#price">Стоимость</a>
+        <a href="#faq">Вопросы</a>
+      </nav>
+      <a class="btn" href="#register" data-track="cta_click" data-cta="header" data-label-presale="Регистрация" data-label-sale="Купить билет"><span class="bl">Регистрация</span><span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
+    </div>
   </div>
 </header>
 
@@ -285,77 +451,90 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <!-- 1. Первый экран -->
 <section class="hero">
   <div class="wrap hero-grid">
-    <div class="hero-copy">
+    <div class="hero-copy load">
       <p class="eyebrow">Однодневный офлайн-семинар для собственников</p>
-      <h1><span>Бизнес</span><span>без собственника</span></h1>
+      <h1><span>Бизнес</span><span>без <span class="hl">собственника</span></span></h1>
       <p class="sub">Как выйти из операционки без потери контроля над компанией.</p>
       <p class="lead">Разберём, почему сотрудники и руководители по-прежнему зависят от ваших решений, и составим план первых изменений в управлении.</p>
       <div class="cta-row">
-        <a class="btn" href="#register" data-track="cta_click" data-cta="hero" data-label-presale="Узнать об участии" data-label-sale="Купить билет">Узнать об участии</a>
-        <a class="btn ghost" href="#program" data-track="cta_click" data-cta="hero_program">Посмотреть программу <span class="arr" aria-hidden="true">↓</span></a>
+        <a class="btn" href="#register" data-track="cta_click" data-cta="hero" data-label-presale="Зарегистрироваться" data-label-sale="Купить билет"><span class="bl">Зарегистрироваться</span><span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
+        <a class="btn ghost" href="#program" data-track="cta_click" data-cta="hero_program">Программа<span class="bi"><svg class="ic"><use href="#i-down"/></svg></span></a>
       </div>
       <dl class="facts">
-        <div class="fact"><dt>Город</dt><dd>Батуми</dd></div>
-        <div class="fact"><dt>Дата</dt><dd>13 ноября 2026 <span class="tag">предварительно</span></dd></div>
-        <div class="fact"><dt>Формат</dt><dd>Офлайн, 1 день</dd></div>
-        <div class="fact"><dt>Язык</dt><dd>Русский</dd></div>
+        <div class="fact"><span class="ib"><svg class="ic"><use href="#i-pin"/></svg></span><div><dt>Город</dt><dd>Батуми</dd></div></div>
+        <div class="fact"><span class="ib"><svg class="ic"><use href="#i-cal"/></svg></span><div><dt>Дата</dt><dd>13.11.2026</dd></div></div>
+        <div class="fact"><span class="ib"><svg class="ic"><use href="#i-people"/></svg></span><div><dt>Формат</dt><dd>Офлайн, 1 день</dd></div></div>
+        <div class="fact"><span class="ib"><svg class="ic"><use href="#i-chat"/></svg></span><div><dt>Язык</dt><dd>Русский</dd></div></div>
       </dl>
     </div>
-    <figure class="hero-photo">
-      <img src="img/ulyana_balcony_portrait.webp" width="853" height="1280" alt="Портрет Ульяны Павловой на балконе на фоне старинного здания" fetchpriority="high">
-      <figcaption>Ульяна Павлова<small>спикер семинара</small></figcaption>
-    </figure>
+    <div class="hero-art">
+      <span class="ring" aria-hidden="true"></span>
+      <figure class="arch">
+        <img src="img/ulyana_balcony_portrait.webp" width="853" height="1280" alt="Портрет Ульяны Павловой на балконе на фоне старинного здания" fetchpriority="high">
+      </figure>
+      <div class="float f1"><span class="ib"><svg class="ic"><use href="#i-user"/></svg></span><span>Ульяна Павлова<small>спикер семинара</small></span></div>
+      <div class="float f2"><span class="ib"><svg class="ic"><use href="#i-cal"/></svg></span><span>13 ноября<small>дата предварительная</small></span></div>
+    </div>
   </div>
 </section>
 
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>Структура</span><span>Функции</span><span>Ответственность</span><span>Показатели</span><span>Руководители</span><span>Передача управления</span>
+    <span>Структура</span><span>Функции</span><span>Ответственность</span><span>Показатели</span><span>Руководители</span><span>Передача управления</span>
+  </div>
+</div>
+
 <!-- 2. Знакомые ситуации -->
-<section class="band on-dark section" id="pain">
+<div style="padding-top:clamp(48px,6vw,80px)">
+<section class="island on-dark section" id="pain">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head rv">
       <p class="eyebrow">Знакомые ситуации</p>
-      <h2>Сотрудники есть. Почему всё на вас?</h2>
+      <h2>Сотрудники есть. Почему <span class="hl">всё на вас?</span></h2>
       <p class="muted">Кажется, людей становится больше, а свободного времени нет. Узнаёте себя?</p>
     </div>
-    <div class="quote-row">
-      <blockquote>«Я нанял людей, а всё равно решаю почти всё сам».</blockquote>
-      <blockquote>«Стоит уехать на несколько дней, и рабочий телефон не замолкает».</blockquote>
-      <blockquote>«Директор есть, а времени стало не больше».</blockquote>
-      <blockquote>«Я хочу развивать бизнес, но день снова уходит на текучку».</blockquote>
+    <div class="bubbles">
+      <p class="bubble rv">«Я нанял людей, а всё равно решаю почти всё сам».</p>
+      <p class="bubble rv">«Стоит уехать на несколько дней, и рабочий телефон не замолкает».</p>
+      <p class="bubble rv">«Директор есть, а времени стало не больше».</p>
+      <p class="bubble rv">«Я хочу развивать бизнес, но день снова уходит на текучку».</p>
     </div>
-    <ul class="plain pain-grid">
-      <li>Даже в отпуске вы продолжаете отвечать на рабочие звонки.</li>
-      <li>Сотрудники ждут вашего согласования по обычным вопросам.</li>
-      <li>Управляющий есть, но сложные решения всё равно приходят к вам.</li>
-      <li>Вы каждый день проверяете задачи, вместо того чтобы видеть итоговый результат.</li>
-      <li>Найм новых людей не уменьшает вашу нагрузку.</li>
-      <li>На развитие компании снова не осталось времени.</li>
+    <ul class="plain cards">
+      <li class="pain-card rv"><span class="ib"><svg class="ic"><use href="#i-phone"/></svg></span>Даже в отпуске вы продолжаете отвечать на рабочие звонки.</li>
+      <li class="pain-card rv"><span class="ib"><svg class="ic"><use href="#i-approve"/></svg></span>Сотрудники ждут вашего согласования по обычным вопросам.</li>
+      <li class="pain-card rv"><span class="ib"><svg class="ic"><use href="#i-user"/></svg></span>Управляющий есть, но сложные решения всё равно приходят к вам.</li>
+      <li class="pain-card rv"><span class="ib"><svg class="ic"><use href="#i-eye"/></svg></span>Вы каждый день проверяете задачи, вместо того чтобы видеть итоговый результат.</li>
+      <li class="pain-card rv"><span class="ib"><svg class="ic"><use href="#i-users-plus"/></svg></span>Найм новых людей не уменьшает вашу нагрузку.</li>
+      <li class="pain-card rv"><span class="ib"><svg class="ic"><use href="#i-trend"/></svg></span>На развитие компании снова не осталось времени.</li>
     </ul>
-    <div class="conclusion">
+    <div class="conclusion rv">
       <p>Если это знакомо, проблема может быть не в количестве сотрудников. Важно разобраться, как распределены функции, полномочия и ответственность за результат.</p>
-      <a class="btn" href="#program" data-track="cta_click" data-cta="pain_program">Смотреть программу</a>
+      <a class="btn" href="#program" data-track="cta_click" data-cta="pain_program">Смотреть программу<span class="bi"><svg class="ic"><use href="#i-down"/></svg></span></a>
     </div>
   </div>
 </section>
+</div>
 
 <!-- 3. Для кого -->
 <section class="section" id="audience">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head rv">
       <p class="eyebrow">Для кого</p>
       <h2>Кому подойдёт семинар</h2>
       <p class="lead">Вам, если у вас уже есть работающий бизнес и команда, но вы по-прежнему нужны почти для каждого важного решения.</p>
     </div>
     <div class="aud-grid">
       <ul class="plain check-list">
-        <li>Вы собственник компании с командой примерно от 5–10 человек.</li>
-        <li>Хотите передать текущие задачи руководителям, но не понимаете, с чего начать.</li>
-        <li>Уже наняли директора или управляющего, но продолжаете работать за него.</li>
-        <li>Планируете масштабирование и понимаете, что текущая система не выдержит роста.</li>
-        <li>Хотите видеть результаты бизнеса, не контролируя каждое действие сотрудников.</li>
+        <li class="rv"><span class="ib"><svg class="ic"><use href="#i-check"/></svg></span>Вы собственник компании с командой примерно от 5–10 человек.</li>
+        <li class="rv"><span class="ib"><svg class="ic"><use href="#i-check"/></svg></span>Хотите передать текущие задачи руководителям, но не понимаете, с чего начать.</li>
+        <li class="rv"><span class="ib"><svg class="ic"><use href="#i-check"/></svg></span>Уже наняли директора или управляющего, но продолжаете работать за него.</li>
+        <li class="rv"><span class="ib"><svg class="ic"><use href="#i-check"/></svg></span>Планируете масштабирование и понимаете, что текущая система не выдержит роста.</li>
+        <li class="rv"><span class="ib"><svg class="ic"><use href="#i-check"/></svg></span>Хотите видеть результаты бизнеса, не контролируя каждое действие сотрудников.</li>
       </ul>
-      <div class="note">
-        <p class="eyebrow">Важно</p>
-        <p>Семинар особенно полезен тем, кто готов не просто послушать лекцию, а посмотреть на собственную систему управления и принять решения о её изменении.</p>
+      <div class="note rv">
+        <p class="big">5–10+<small>человек в команде: с этого семинар особенно полезен</small></p>
+        <p>Семинар для тех, кто готов не просто послушать лекцию, а посмотреть на собственную систему управления и принять решения о её изменении.</p>
         <p class="muted" style="font-size:15px">Для бизнеса без сотрудников программа может быть преждевременной.</p>
       </div>
     </div>
@@ -363,22 +542,23 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 </section>
 
 <!-- 4. Что получите -->
-<section class="section results" id="results">
+<section class="section tint" id="results">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head rv">
       <p class="eyebrow">Что получите</p>
-      <h2>Один день для конкретных управленческих решений</h2>
+      <h2>Один день для конкретных <span class="hl">решений</span></h2>
       <p>На семинаре вы будете разбирать свою компанию, а не абстрактные примеры.</p>
     </div>
     <div class="results-grid">
-      <figure>
+      <figure class="photo-card rv">
         <img src="img/ulyana_cafe_laptop.webp" width="853" height="1280" alt="Ульяна Павлова работает за ноутбуком в кафе" loading="lazy">
+        <figcaption><span class="ib"><svg class="ic"><use href="#i-laptop"/></svg></span>Разбираем вашу компанию, а не абстрактные примеры</figcaption>
       </figure>
       <ul class="plain res-list">
-        <li><h3>Найти причину зависимости</h3><p>Определить, какие задачи и решения неизменно возвращаются к собственнику.</p></li>
-        <li><h3>Разобраться в структуре</h3><p>Увидеть размытые функции, полномочия и зоны ответственности.</p></li>
-        <li><h3>Оценить руководителей</h3><p>Понять, какие навыки, результаты и полномочия нужны людям на ключевых должностях.</p></li>
-        <li><h3>Наметить план</h3><p>Составить последовательность изменений, с которых стоит начать.</p></li>
+        <li class="res-card rv"><span class="ib"><svg class="ic"><use href="#i-target"/></svg></span><h3>Найти причину зависимости</h3><p>Определить, какие задачи и решения неизменно возвращаются к собственнику.</p></li>
+        <li class="res-card rv"><span class="ib"><svg class="ic"><use href="#i-tree"/></svg></span><h3>Разобраться в структуре</h3><p>Увидеть размытые функции, полномочия и зоны ответственности.</p></li>
+        <li class="res-card rv"><span class="ib"><svg class="ic"><use href="#i-user-check"/></svg></span><h3>Оценить руководителей</h3><p>Понять, какие навыки, результаты и полномочия нужны людям на ключевых должностях.</p></li>
+        <li class="res-card rv"><span class="ib"><svg class="ic"><use href="#i-route"/></svg></span><h3>Наметить план</h3><p>Составить последовательность изменений, с которых стоит начать.</p></li>
       </ul>
     </div>
   </div>
@@ -387,42 +567,43 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
 <!-- 5. Программа -->
 <section class="section" id="program">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head rv">
       <p class="eyebrow">Программа дня</p>
       <h2>Четыре блока: от диагностики к плану</h2>
     </div>
-    <div class="program">
-      <article class="prog">
-        <p class="prog-num">Блок 1</p>
-        <h3>Почему собственник остаётся в операционке</h3>
+    <div class="timeline">
+      <span class="fill" aria-hidden="true"></span>
+      <article class="prog rv">
+        <span class="prog-dot" aria-hidden="true">1</span>
+        <div><p class="prog-num">Блок 1</p><h3>Почему собственник остаётся в операционке</h3></div>
         <ul>
           <li>Какие сигналы показывают, что компания зависит от владельца.</li>
           <li>Почему простая передача поручений не делает управление самостоятельным.</li>
           <li>Как определить функции, которые собственник продолжает выполнять за команду.</li>
         </ul>
       </article>
-      <article class="prog">
-        <p class="prog-num">Блок 2</p>
-        <h3>Структура, функции и ответственность</h3>
+      <article class="prog rv">
+        <span class="prog-dot" aria-hidden="true">2</span>
+        <div><p class="prog-num">Блок 2</p><h3>Структура, функции и ответственность</h3></div>
         <ul>
           <li>Какая организационная структура нужна компании на её текущем этапе.</li>
           <li>Как избежать «ничьих» задач и размытых полномочий.</li>
           <li>Кто за что отвечает и какой конкретный результат нужен от каждой роли.</li>
         </ul>
       </article>
-      <article class="prog">
-        <p class="prog-num">Блок 3</p>
-        <h3>Результаты, показатели и руководители</h3>
+      <article class="prog rv">
+        <span class="prog-dot" aria-hidden="true">3</span>
+        <div><p class="prog-num">Блок 3</p><h3>Результаты, показатели и руководители</h3></div>
         <ul>
           <li>Как контролировать состояние бизнеса по измеримым показателям.</li>
           <li>Какие решения руководитель принимает сам, а какие согласовывает.</li>
           <li>Как оценивать людей перед назначением на ключевые должности.</li>
-          <li>Где в системе может использоваться технология Performia.</li>
+          <li>Где в системе может использоваться технология <span class="perf">Performia</span>.</li>
         </ul>
       </article>
-      <article class="prog">
-        <p class="prog-num">Блок 4</p>
-        <h3>План выхода из операционки</h3>
+      <article class="prog rv">
+        <span class="prog-dot" aria-hidden="true">4</span>
+        <div><p class="prog-num">Блок 4</p><h3>План выхода из операционки</h3></div>
         <ul>
           <li>Какие функции передавать в первую очередь.</li>
           <li>Какие изменения нужны в структуре и команде.</li>
@@ -430,129 +611,165 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
         </ul>
       </article>
     </div>
-    <p class="small-note">Расписание по часам и перерывы сообщим после утверждения площадки и времени.</p>
+    <p class="small-note"><svg class="ic"><use href="#i-clock"/></svg>Расписание по часам и перерывы сообщим после утверждения площадки и времени.</p>
   </div>
 </section>
 
 <!-- 6. Спикер -->
-<section class="band on-dark section speaker" id="speaker">
+<section class="island on-dark section" id="speaker">
   <div class="wrap speaker-grid">
-    <figure>
-      <img src="img/ulyana_cafe_terrace.webp" width="853" height="1280" alt="Ульяна Павлова с чашкой кофе и ноутбуком на террасе кафе" loading="lazy">
-    </figure>
+    <div class="sp-photo rv">
+      <figure>
+        <img src="img/ulyana_cafe_terrace.webp" width="853" height="1280" alt="Ульяна Павлова с чашкой кофе и ноутбуком на террасе кафе" loading="lazy">
+      </figure>
+      <div class="seal" aria-label="Более 300 сотрудников в проектах команды Ульяны">
+        <svg viewBox="0 0 150 150" aria-hidden="true">
+          <defs><path id="circ" d="M75,75 m-58,0 a58,58 0 1,1 116,0 a58,58 0 1,1 -116,0"/></defs>
+          <text><textPath href="#circ" textLength="360">сотрудников в проектах · сотрудников в проектах ·</textPath></text>
+        </svg>
+        <b>300+</b>
+      </div>
+    </div>
     <div class="speaker-copy">
-      <p class="eyebrow">Спикер</p>
-      <h2>Ульяна Павлова</h2>
-      <p class="role">Предприниматель, сооснователь трёх образовательных проектов, практик в построении управленческих команд.</p>
-      <div class="stat"><b>300+</b><span>сотрудников работают в образовательных проектах, которыми управляет команда Ульяны.</span></div>
-      <p>Сама Ульяна сегодня не занимается ежедневной операционной работой школ.</p>
-      <p class="muted">На семинаре она разберёт подходы к структуре, ответственности, оценке результатов и выбору руководителей, которые использует в управлении бизнесом.</p>
+      <p class="eyebrow rv">Спикер</p>
+      <h2 class="rv">Ульяна Павлова</h2>
+      <p class="role rv">Предприниматель, сооснователь трёх образовательных проектов, практик в построении управленческих команд.</p>
+      <ul class="plain sp-points">
+        <li class="rv"><span class="ib"><svg class="ic"><use href="#i-people"/></svg></span><span>В образовательных проектах, которыми управляет команда Ульяны, работает более 300 сотрудников.</span></li>
+        <li class="rv"><span class="ib"><svg class="ic"><use href="#i-layers"/></svg></span><span>Сама Ульяна сегодня не занимается ежедневной операционной работой школ.</span></li>
+        <li class="rv"><span class="ib"><svg class="ic"><use href="#i-star"/></svg></span><span>На семинаре разберёт подходы к структуре, ответственности, оценке результатов и выбору руководителей, которые использует в управлении бизнесом.</span></li>
+      </ul>
     </div>
   </div>
 </section>
 
-<!-- 7. Почему важна команда -->
+<!-- 7. Почему важна команда: живая оргструктура -->
 <section class="section" id="team">
   <div class="wrap team-grid">
-    <div class="section-head" style="margin-bottom:0">
-      <p class="eyebrow">Люди в системе</p>
-      <h2>Структуру можно выстроить. Но кому передавать управление?</h2>
-    </div>
     <div class="body">
-      <p class="lead">Даже понятные функции и показатели не работают сами по себе. На ключевых должностях должны быть люди, которые способны брать ответственность и давать результат.</p>
-      <p class="muted">Поэтому на семинаре мы отдельно разберём, как оценивать руководителей и выбирать людей, которым можно доверить важные функции. Подходы Performia будут одной из тем этого разговора.</p>
-      <ol class="chain" aria-label="Последовательность передачи управления">
-        <li><span>Структура</span></li>
-        <li><span>Функции и ответственность</span></li>
-        <li><span>Результаты</span></li>
-        <li><span>Подходящие люди</span></li>
-        <li><span>Передача управления</span></li>
+      <p class="eyebrow rv">Люди в системе</p>
+      <h2 class="rv">Структуру можно выстроить. Но кому передавать управление?</h2>
+      <p class="lead rv">Даже понятные функции и показатели не работают сами по себе. На ключевых должностях должны быть люди, которые способны брать ответственность и давать результат.</p>
+      <p class="muted rv">Поэтому на семинаре мы отдельно разберём, как оценивать руководителей и выбирать людей, которым можно доверить важные функции. Подходы Performia будут одной из тем.</p>
+      <ol class="chain rv" aria-label="Последовательность передачи управления">
+        <li><span>1</span>Структура</li>
+        <li><span>2</span>Функции и ответственность</li>
+        <li><span>3</span>Результаты</li>
+        <li><span>4</span>Подходящие люди</li>
+        <li><span>5</span>Передача управления</li>
       </ol>
+    </div>
+    <div class="org-card rv">
+      <div class="seg" role="group" aria-label="Схема управления">
+        <button type="button" id="org-now" aria-pressed="true">Сейчас</button>
+        <button type="button" id="org-goal" aria-pressed="false">Цель</button>
+      </div>
+      <svg class="org" id="org" data-state="now" viewBox="0 0 360 250" role="img" aria-labelledby="org-cap-text">
+        <g class="g g-now">
+          <line x1="180" y1="125" x2="280" y2="125"/><line x1="180" y1="125" x2="251" y2="188"/><line x1="180" y1="125" x2="180" y2="215"/><line x1="180" y1="125" x2="109" y2="188"/>
+          <line x1="180" y1="125" x2="80" y2="125"/><line x1="180" y1="125" x2="109" y2="62"/><line x1="180" y1="125" x2="180" y2="35"/><line x1="180" y1="125" x2="251" y2="62"/>
+          <circle class="node" cx="280" cy="125" r="13"/><circle class="node" cx="251" cy="188" r="13"/><circle class="node" cx="180" cy="215" r="13"/><circle class="node" cx="109" cy="188" r="13"/>
+          <circle class="node" cx="80" cy="125" r="13"/><circle class="node" cx="109" cy="62" r="13"/><circle class="node" cx="180" cy="35" r="13"/><circle class="node" cx="251" cy="62" r="13"/>
+          <circle class="pulse" cx="180" cy="125" r="28"/>
+          <circle class="owner" cx="180" cy="125" r="28"/><text x="180" y="125">ВЫ</text>
+        </g>
+        <g class="g g-goal">
+          <line x1="180" y1="40" x2="100" y2="120"/><line x1="180" y1="40" x2="260" y2="120"/>
+          <line x1="100" y1="120" x2="50" y2="205"/><line x1="100" y1="120" x2="100" y2="205"/><line x1="100" y1="120" x2="150" y2="205"/>
+          <line x1="260" y1="120" x2="210" y2="205"/><line x1="260" y1="120" x2="260" y2="205"/><line x1="260" y1="120" x2="310" y2="205"/>
+          <circle class="node" cx="50" cy="205" r="13"/><circle class="node" cx="100" cy="205" r="13"/><circle class="node" cx="150" cy="205" r="13"/>
+          <circle class="node" cx="210" cy="205" r="13"/><circle class="node" cx="260" cy="205" r="13"/><circle class="node" cx="310" cy="205" r="13"/>
+          <circle class="lead-node" cx="100" cy="120" r="22"/><text x="100" y="120">РУК</text>
+          <circle class="lead-node" cx="260" cy="120" r="22"/><text x="260" y="120">РУК</text>
+          <circle class="owner-out" cx="180" cy="40" r="24"/><text class="dark" x="180" y="40">ВЫ</text>
+        </g>
+      </svg>
+      <p class="org-cap"><span class="ib"><svg class="ic"><use href="#i-info"/></svg></span><span id="org-cap-text">Сейчас: каждый вопрос идёт к собственнику.</span></p>
     </div>
   </div>
 </section>
 
 <!-- 8. Формат -->
-<section class="section results" id="format">
-  <div class="wrap format-grid">
-    <div>
-      <div class="section-head">
-        <p class="eyebrow">Формат</p>
-        <h2>Как всё пройдёт</h2>
-      </div>
-      <table class="format-table">
-        <tbody>
-          <tr><th scope="row">Город</th><td>Батуми, Грузия</td></tr>
-          <tr><th scope="row">Дата</th><td>13 ноября 2026, пятница<small>Дата предварительная, подтвердим при открытии регистрации.</small></td></tr>
-          <tr><th scope="row">Формат</th><td>Однодневный практический офлайн-семинар</td></tr>
-          <tr><th scope="row">Язык</th><td>Русский</td></tr>
-          <tr><th scope="row">Место и время</th><td>Уточняются<small>Сообщим всем, кто оставит заявку.</small></td></tr>
-        </tbody>
-      </table>
+<section class="section tint" id="format">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">Формат</p>
+      <h2>Как всё пройдёт</h2>
     </div>
+    <dl class="format-grid">
+      <div class="f-card rv"><span class="ib"><svg class="ic"><use href="#i-pin"/></svg></span><dt>Город</dt><dd>Батуми, Грузия</dd></div>
+      <div class="f-card rv"><span class="ib"><svg class="ic"><use href="#i-cal"/></svg></span><dt>Дата</dt><dd>13 ноября 2026, пятница<br><span class="tag">предварительно</span></dd></div>
+      <div class="f-card rv"><span class="ib"><svg class="ic"><use href="#i-people"/></svg></span><dt>Формат</dt><dd>Практический офлайн-семинар, один день</dd></div>
+      <div class="f-card rv"><span class="ib"><svg class="ic"><use href="#i-chat"/></svg></span><dt>Язык</dt><dd>Русский</dd></div>
+      <div class="f-card rv"><span class="ib"><svg class="ic"><use href="#i-clock"/></svg></span><dt>Место и время</dt><dd>Уточняются<small>Сообщим всем, кто зарегистрируется.</small></dd></div>
+    </dl>
   </div>
 </section>
 
 <!-- 9. Тарифы -->
 <section class="section" id="price">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head center rv">
       <p class="eyebrow">Стоимость</p>
       <h2>Участие в семинаре</h2>
-      <p>Выберите подходящий вариант. Онлайн-оплата пока не подключена: оставьте заявку, и мы сообщим, когда откроются продажи.</p>
+      <p class="muted">Онлайн-оплата пока не подключена. Зарегистрируйтесь, и мы сообщим, когда откроются продажи.</p>
     </div>
     <div class="prices">
-      <article class="price feature" data-tariff="early">
+      <article class="price feature rv" data-tariff="early">
+        <span class="badge">Выгоднее</span>
         <p class="eyebrow">Ранняя регистрация</p>
         <p class="amount">200<small>₾ GEL</small></p>
         <p class="muted">Первый этап продаж. Дату завершения ранней цены сообщим отдельно.</p>
-        <a class="btn" href="#register" data-tariff-btn="early" data-track="cta_click" data-cta="price_early">Узнать о начале продаж</a>
+        <a class="btn" href="#register" data-tariff-btn="early" data-track="cta_click" data-cta="price_early"><span class="bl">Зарегистрироваться</span><span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
       </article>
-      <article class="price" data-tariff="standard">
+      <article class="price rv" data-tariff="standard">
         <p class="eyebrow">Основная стоимость</p>
         <p class="amount">250<small>₾ GEL</small></p>
         <p class="muted">Стандартный билет на однодневный семинар.</p>
-        <a class="btn ghost" href="#register" data-tariff-btn="standard" data-track="cta_click" data-cta="price_standard">Узнать о начале продаж</a>
+        <a class="btn ghost" href="#register" data-tariff-btn="standard" data-track="cta_click" data-cta="price_standard"><span class="bl">Зарегистрироваться</span><span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
       </article>
-      <article class="price" data-tariff="club">
+      <article class="price rv" data-tariff="club">
         <p class="eyebrow">Для членов бизнес-клуба</p>
         <p class="amount">200<small>₾ GEL</small></p>
         <p class="muted">Специальная стоимость после подтверждения членства. Правила подтверждения сообщим при регистрации.</p>
-        <a class="btn ghost" href="#register" data-tariff-btn="club" data-track="cta_click" data-cta="price_club">Узнать о начале продаж</a>
+        <a class="btn ghost" href="#register" data-tariff-btn="club" data-track="cta_click" data-cta="price_club"><span class="bl">Зарегистрироваться</span><span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
       </article>
     </div>
-    <p class="price-note">Условия возврата и переноса билета опубликуем до начала приёма оплаты.</p>
+    <p class="price-note"><svg class="ic"><use href="#i-info"/></svg>Условия возврата и переноса билета опубликуем до начала приёма оплаты.</p>
   </div>
 </section>
 
 <!-- 10. FAQ -->
-<section class="section results" id="faq">
+<section class="section tint" id="faq">
   <div class="wrap faq-grid">
-    <div class="section-head">
+    <div class="faq-side rv">
       <p class="eyebrow">Вопросы</p>
       <h2>Частые вопросы</h2>
+      <p class="lead">Не нашли ответ? Оставьте заявку, и мы свяжемся с вами.</p>
+      <div><a class="btn" href="#register" data-track="cta_click" data-cta="faq">Регистрация<span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a></div>
     </div>
     <div class="faq">
-      <details><summary>Кому подходит семинар?</summary><p>Собственникам действующего бизнеса, у которых уже есть сотрудники, но многие важные решения по-прежнему зависят от владельца. Особенно актуально для команд от 5–10 человек.</p></details>
-      <details><summary>Нужен ли мне действующий директор?</summary><p>Нет. Мы разберём в том числе требования к будущему руководителю и то, какие функции стоит передавать.</p></details>
-      <details><summary>Семинар будет только про найм?</summary><p>Нет. Разберём структуру компании, функции, ответственность, показатели и роль руководителей. Оценка людей, включая подходы Performia, станет одной из тем.</p></details>
-      <details><summary>Можно ли выйти из операционки сразу после семинара?</summary><p>Изменения в управлении требуют времени. За один день можно разобраться в препятствиях и наметить последовательность первых шагов.</p></details>
-      <details><summary>Подойдёт ли владельцу небольшого бизнеса?</summary><p>Да, если компания уже работает с командой и собственник планирует передавать функции. Для бизнеса без сотрудников программа может быть преждевременной.</p></details>
-      <details><summary>Где и во сколько проходит мероприятие?</summary><p>Планируется офлайн-семинар в Батуми 13 ноября 2026 года. Точный адрес и время появятся после подтверждения.</p></details>
-      <details><summary>На каком языке?</summary><p>На русском.</p></details>
-      <details><summary>Как оплатить участие?</summary><p>После подключения онлайн-оплаты на сайте появится переход на защищённую платёжную страницу банка. До этого можно оставить заявку и узнать об открытии продаж.</p></details>
-      <details><summary>Можно ли оплатить по клубной цене?</summary><p>Для членов бизнес-клуба предусмотрена специальная стоимость 200 ₾. Правила подтверждения членства сообщим при регистрации.</p></details>
-      <details><summary>Что делать, если планы изменятся?</summary><p>Условия возврата и переноса билета будут опубликованы до начала приёма оплаты. Сейчас они согласуются.</p></details>
+      <details class="rv"><summary>Кому подходит семинар?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Собственникам действующего бизнеса, у которых уже есть сотрудники, но многие важные решения по-прежнему зависят от владельца. Особенно актуально для команд от 5–10 человек.</p></details>
+      <details class="rv"><summary>Нужен ли мне действующий директор?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Нет. Мы разберём в том числе требования к будущему руководителю и то, какие функции стоит передавать.</p></details>
+      <details class="rv"><summary>Семинар будет только про найм?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Нет. Разберём структуру компании, функции, ответственность, показатели и роль руководителей. Оценка людей, включая подходы Performia, станет одной из тем.</p></details>
+      <details class="rv"><summary>Можно ли выйти из операционки сразу после семинара?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Изменения в управлении требуют времени. За один день можно разобраться в препятствиях и наметить последовательность первых шагов.</p></details>
+      <details class="rv"><summary>Подойдёт ли владельцу небольшого бизнеса?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Да, если компания уже работает с командой и собственник планирует передавать функции. Для бизнеса без сотрудников программа может быть преждевременной.</p></details>
+      <details class="rv"><summary>Где и во сколько проходит мероприятие?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Планируется офлайн-семинар в Батуми 13 ноября 2026 года. Точный адрес и время появятся после подтверждения.</p></details>
+      <details class="rv"><summary>На каком языке?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>На русском.</p></details>
+      <details class="rv"><summary>Как оплатить участие?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>После подключения онлайн-оплаты на сайте появится переход на защищённую платёжную страницу банка. До этого можно зарегистрироваться и узнать об открытии продаж.</p></details>
+      <details class="rv"><summary>Можно ли оплатить по клубной цене?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Для членов бизнес-клуба предусмотрена специальная стоимость 200 ₾. Правила подтверждения членства сообщим при регистрации.</p></details>
+      <details class="rv"><summary>Что делать, если планы изменятся?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Условия возврата и переноса билета будут опубликованы до начала приёма оплаты. Сейчас они согласуются.</p></details>
     </div>
   </div>
 </section>
 
 <!-- 11. Регистрация: шаг 1 заявка, шаг 2 анкета участника -->
-<section class="band on-dark section" id="register">
+<div style="padding-top:clamp(24px,4vw,48px)">
+<section class="island on-dark section" id="register">
   <div class="wrap final-grid">
     <div class="final-copy">
       <p class="eyebrow">Регистрация</p>
-      <h2>Регистрация на семинар</h2>
+      <h2>Регистрация на <span class="hl">семинар</span></h2>
       <p class="lead">Батуми · 13 ноября 2026 (дата предварительная) · офлайн, один день.</p>
       <ol class="plain reg-steps">
         <li><b>Заявка</b><span>Имя, контакт и вариант участия. Займёт минуту.</span></li>
@@ -563,7 +780,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
     </div>
 
     <div class="reg-panel">
-      <p class="preview-note" id="preview-note" hidden>Версия для согласования: приём заявок ещё не подключён. Можно пройти оба шага, но данные никуда не отправляются.</p>
+      <p class="preview-note" id="preview-note" hidden><svg class="ic"><use href="#i-info"/></svg><span>Версия для согласования: приём заявок ещё не подключён. Можно пройти оба шага, но данные никуда не отправляются.</span></p>
       <ol class="plain stepper" aria-label="Шаги регистрации">
         <li id="st-1" aria-current="step"><span>1</span>Заявка</li>
         <li id="st-2"><span>2</span>Анкета</li>
@@ -592,12 +809,12 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
           </select>
         </div>
         <label class="consent" for="f-consent"><input id="f-consent" name="consent" type="checkbox" required><span>Согласен на обработку персональных данных для связи по поводу семинара.</span></label>
-        <button class="btn" type="submit" id="reg-submit">Далее: анкета участника <span class="arr" aria-hidden="true">→</span></button>
+        <button class="btn" type="submit" id="reg-submit" style="justify-content:space-between">Далее: анкета участника<span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></button>
         <p class="form-status" id="reg-status" role="status" aria-live="polite" hidden></p>
       </form>
 
       <form id="survey-form" novalidate hidden>
-        <p class="survey-intro">Анкета участника. Отвечайте коротко, как есть: правильных ответов нет.</p>
+        <p class="survey-intro">Отвечайте коротко, как есть: правильных ответов нет.</p>
         <div class="field">
           <label for="q-sphere">Сфера бизнеса</label>
           <select id="q-sphere" name="sphere" required>
@@ -675,28 +892,34 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
           </select>
         </div>
         <div class="form-actions">
-          <button class="btn" type="submit" id="survey-submit">Отправить анкету</button>
-          <button class="btn ghost" type="button" id="survey-back">Назад</button>
+          <button class="btn" type="submit" id="survey-submit">Отправить анкету<span class="bi"><svg class="ic"><use href="#i-check"/></svg></span></button>
+          <button class="btn ghost plain-pad" type="button" id="survey-back">Назад</button>
         </div>
         <p class="form-status" id="survey-status" role="status" aria-live="polite" hidden></p>
       </form>
 
       <div class="done" id="reg-done" tabindex="-1" hidden>
+        <span class="ib"><svg class="ic"><use href="#i-check"/></svg></span>
         <h3 id="done-title">Готово</h3>
         <p id="done-text"></p>
       </div>
     </div>
   </div>
 </section>
+</div>
 
 </main>
 
 <footer>
   <div class="wrap">
-    <span>«Бизнес без собственника» · семинар Ульяны Павловой</span>
+    <span class="brand"><span class="brand-mark" aria-hidden="true">ББС</span><span>«Бизнес без собственника» · семинар Ульяны Павловой</span></span>
     <span>Батуми, 2026</span>
   </div>
 </footer>
+
+<div class="dock" id="dock">
+  <a class="btn" href="#register" data-track="cta_click" data-cta="dock" data-label-presale="Регистрация на семинар" data-label-sale="Купить билет"><span class="bl">Регистрация на семинар</span><span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
+</div>
 
 <script>
 /* ===== Настройки сайта: всё, что меняется при запуске, собрано здесь ===== */
@@ -704,7 +927,7 @@ var SITE_CONFIG = {
   // Адрес приёма заявок и анкет: URL веб-приложения Google Apps Script (см. google-apps-script.gs).
   // Пусто = приём не подключён, форма честно сообщает, что данные не отправлены.
   leadEndpoint: "",
-  // false = анонс (кнопки «Узнать об участии»). true = продажи открыты: кнопки тарифов ведут на paymentUrl.
+  // false = анонс (кнопки «Регистрация»). true = продажи открыты: кнопки тарифов ведут на paymentUrl.
   salesOpen: false,
   // Ссылки на платёжные страницы Bank of Georgia (платёжная ссылка / checkout) для каждого тарифа.
   // Подтверждение участия отправляется только после проверенного статуса оплаты от банка (на сервере),
@@ -729,8 +952,7 @@ var UTM = {};
   } catch (e) {}
 })();
 function track(event, data) {
-  var payload = Object.assign({ event: event }, UTM, data || {});
-  window.dataLayer.push(payload);
+  window.dataLayer.push(Object.assign({ event: event }, UTM, data || {}));
 }
 track("page_view");
 
@@ -739,28 +961,66 @@ document.addEventListener("click", function (e) {
   if (el) track(el.getAttribute("data-track"), { cta: el.getAttribute("data-cta") });
 });
 
-/* Просмотр программы */
+var reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Просмотр программы + плавающая кнопка на телефоне */
 (function () {
+  if (!("IntersectionObserver" in window)) return;
   var prog = document.getElementById("program");
-  if (!("IntersectionObserver" in window) || !prog) return;
   var io = new IntersectionObserver(function (entries) {
     if (entries[0].isIntersecting) { track("program_view"); io.disconnect(); }
   }, { threshold: 0.3 });
   io.observe(prog);
+
+  var dock = document.getElementById("dock");
+  var heroOut = false, regIn = false;
+  function upd() { dock.classList.toggle("show", heroOut && !regIn); }
+  new IntersectionObserver(function (e) { heroOut = !e[0].isIntersecting; upd(); }).observe(document.querySelector(".hero"));
+  new IntersectionObserver(function (e) { regIn = e[0].isIntersecting; upd(); }, { threshold: 0.05 }).observe(document.getElementById("register"));
+})();
+
+/* ===== Живая оргструктура: «Сейчас» ↔ «Цель» ===== */
+(function () {
+  var org = document.getElementById("org");
+  var bNow = document.getElementById("org-now"), bGoal = document.getElementById("org-goal");
+  var cap = document.getElementById("org-cap-text");
+  var CAPS = {
+    now: "Сейчас: каждый вопрос идёт к собственнику.",
+    goal: "Цель: решения принимаются на своём уровне, к вам приходят результаты."
+  };
+  var timer = null;
+  function set(state) {
+    org.setAttribute("data-state", state);
+    bNow.setAttribute("aria-pressed", state === "now");
+    bGoal.setAttribute("aria-pressed", state === "goal");
+    cap.textContent = CAPS[state];
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+  bNow.addEventListener("click", function () { stop(); set("now"); });
+  bGoal.addEventListener("click", function () { stop(); set("goal"); });
+  if (!reduceMotion && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (e) {
+      if (e[0].isIntersecting && !timer && !org.dataset.touched) {
+        timer = setInterval(function () { set(org.getAttribute("data-state") === "now" ? "goal" : "now"); }, 4200);
+      } else if (!e[0].isIntersecting) stop();
+    }, { threshold: 0.4 }).observe(org);
+    [bNow, bGoal].forEach(function (b) { b.addEventListener("click", function () { org.dataset.touched = "1"; }); });
+  }
 })();
 
 /* ===== Режим продаж ===== */
 (function () {
   var sale = SITE_CONFIG.salesOpen;
   document.querySelectorAll("[data-label-presale]").forEach(function (el) {
-    el.textContent = sale ? el.getAttribute("data-label-sale") : el.getAttribute("data-label-presale");
+    var label = el.querySelector(".bl") || el;
+    label.textContent = sale ? el.getAttribute("data-label-sale") : el.getAttribute("data-label-presale");
     if (sale) el.setAttribute("href", "#price");
   });
   document.querySelectorAll("[data-tariff-btn]").forEach(function (btn) {
     var key = btn.getAttribute("data-tariff-btn");
     var t = SITE_CONFIG.tariffs[key];
     if (sale && t && t.paymentUrl) {
-      btn.textContent = "Купить билет · " + t.amount + " ₾";
+      btn.querySelector(".bl").textContent = "Купить билет · " + t.amount + " ₾";
       btn.setAttribute("href", t.paymentUrl);
       btn.setAttribute("rel", "noopener");
       btn.addEventListener("click", function () { track("checkout_start", { tariff: key, value: t.amount, currency: t.currency }); });
@@ -807,11 +1067,13 @@ document.addEventListener("click", function (e) {
   function goStep(n) {
     reg.hidden = n !== 1;
     survey.hidden = n !== 2;
+    var shown = n === 1 ? reg : survey;
+    shown.classList.remove("step-anim"); void shown.offsetWidth; shown.classList.add("step-anim");
     $("st-1").toggleAttribute("aria-current", n === 1);
     $("st-1").classList.toggle("done", n > 1);
     $("st-2").toggleAttribute("aria-current", n === 2);
-    $("register").scrollIntoView({ block: "start" });
-    var first = (n === 1 ? reg : survey).querySelector("input,select");
+    $("register").scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
+    var first = shown.querySelector("input,select");
     if (first) first.focus({ preventScroll: true });
   }
 
