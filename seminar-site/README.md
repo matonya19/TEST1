@@ -1,5 +1,10 @@
 # Бизнес без собственника: лендинг семинара
 
+Адрес: https://biznes-bez-sobstvennika.netlify.app/ (Netlify, ветка `seminar-site`, папка `seminar-site`).
+
+Регистрация: заявка → анкета → готовое сообщение уходит в Telegram организатора (`SITE_CONFIG.telegram`),
+в ответ участнику присылают реквизиты для перевода.
+
 Одностраничный статический сайт (HTML + CSS + немного JS, без сборки). Открывается как `index.html`,
 публикуется на любом статическом хостинге (GitHub Pages, Netlify, Cloudflare Pages).
 
@@ -17,7 +22,7 @@
 Аналитика: события `page_view`, `cta_click`, `program_view`, `lead_start`, `lead_submit`, `lead_error`, `survey_submit`,
 `checkout_start` пишутся в `window.dataLayer` вместе с UTM-метками. Подключите GTM / GA4 / Метрику.
 
-Перед запуском убрать `<meta name="robots" content="noindex, nofollow">` и указать абсолютный URL в `og:image`.
+Если адрес сайта изменится, поправьте `canonical`, `og:url` и `og:image` в `<head>`.
 
 ## Вопросы к организатору
 

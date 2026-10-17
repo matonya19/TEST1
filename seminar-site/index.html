@@ -5,13 +5,16 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- Черновик для согласования: убрать noindex после запуска -->
-<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://biznes-bez-sobstvennika.netlify.app/">
 <meta name="description" content="Практический семинар для владельцев бизнеса: структура компании, ответственность, руководители, показатели и план выхода из операционки. Батуми, ноябрь 2026.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Бизнес без собственника | Семинар Ульяны Павловой в Батуми">
 <meta property="og:description" content="Как выйти из операционки без потери контроля над компанией. Однодневный офлайн-семинар в Батуми.">
-<meta property="og:image" content="img/og.jpg">
+<meta property="og:url" content="https://biznes-bez-sobstvennika.netlify.app/">
+<meta property="og:image" content="https://biznes-bez-sobstvennika.netlify.app/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta property="og:locale" content="ru_RU">
 <meta name="theme-color" content="#3D2A23">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -339,7 +342,7 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;padding-block
 .reg-panel{display:grid;gap:20px;align-content:start;min-width:0;padding:clamp(20px,3vw,36px);border-radius:var(--r-xl);background:var(--milk);color:var(--ink);box-shadow:0 40px 80px -40px rgba(0,0,0,.7)}
 .preview-note{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:var(--muted);padding:12px 14px;border-radius:var(--r-sm);background:var(--sand-2)}
 .preview-note .ic{width:18px;height:18px;margin-top:2px;color:var(--coffee-deep)}
-.stepper{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border-radius:var(--pill);background:var(--sand-2)}
+.stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:5px;border-radius:var(--pill);background:var(--sand-2)}
 .stepper li{display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 10px;border-radius:var(--pill);font-size:14px;font-weight:700;color:var(--muted);transition:background .35s,color .35s}
 .stepper li span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:1.5px solid currentColor;font-size:12px}
 .stepper li[aria-current="step"]{background:var(--choc);color:var(--milk);box-shadow:var(--sh-sm)}
@@ -372,6 +375,15 @@ fieldset.choice legend{padding:0;margin-bottom:10px}
 .done{border-radius:var(--r-lg);background:var(--sand-2);padding:28px;display:grid;gap:12px;justify-items:start;animation:up .5s var(--ease) both}
 .done .ib{width:56px;height:56px;background:var(--choc);color:var(--milk)}
 .done p{color:var(--muted)}
+.copy-hint{font-size:14px}
+.reg-panel .btn{background:var(--choc);color:var(--milk);border-color:var(--choc)}
+.reg-panel .btn .bi{background:var(--milk);color:var(--choc)}
+.reg-panel .btn.ghost{background:transparent;color:var(--choc);border-color:var(--milk-soft)}
+.reg-panel .btn.ghost:hover{background:var(--white)}
+@media (max-width:480px){.stepper li{padding:9px 4px;gap:6px;font-size:13px}.stepper li span{width:20px;height:20px;font-size:11px}}
+.tg-text{width:100%;min-height:150px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--white);color:var(--ink);font:inherit;font-size:14px;line-height:1.5;resize:vertical}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.on-dark a:not(.btn),.faq a,.price-note a{color:inherit;text-decoration-color:var(--coffee);text-underline-offset:3px}
 @media (min-width:900px){.final-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:64px}.final-copy{position:sticky;top:110px}}
 
 footer{padding-block:40px 32px;font-size:14px;color:var(--muted)}
@@ -695,7 +707,7 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
     <div class="section-head center rv">
       <p class="eyebrow">Стоимость</p>
       <h2>Участие в семинаре</h2>
-      <p class="muted">Онлайн-оплата пока не подключена. Зарегистрируйтесь, и мы сообщим, когда откроются продажи.</p>
+      <p class="muted">Оплата переводом. После регистрации и анкеты пришлём реквизиты в Telegram.</p>
     </div>
     <div class="prices">
       <article class="price feature rv" data-tariff="early">
@@ -718,7 +730,7 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
         <a class="btn ghost" href="#register" data-tariff-btn="club" data-track="cta_click" data-cta="price_club"><span class="bl">Зарегистрироваться</span><span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
       </article>
     </div>
-    <p class="price-note"><svg class="ic"><use href="#i-info"/></svg>Условия возврата и переноса билета опубликуем до начала приёма оплаты.</p>
+    <p class="price-note"><svg class="ic"><use href="#i-chat"/></svg>Вопросы об оплате и участии: <a href="https://t.me/m_misarosh" target="_blank" rel="noopener">@m_misarosh</a> в Telegram.</p>
   </div>
 </section>
 
@@ -728,7 +740,7 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
     <div class="faq-side rv">
       <p class="eyebrow">Вопросы</p>
       <h2>Частые вопросы</h2>
-      <p class="lead">Не нашли ответ? Оставьте заявку, и мы свяжемся с вами.</p>
+      <p class="lead">Не нашли ответ? Напишите в Telegram <a href="https://t.me/m_misarosh" target="_blank" rel="noopener">@m_misarosh</a>.</p>
       <div><a class="btn" href="#register" data-track="cta_click" data-cta="faq">Регистрация<span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a></div>
     </div>
     <div class="faq">
@@ -739,9 +751,9 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
       <details class="rv"><summary>Подойдёт ли владельцу небольшого бизнеса?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Да, если компания уже работает с командой и собственник планирует передавать функции. Для бизнеса без сотрудников программа может быть преждевременной.</p></details>
       <details class="rv"><summary>Где и во сколько проходит мероприятие?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Планируется офлайн-семинар в Батуми 13 ноября 2026 года. Точный адрес и время появятся после подтверждения.</p></details>
       <details class="rv"><summary>На каком языке?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>На русском.</p></details>
-      <details class="rv"><summary>Как оплатить участие?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>После подключения онлайн-оплаты на сайте появится переход на защищённую платёжную страницу банка. До этого можно зарегистрироваться и узнать об открытии продаж.</p></details>
+      <details class="rv"><summary>Как оплатить участие?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Переводом. Заполните заявку и анкету на сайте, затем отправьте их в Telegram <a href="https://t.me/m_misarosh" target="_blank" rel="noopener">@m_misarosh</a>. В ответ пришлём реквизиты для оплаты. Участие подтверждаем после получения оплаты.</p></details>
       <details class="rv"><summary>Можно ли оплатить по клубной цене?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Для членов бизнес-клуба предусмотрена специальная стоимость 200 ₾. Правила подтверждения членства сообщим при регистрации.</p></details>
-      <details class="rv"><summary>Что делать, если планы изменятся?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Условия возврата и переноса билета будут опубликованы до начала приёма оплаты. Сейчас они согласуются.</p></details>
+      <details class="rv"><summary>Что делать, если планы изменятся?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Напишите в Telegram <a href="https://t.me/m_misarosh" target="_blank" rel="noopener">@m_misarosh</a>, и мы подскажем варианты.</p></details>
     </div>
   </div>
 </section>
@@ -757,16 +769,16 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
       <ol class="plain reg-steps">
         <li><b>Заявка</b><span>Имя, контакт и вариант участия. Займёт минуту.</span></li>
         <li><b>Анкета участника</b><span>Несколько вопросов о вашей компании и команде. Ответы помогут лучше понять задачи участников.</span></li>
-        <li><b>Подтверждение и оплата</b><span>Когда откроются продажи, пришлём место, время и ссылку на оплату.</span></li>
+        <li><b>Отправка в Telegram и оплата</b><span>Заявка с анкетой уйдёт в чат @m_misarosh. В ответ пришлём реквизиты для перевода, место и время.</span></li>
       </ol>
       <p class="muted reg-price">Стоимость: 200 ₾ ранняя регистрация, 250 ₾ основная, 200 ₾ для членов бизнес-клуба.</p>
     </div>
 
     <div class="reg-panel">
-      <p class="preview-note" id="preview-note" hidden><svg class="ic"><use href="#i-info"/></svg><span>Версия для согласования: приём заявок ещё не подключён. Можно пройти оба шага, но данные никуда не отправляются.</span></p>
       <ol class="plain stepper" aria-label="Шаги регистрации">
         <li id="st-1" aria-current="step"><span>1</span>Заявка</li>
         <li id="st-2"><span>2</span>Анкета</li>
+        <li id="st-3"><span>3</span>Telegram</li>
       </ol>
 
       <form id="reg-form" novalidate>
@@ -875,16 +887,23 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
           </select>
         </div>
         <div class="form-actions">
-          <button class="btn" type="submit" id="survey-submit">Отправить анкету<span class="bi"><svg class="ic"><use href="#i-check"/></svg></span></button>
+          <button class="btn" type="submit" id="survey-submit">Далее<span class="bi"><svg class="ic"><use href="#i-check"/></svg></span></button>
           <button class="btn ghost plain-pad" type="button" id="survey-back">Назад</button>
         </div>
         <p class="form-status" id="survey-status" role="status" aria-live="polite" hidden></p>
       </form>
 
       <div class="done" id="reg-done" tabindex="-1" hidden>
-        <span class="ib"><svg class="ic"><use href="#i-check"/></svg></span>
-        <h3 id="done-title">Готово</h3>
-        <p id="done-text"></p>
+        <span class="ib"><svg class="ic"><use href="#i-chat"/></svg></span>
+        <h3>Последний шаг: отправьте заявку в Telegram</h3>
+        <p>Откроется чат с <b>@m_misarosh</b>, текст заявки уже набран. Нажмите «Отправить», и в ответ мы пришлём реквизиты для оплаты.</p>
+        <div class="form-actions">
+          <a class="btn" id="tg-open" href="https://t.me/m_misarosh" target="_blank" rel="noopener">Открыть Telegram<span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
+          <button class="btn ghost plain-pad" type="button" id="tg-copy">Скопировать текст</button>
+        </div>
+        <p class="copy-hint" id="copy-hint">Если текст не подставился в чат, скопируйте его и вставьте в сообщение.</p>
+        <label class="sr" for="tg-text">Текст заявки</label>
+        <textarea id="tg-text" class="tg-text" rows="8" readonly></textarea>
       </div>
     </div>
   </div>
@@ -896,7 +915,7 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
 <footer>
   <div class="wrap">
     <span class="brand"><span class="brand-mark" aria-hidden="true">ББС</span><span>«Бизнес без собственника» · семинар Ульяны Павловой</span></span>
-    <span>Батуми, 2026</span>
+    <span>Telegram: <a href="https://t.me/m_misarosh" target="_blank" rel="noopener">@m_misarosh</a></span>
   </div>
 </footer>
 
@@ -910,6 +929,8 @@ var SITE_CONFIG = {
   // Адрес приёма заявок и анкет: URL веб-приложения Google Apps Script (см. google-apps-script.gs).
   // Пусто = приём не подключён, форма честно сообщает, что данные не отправлены.
   leadEndpoint: "",
+  // Telegram организатора: сюда уходит заявка с анкетой, в ответ участнику присылают реквизиты для оплаты.
+  telegram: "m_misarosh",
   // false = анонс (кнопки «Регистрация»). true = продажи открыты: кнопки тарифов ведут на paymentUrl.
   salesOpen: false,
   // Ссылки на платёжные страницы Bank of Georgia (платёжная ссылка / checkout) для каждого тарифа.
@@ -1021,7 +1042,6 @@ var reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: red
   var $ = function (id) { return document.getElementById(id); };
   var reg = $("reg-form"), survey = $("survey-form"), done = $("reg-done");
   var hasBackend = !!SITE_CONFIG.leadEndpoint;
-  $("preview-note").hidden = hasBackend;
   var regId = null, started = false;
 
   reg.addEventListener("input", function () {
@@ -1052,9 +1072,10 @@ var reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: red
     survey.hidden = n !== 2;
     var shown = n === 1 ? reg : survey;
     shown.classList.remove("step-anim"); void shown.offsetWidth; shown.classList.add("step-anim");
-    $("st-1").toggleAttribute("aria-current", n === 1);
-    $("st-1").classList.toggle("done", n > 1);
-    $("st-2").toggleAttribute("aria-current", n === 2);
+    ["st-1", "st-2", "st-3"].forEach(function (id, i) {
+      if (i + 1 === n) $(id).setAttribute("aria-current", "step"); else $(id).removeAttribute("aria-current");
+      $(id).classList.toggle("done", i + 1 < n);
+    });
     $("register").scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
     var first = shown.querySelector("input,select");
     if (first) first.focus({ preventScroll: true });
@@ -1070,6 +1091,7 @@ var reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: red
     var data = Object.assign(base("registration"), {
       name: name, contact: contact, company: $("f-company").value.trim(), tariff: $("f-tariff").value, consent: true
     });
+    regData = data;
     if (!hasBackend) { show(status, ""); goStep(2); return; }
     var btn = $("reg-submit"); btn.disabled = true;
     show(status, "Отправляем…");
@@ -1085,17 +1107,50 @@ var reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: red
 
   $("survey-back").addEventListener("click", function () { goStep(1); });
 
-  function finish(sent) {
+  var regData = null;
+
+  // Текст заявки для Telegram: заявка + анкета, пустые поля пропускаются.
+  function message(r, a) {
+    var tariff = $("f-tariff").selectedOptions[0].textContent;
+    var rows = [
+      "Здравствуйте! Хочу на семинар «Бизнес без собственника».",
+      "Заявка " + r.id,
+      "",
+      ["Имя", r.name], ["Контакт", r.contact], ["Компания", r.company], ["Вариант участия", tariff],
+      "",
+      "Анкета:",
+      ["Сфера", a.sphere], ["Команда", a.team], ["Роль", a.role], ["Директор / управляющий", a.manager],
+      ["Часов в неделю на текущие вопросы", a.hours], ["Чаще всего возвращается ко мне", a.returns.join(", ")],
+      ["Главный вопрос", a.question], ["Откуда узнал(а)", a.source]
+    ];
+    return rows.filter(function (x) { return typeof x === "string" || x[1]; })
+      .map(function (x) { return typeof x === "string" ? x : x[0] + ": " + x[1]; }).join("\n");
+  }
+
+  function finish(survey_data) {
+    var text = message(regData, survey_data);
+    var user = SITE_CONFIG.telegram.replace(/^@/, "");
     survey.hidden = true;
     $("st-2").classList.add("done");
     $("st-2").removeAttribute("aria-current");
+    $("st-3").setAttribute("aria-current", "step");
+    $("tg-text").value = text;
+    $("tg-open").href = "https://t.me/" + user + "?text=" + encodeURIComponent(text);
     done.hidden = false;
-    $("done-title").textContent = sent ? "Спасибо, регистрация получена" : "Анкета заполнена";
-    $("done-text").textContent = sent
-      ? "Заявка и анкета сохранены. Когда откроются продажи, мы пришлём место, время и ссылку на оплату."
-      : "Это версия для согласования: приём заявок не подключён, поэтому данные никуда не отправлены.";
+    track("survey_submit", { tariff: regData.tariff });
     done.focus();
   }
+
+  $("tg-open").addEventListener("click", function () {
+    track("telegram_click", { tariff: regData && regData.tariff });
+    $("st-3").classList.add("done");
+  });
+  $("tg-copy").addEventListener("click", function () {
+    var ta = $("tg-text"), hint = $("copy-hint");
+    var ok = function () { hint.textContent = "Текст скопирован. Вставьте его в чат с @" + SITE_CONFIG.telegram.replace(/^@/, "") + "."; };
+    var fallback = function () { ta.focus(); ta.select(); hint.textContent = "Текст выделен: нажмите «Копировать» и вставьте его в чат."; };
+    try { navigator.clipboard.writeText(ta.value).then(ok, fallback); } catch (e) { fallback(); }
+  });
 
   survey.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -1112,15 +1167,16 @@ var reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: red
       returns: Array.prototype.map.call(survey.querySelectorAll('input[name="returns"]:checked'), function (i) { return i.value; }),
       question: f.question.value.trim(), source: f.source.value
     });
-    if (!hasBackend) { show(status, ""); finish(false); return; }
+    if (!hasBackend) { show(status, ""); finish(data); return; }
     var btn = $("survey-submit"); btn.disabled = true;
     show(status, "Отправляем…");
     send(data).then(function () {
       show(status, "");
-      track("survey_submit");
-      finish(true);
+      finish(data);
     }).catch(function () {
-      show(status, "Не удалось отправить анкету. Проверьте интернет и попробуйте ещё раз.", "err");
+      // Таблица недоступна: заявка всё равно уйдёт в Telegram.
+      show(status, "");
+      finish(data);
     }).finally(function () { btn.disabled = false; });
   });
 })();
