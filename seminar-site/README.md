@@ -5,13 +5,16 @@
 
 ## Что настраивается в `index.html` → `SITE_CONFIG`
 
-- `leadEndpoint`: адрес приёма заявок (Google Apps Script, Formspree, вебхук CRM). Пока пусто,
-  форма проверяет поля, но честно сообщает, что заявка не отправлена.
+- `leadEndpoint`: адрес приёма заявок и анкет. Проще всего Google Таблица: инструкция в `google-apps-script.gs`.
+  Пока пусто, форма проверяет поля, но честно сообщает, что данные не отправлены.
+
+Регистрация идёт в два шага: заявка (имя, контакт, тариф) отправляется сразу, затем анкета участника
+с тем же ID. Если человек не заполнит анкету, заявка всё равно сохранится.
 - `salesOpen`: `true` переключает кнопки на «Купить билет».
 - `tariffs.*.paymentUrl`: платёжные ссылки Bank of Georgia для каждого тарифа. Данные карт сайт не собирает.
   Подтверждение участия отправлять только по проверенному статусу оплаты от банка (callback на сервере).
 
-Аналитика: события `page_view`, `cta_click`, `program_view`, `lead_start`, `lead_submit`, `lead_error`,
+Аналитика: события `page_view`, `cta_click`, `program_view`, `lead_start`, `lead_submit`, `lead_error`, `survey_submit`,
 `checkout_start` пишутся в `window.dataLayer` вместе с UTM-метками. Подключите GTM / GA4 / Метрику.
 
 Перед запуском убрать `<meta name="robots" content="noindex, nofollow">` и указать абсолютный URL в `og:image`.
