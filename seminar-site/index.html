@@ -251,6 +251,14 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;padding-block
 @media (min-width:900px){.seal{right:-40px;width:170px;height:170px}.seal b{font-size:46px}}
 .speaker-copy{display:grid;gap:22px;align-content:center;min-width:0}
 .speaker-copy .role{font-size:clamp(19px,1.9vw,23px);font-weight:600;line-height:1.4}
+.sp-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0}
+.sp-stats div:first-child{grid-column:1/-1}
+@media (min-width:1100px){.sp-stats{grid-template-columns:1.5fr 1fr 1fr}.sp-stats div:first-child{grid-column:auto}}
+.sp-stats div{padding:18px;border-radius:var(--r-md);background:var(--milk);color:var(--choc);box-shadow:0 20px 40px -28px rgba(0,0,0,.6)}
+.sp-stats dt{order:2;font-size:13px;font-weight:700;color:var(--coffee-deep)}
+.sp-stats div{display:flex;flex-direction:column;gap:4px}
+.sp-stats dd{margin:0;white-space:nowrap;font-size:clamp(26px,2.6vw,32px);font-weight:800;letter-spacing:-.04em;line-height:1.05;font-variant-numeric:tabular-nums}
+.sp-stats dd small{display:block;margin-top:4px;font-size:13px;font-weight:600;letter-spacing:0;color:var(--muted)}
 .sp-points{display:grid;gap:12px}
 .sp-points li{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:var(--r-md);background:var(--choc-2);border:1px solid var(--choc-3);line-height:1.5}
 .sp-points .ib{width:40px;height:40px;background:rgba(232,215,198,.12);color:var(--sand)}
@@ -634,21 +642,25 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
       <figure>
         <img src="img/ulyana_cafe_terrace.webp" width="853" height="1280" alt="Ульяна Павлова с чашкой кофе и ноутбуком на террасе кафе" loading="lazy">
       </figure>
-      <div class="seal" aria-label="Более 300 сотрудников в проектах команды Ульяны">
+      <div class="seal" aria-label="Около 300 сотрудников в проектах SHKOLA">
         <svg viewBox="0 0 150 150" aria-hidden="true">
           <defs><path id="circ" d="M75,75 m-58,0 a58,58 0 1,1 116,0 a58,58 0 1,1 -116,0"/></defs>
-          <text><textPath href="#circ" textLength="360">сотрудников в проектах · сотрудников в проектах ·</textPath></text>
+          <text><textPath href="#circ" textLength="360">сотрудников в проектах SHKOLA · сотрудников ·</textPath></text>
         </svg>
-        <b>300+</b>
+        <b>≈300</b>
       </div>
     </div>
     <div class="speaker-copy">
       <p class="eyebrow rv">Спикер</p>
       <h2 class="rv">Ульяна Павлова</h2>
-      <p class="role rv">Предприниматель, сооснователь трёх образовательных проектов, практик в построении управленческих команд.</p>
+      <p class="role rv">Предприниматель, сооснователь образовательных проектов SHKOLA, практик в построении управленческих команд.</p>
+      <dl class="sp-stats rv">
+        <div><dt>оборот в год</dt><dd>≈260 млн ₽<small>около 3 млн $</small></dd></div>
+        <div><dt>учеников в год</dt><dd>≈2000</dd></div>
+        <div><dt>сотрудников</dt><dd>≈300</dd></div>
+      </dl>
       <ul class="plain sp-points">
-        <li class="rv"><span class="ib"><svg class="ic"><use href="#i-people"/></svg></span><span>В образовательных проектах, которыми управляет команда Ульяны, работает более 300 сотрудников.</span></li>
-        <li class="rv"><span class="ib"><svg class="ic"><use href="#i-layers"/></svg></span><span>Сама Ульяна сегодня не занимается ежедневной операционной работой школ.</span></li>
+                <li class="rv"><span class="ib"><svg class="ic"><use href="#i-layers"/></svg></span><span>Сама Ульяна сегодня не занимается ежедневной операционной работой школ.</span></li>
         <li class="rv"><span class="ib"><svg class="ic"><use href="#i-star"/></svg></span><span>На семинаре разберёт подходы к структуре, ответственности, оценке результатов и выбору руководителей, которые использует в управлении бизнесом.</span></li>
       </ul>
     </div>
