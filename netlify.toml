@@ -1,0 +1,5 @@
+# Netlify: публикуем лендинг семинара из папки seminar-site (без сборки)
+[build]
+  base = "seminar-site"
+  publish = "."
+  command = ""
