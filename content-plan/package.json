@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/set-workspace-icon.mjs",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview"
