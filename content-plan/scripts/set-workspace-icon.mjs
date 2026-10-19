@@ -20,6 +20,7 @@ const WORKSPACE_META = {
   shkola: { title: 'Школа — контент-план' },
   ulyana: { title: 'Ульяна — контент-план' },
   natalia: { title: 'Наталья — контент-план' },
+  interview: { title: 'Курс интервью — контент-план' },
   my: { title: 'Мой контент-план' },
   combined: { title: 'Все клиенты — сводный план' },
 };
