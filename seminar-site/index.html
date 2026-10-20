@@ -126,7 +126,7 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;padding-block
 .fact{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:var(--r-md);background:var(--white);border:1px solid var(--line);box-shadow:var(--sh-sm);min-width:0}
 .fact .ib{width:40px;height:40px}
 .fact dt{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.fact dd{margin:0;font-weight:700;font-size:15px;line-height:1.3}
+.fact dd{margin:0;white-space:nowrap;font-weight:700;font-size:15px;line-height:1.3}
 @media (min-width:640px){.facts{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (min-width:960px) and (max-width:1180px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .tag{display:inline-block;padding:2px 9px;border-radius:var(--pill);background:var(--sand-2);color:var(--coffee-deep);font-size:11px;font-weight:700;white-space:nowrap}
@@ -319,8 +319,9 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;padding-block
 .price .btn{width:100%;justify-content:space-between}
 .price.feature .btn{background:var(--milk);color:var(--choc);border-color:var(--milk)}
 .price.feature .btn .bi{background:var(--choc);color:var(--milk)}
-@media (min-width:900px){.prices{grid-template-columns:repeat(3,minmax(0,1fr))}.price.feature{transform:translateY(-12px)}.price.feature:hover{transform:translateY(-18px)}}
-.price-note{display:flex;gap:10px;align-items:center;margin-top:28px;font-size:15px;color:var(--muted)}
+.prices{max-width:860px;margin-inline:auto}
+@media (min-width:760px){.prices{grid-template-columns:repeat(2,minmax(0,1fr))}.price.feature{transform:translateY(-12px)}.price.feature:hover{transform:translateY(-18px)}}
+.price-note{display:flex;flex-wrap:wrap;justify-content:center;text-align:center;gap:10px;align-items:center;margin-top:28px;font-size:15px;color:var(--muted)}
 .price-note .ic{width:18px;height:18px;color:var(--coffee-deep)}
 
 /* faq */
@@ -483,7 +484,7 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
       <dl class="facts">
         <div class="fact"><span class="ib"><svg class="ic"><use href="#i-pin"/></svg></span><div><dt>Город</dt><dd>Батуми</dd></div></div>
         <div class="fact"><span class="ib"><svg class="ic"><use href="#i-cal"/></svg></span><div><dt>Дата</dt><dd>13.11.2026</dd></div></div>
-        <div class="fact"><span class="ib"><svg class="ic"><use href="#i-people"/></svg></span><div><dt>Формат</dt><dd>Офлайн, 1 день</dd></div></div>
+        <div class="fact"><span class="ib"><svg class="ic"><use href="#i-clock"/></svg></span><div><dt>Время</dt><dd>14:00–18:00</dd></div></div>
         <div class="fact"><span class="ib"><svg class="ic"><use href="#i-chat"/></svg></span><div><dt>Язык</dt><dd>Русский</dd></div></div>
       </dl>
     </div>
@@ -631,7 +632,7 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
         </ul>
       </article>
     </div>
-    <p class="small-note"><svg class="ic"><use href="#i-clock"/></svg>Расписание по часам и перерывы сообщим после утверждения площадки и времени.</p>
+    <p class="small-note"><svg class="ic"><use href="#i-clock"/></svg>Семинар идёт с 14:00 до 18:00. Адрес площадки пришлём после регистрации.</p>
   </div>
 </section>
 
@@ -735,14 +736,8 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
         <p class="muted">Стандартный билет на однодневный семинар.</p>
         <a class="btn ghost" href="#register" data-tariff-btn="standard" data-track="cta_click" data-cta="price_standard"><span class="bl">Зарегистрироваться</span><span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
       </article>
-      <article class="price rv" data-tariff="club">
-        <p class="eyebrow">Для членов бизнес-клуба</p>
-        <p class="amount">200<small>₾ GEL</small></p>
-        <p class="muted">Специальная стоимость после подтверждения членства. Правила подтверждения сообщим при регистрации.</p>
-        <a class="btn ghost" href="#register" data-tariff-btn="club" data-track="cta_click" data-cta="price_club"><span class="bl">Зарегистрироваться</span><span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
-      </article>
     </div>
-    <p class="price-note"><svg class="ic"><use href="#i-chat"/></svg>Вопросы об оплате и участии: <a href="https://t.me/matosha19" target="_blank" rel="noopener">@matosha19</a> в Telegram.</p>
+    <p class="price-note"><svg class="ic"><use href="#i-chat"/></svg>Вопросы об оплате и участии: <a href="https://t.me/m_misarosh" target="_blank" rel="noopener">@m_misarosh</a> в Telegram.</p>
   </div>
 </section>
 
@@ -752,7 +747,7 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
     <div class="faq-side rv">
       <p class="eyebrow">Вопросы</p>
       <h2>Частые вопросы</h2>
-      <p class="lead">Не нашли ответ? Напишите в Telegram <a href="https://t.me/matosha19" target="_blank" rel="noopener">@matosha19</a>.</p>
+      <p class="lead">Не нашли ответ? Напишите в Telegram <a href="https://t.me/m_misarosh" target="_blank" rel="noopener">@m_misarosh</a>.</p>
       <div><a class="btn" href="#register" data-track="cta_click" data-cta="faq">Регистрация<span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a></div>
     </div>
     <div class="faq">
@@ -761,11 +756,10 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
       <details class="rv"><summary>Семинар будет только про найм?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Нет. Разберём структуру компании, функции, ответственность, показатели и роль руководителей. Оценка людей, включая подходы Performia, станет одной из тем.</p></details>
       <details class="rv"><summary>Можно ли выйти из операционки сразу после семинара?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Изменения в управлении требуют времени. За один день можно разобраться в препятствиях и наметить последовательность первых шагов.</p></details>
       <details class="rv"><summary>Подойдёт ли владельцу небольшого бизнеса?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Да, если компания уже работает с командой и собственник планирует передавать функции. Для бизнеса без сотрудников программа может быть преждевременной.</p></details>
-      <details class="rv"><summary>Где и во сколько проходит мероприятие?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Планируется офлайн-семинар в Батуми 13 ноября 2026 года. Точный адрес и время появятся после подтверждения.</p></details>
+      <details class="rv"><summary>Где и во сколько проходит мероприятие?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>13 ноября 2026 года в Батуми, с 14:00 до 18:00. Точный адрес площадки пришлём после регистрации.</p></details>
       <details class="rv"><summary>На каком языке?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>На русском.</p></details>
-      <details class="rv"><summary>Как оплатить участие?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Переводом. Заполните заявку и анкету на сайте, затем отправьте их в Telegram <a href="https://t.me/matosha19" target="_blank" rel="noopener">@matosha19</a>. В ответ пришлём реквизиты для оплаты. Участие подтверждаем после получения оплаты.</p></details>
-      <details class="rv"><summary>Можно ли оплатить по клубной цене?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Для членов бизнес-клуба предусмотрена специальная стоимость 200 ₾. Правила подтверждения членства сообщим при регистрации.</p></details>
-      <details class="rv"><summary>Что делать, если планы изменятся?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Напишите в Telegram <a href="https://t.me/matosha19" target="_blank" rel="noopener">@matosha19</a>, и мы подскажем варианты.</p></details>
+      <details class="rv"><summary>Как оплатить участие?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Переводом. Заполните заявку и анкету на сайте, затем отправьте их в Telegram <a href="https://t.me/m_misarosh" target="_blank" rel="noopener">@m_misarosh</a>. В ответ пришлём реквизиты для оплаты. Участие подтверждаем после получения оплаты.</p></details>
+      <details class="rv"><summary>Что делать, если планы изменятся?<span class="pm"><svg class="ic"><use href="#i-plus"/></svg></span></summary><p>Напишите в Telegram <a href="https://t.me/m_misarosh" target="_blank" rel="noopener">@m_misarosh</a>, и мы подскажем варианты.</p></details>
     </div>
   </div>
 </section>
@@ -777,13 +771,13 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
     <div class="final-copy">
       <p class="eyebrow">Регистрация</p>
       <h2>Регистрация на <span class="hl">семинар</span></h2>
-      <p class="lead">Батуми · 13 ноября 2026 (дата предварительная) · офлайн, один день.</p>
+      <p class="lead">Батуми · 13 ноября 2026 · 14:00–18:00 · офлайн.</p>
       <ol class="plain reg-steps">
         <li><b>Заявка</b><span>Имя, контакт и вариант участия. Займёт минуту.</span></li>
         <li><b>Анкета участника</b><span>Несколько вопросов о вашей компании и команде. Ответы помогут лучше понять задачи участников.</span></li>
-        <li><b>Отправка в Telegram и оплата</b><span>Заявка с анкетой уйдёт в чат @matosha19. В ответ пришлём реквизиты для перевода, место и время.</span></li>
+        <li><b>Отправка в Telegram и оплата</b><span>Заявка с анкетой уйдёт в чат @m_misarosh. В ответ пришлём реквизиты для перевода, место и время.</span></li>
       </ol>
-      <p class="muted reg-price">Стоимость: 200 ₾ ранняя регистрация, 250 ₾ основная, 200 ₾ для членов бизнес-клуба.</p>
+      <p class="muted reg-price">Стоимость: 200 ₾ ранняя регистрация, 250 ₾ основная.</p>
     </div>
 
     <div class="reg-panel">
@@ -811,7 +805,6 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
           <select id="f-tariff" name="tariff">
             <option value="early">Ранняя регистрация · 200 ₾</option>
             <option value="standard">Основная стоимость · 250 ₾</option>
-            <option value="club">Член бизнес-клуба · 200 ₾</option>
             <option value="unsure" selected>Пока не определился</option>
           </select>
         </div>
@@ -908,9 +901,9 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
       <div class="done" id="reg-done" tabindex="-1" hidden>
         <span class="ib"><svg class="ic"><use href="#i-chat"/></svg></span>
         <h3>Последний шаг: отправьте заявку в Telegram</h3>
-        <p>Откроется чат с <b>@matosha19</b>, текст заявки уже набран. Нажмите «Отправить», и в ответ мы пришлём реквизиты для оплаты.</p>
+        <p>Откроется чат с <b>@m_misarosh</b>, текст заявки уже набран. Нажмите «Отправить», и в ответ мы пришлём реквизиты для оплаты.</p>
         <div class="form-actions">
-          <a class="btn" id="tg-open" href="https://t.me/matosha19" target="_blank" rel="noopener">Открыть Telegram<span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
+          <a class="btn" id="tg-open" href="https://t.me/m_misarosh" target="_blank" rel="noopener">Открыть Telegram<span class="bi"><svg class="ic"><use href="#i-arrow"/></svg></span></a>
           <button class="btn ghost plain-pad" type="button" id="tg-copy">Скопировать текст</button>
         </div>
         <p class="copy-hint" id="copy-hint">Если текст не подставился в чат, скопируйте его и вставьте в сообщение.</p>
@@ -927,7 +920,7 @@ footer .brand-mark{width:34px;height:34px;font-size:11px}
 <footer>
   <div class="wrap">
     <span class="brand"><span class="brand-mark" aria-hidden="true">ББС</span><span>«Бизнес без собственника» · семинар Ульяны Павловой</span></span>
-    <span>Telegram: <a href="https://t.me/matosha19" target="_blank" rel="noopener">@matosha19</a></span>
+    <span>Telegram: <a href="https://t.me/m_misarosh" target="_blank" rel="noopener">@m_misarosh</a></span>
   </div>
 </footer>
 
@@ -942,7 +935,7 @@ var SITE_CONFIG = {
   // Пусто = приём не подключён, форма честно сообщает, что данные не отправлены.
   leadEndpoint: "",
   // Telegram организатора: сюда уходит заявка с анкетой, в ответ участнику присылают реквизиты для оплаты.
-  telegram: "matosha19",
+  telegram: "m_misarosh",
   // false = анонс (кнопки «Регистрация»). true = продажи открыты: кнопки тарифов ведут на paymentUrl.
   salesOpen: false,
   // Ссылки на платёжные страницы Bank of Georgia (платёжная ссылка / checkout) для каждого тарифа.
@@ -950,8 +943,7 @@ var SITE_CONFIG = {
   // а не по возврату на страницу «Спасибо». Данные карт на сайте не собираются.
   tariffs: {
     early:    { title: "Ранняя регистрация", amount: 200, currency: "GEL", paymentUrl: "" },
-    standard: { title: "Основная стоимость", amount: 250, currency: "GEL", paymentUrl: "" },
-    club:     { title: "Член бизнес-клуба",  amount: 200, currency: "GEL", paymentUrl: "" }
+    standard: { title: "Основная стоимость", amount: 250, currency: "GEL", paymentUrl: "" }
   }
 };
 
