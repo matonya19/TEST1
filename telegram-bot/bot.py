@@ -251,8 +251,8 @@ async def on_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
     get_user(update.effective_user)
-    if query.data in SCREENS:
-        await show(update, context, query.data)
+    # Неизвестная кнопка — например, из старых сообщений прежнего бота: открываем главное меню.
+    await show(update, context, query.data if query.data in SCREENS else "START")
 
 
 async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
