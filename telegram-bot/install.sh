@@ -34,8 +34,11 @@ fi
 
 echo "==> Устанавливаю зависимости"
 python3 -m venv "$BOT_DIR/venv"
-"$BOT_DIR/venv/bin/pip" install -q --upgrade pip
-"$BOT_DIR/venv/bin/pip" install -q -r "$BOT_DIR/requirements.txt"
+# Библиотеки лежат в папке wheels рядом с ботом: pypi.org из России бывает недоступен.
+if ! "$BOT_DIR/venv/bin/pip" install -q --no-index --find-links "$BOT_DIR/wheels" -r "$BOT_DIR/requirements.txt"; then
+  echo "Не хватило библиотек в папке wheels — пробую скачать с pypi.org"
+  "$BOT_DIR/venv/bin/pip" install -q --timeout 60 -r "$BOT_DIR/requirements.txt"
+fi
 
 # Текущие значения настроек (если бот уже ставился раньше).
 current() { [ -f "$ENV_FILE" ] && grep -E "^$1=" "$ENV_FILE" | cut -d= -f2- || true; }
