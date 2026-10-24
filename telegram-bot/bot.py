@@ -39,6 +39,7 @@ ASSISTANT_CHAT_ID = int(os.environ.get("ASSISTANT_CHAT_ID") or 0)
 ASSISTANT_CONTACT = os.environ.get("ASSISTANT_CONTACT", "")
 CONSENT_VERSION = os.environ.get("CONSENT_VERSION", "v1")
 DB_PATH = Path(__file__).parent / "bot.db"
+MEDIA_DIR = Path(__file__).parent / "media"
 DAY = 24 * 3600
 
 LEAD_TYPES = {"LEAD": "program", "LEAD_CHILD": "child", "LEAD_OWN": "existing_test"}
@@ -168,7 +169,7 @@ async def run_actions(context: ContextTypes.DEFAULT_TYPE, user_id: int, screen_i
     fields: dict = {"last_screen": screen_id, "awaiting": None}
     if "tag" in screen:
         fields["topic"] = screen["tag"]
-    if screen_id in ("PRICE", "Q_PARTS", "OB_PRICE"):
+    if screen_id == "PRICE":
         fields["price_seen"] = 1
     if screen_id in LEAD_TYPES:
         fields["lead_type"] = LEAD_TYPES[screen_id]
@@ -225,8 +226,30 @@ async def show(update: Update, context: ContextTypes.DEFAULT_TYPE, screen_id: st
     screen_id = await run_actions(context, user_id, screen_id)
     with db() as conn:
         conn.execute("INSERT INTO events (user_id, screen, ts) VALUES (?, ?, ?)", (user_id, screen_id, time.time()))
-    text = SCREENS[screen_id]["text"].format(contact=ASSISTANT_CONTACT or "контакт уточняется")
-    await context.bot.send_message(chat_id or update.effective_chat.id, text, reply_markup=keyboard(screen_id))
+    await send_screen(context, chat_id or update.effective_chat.id, screen_id)
+
+
+PHOTO_CAPTION_LIMIT = 1024  # длиннее Telegram не принимает подпись к фото
+photo_ids: dict[str, str] = {}  # после первой загрузки фото Telegram отдаёт id, дальше шлём по нему
+
+
+async def send_screen(context: ContextTypes.DEFAULT_TYPE, chat_id: int, screen_id: str) -> None:
+    screen = SCREENS[screen_id]
+    text = screen["text"].format(contact=ASSISTANT_CONTACT or "контакт уточняется")
+    photo = screen.get("photo")
+    path = MEDIA_DIR / photo if photo else None
+    if path and (photo in photo_ids or path.exists()):
+        fits = len(text) <= PHOTO_CAPTION_LIMIT
+        msg = await context.bot.send_photo(
+            chat_id,
+            photo_ids.get(photo) or path.read_bytes(),
+            caption=text if fits else None,
+            reply_markup=keyboard(screen_id) if fits else None,
+        )
+        photo_ids[photo] = msg.photo[-1].file_id
+        if fits:
+            return
+    await context.bot.send_message(chat_id, text, reply_markup=keyboard(screen_id))
 
 
 # ---------- обработчики клиента ----------
@@ -235,7 +258,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Ссылка вида t.me/<бот>?start=instagram сохраняет источник перехода.
     source = context.args[0][:64] if context.args else None
     get_user(update.effective_user, source)
-    menu = ReplyKeyboardMarkup([list(MENU)[:2], list(MENU)[2:]], resize_keyboard=True, is_persistent=True)
+    menu = ReplyKeyboardMarkup([list(MENU)], resize_keyboard=True, is_persistent=True)
     await update.message.reply_text("Меню всегда внизу 👇", reply_markup=menu)
     await show(update, context, "START")
 
@@ -352,7 +375,7 @@ async def send_followups(context: ContextTypes.DEFAULT_TYPE) -> None:
         if not row["followup_consent"] or row["has_lead"]:
             continue
         try:
-            await context.bot.send_message(row["user_id"], SCREENS[row["screen"]]["text"], reply_markup=keyboard(row["screen"]))
+            await send_screen(context, row["user_id"], row["screen"])
         except Forbidden:
             cancel_followups(row["user_id"])
         except TelegramError as e:
