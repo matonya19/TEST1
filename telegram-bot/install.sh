@@ -26,8 +26,8 @@ id dnabot >/dev/null 2>&1 || useradd --system --home "$APP_DIR" --shell /usr/sbi
 
 echo "==> Загружаю код бота"
 if [ -d "$APP_DIR/.git" ]; then
-  git -C "$APP_DIR" fetch -q origin "$BRANCH"
-  git -C "$APP_DIR" reset -q --hard "origin/$BRANCH"
+  git -c safe.directory="$APP_DIR" -C "$APP_DIR" fetch -q origin "$BRANCH"
+  git -c safe.directory="$APP_DIR" -C "$APP_DIR" reset -q --hard "origin/$BRANCH"
 else
   git clone -q --branch "$BRANCH" --depth 1 "$REPO" "$APP_DIR"
 fi
