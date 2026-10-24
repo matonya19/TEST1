@@ -1,0 +1,396 @@
+"""Telegram-бот «ДНК-здоровье» для Натальи Перепелицы.
+
+Кнопочный бот по сценарию из screens.py. Заявки и вопросы клиентов уходят в чат ассистента;
+ассистент отвечает клиенту, просто ответив (Reply) на уведомление бота.
+"""
+
+import html
+import logging
+import os
+import sqlite3
+import time
+from pathlib import Path
+
+from dotenv import load_dotenv
+from telegram import (
+    BotCommand,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    ReplyKeyboardMarkup,
+    Update,
+)
+from telegram.constants import ParseMode
+from telegram.error import Forbidden, TelegramError
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
+
+from screens import FOLLOWUPS, MENU, SCREENS
+
+load_dotenv()
+
+BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
+ASSISTANT_CHAT_ID = int(os.environ.get("ASSISTANT_CHAT_ID") or 0)
+ASSISTANT_CONTACT = os.environ.get("ASSISTANT_CONTACT", "")
+CONSENT_VERSION = os.environ.get("CONSENT_VERSION", "v1")
+DB_PATH = Path(__file__).parent / "bot.db"
+DAY = 24 * 3600
+
+LEAD_TYPES = {"LEAD": "program", "LEAD_CHILD": "child", "LEAD_OWN": "existing_test"}
+LEAD_TYPE_NAMES = {"program": "программа", "child": "ребёнок", "existing_test": "уже есть тест"}
+TOPIC_NAMES = {
+    "energy": "энергия и сон",
+    "weight": "вес и питание",
+    "age": "возрастные изменения",
+    "vitamins": "витамины и нагрузки",
+    "risks": "риски и профилактика",
+    "child": "ребёнок",
+    "other": "другая тема",
+    "existing_test": "уже есть тест",
+}
+
+logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+log = logging.getLogger("dna-bot")
+
+
+# ---------- база данных ----------
+
+def db() -> sqlite3.Connection:
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    conn.executescript(
+        """
+        CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY, username TEXT, first_name TEXT, source TEXT,
+            topic TEXT, last_screen TEXT, awaiting TEXT, lead_type TEXT,
+            price_seen INTEGER DEFAULT 0, followup_consent INTEGER DEFAULT 0, created REAL);
+        CREATE TABLE IF NOT EXISTS leads (
+            user_id INTEGER PRIMARY KEY, type TEXT, status TEXT, city TEXT, question TEXT,
+            consent_at REAL, consent_version TEXT, consent_purpose TEXT, created REAL, updated REAL);
+        CREATE TABLE IF NOT EXISTS followups (
+            id INTEGER PRIMARY KEY, user_id INTEGER, screen TEXT, due REAL, done INTEGER DEFAULT 0);
+        CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, user_id INTEGER, screen TEXT, ts REAL);
+        CREATE TABLE IF NOT EXISTS relay (assistant_msg_id INTEGER PRIMARY KEY, user_id INTEGER);
+        """
+    )
+    return conn
+
+
+def get_user(tg_user, source: str | None = None) -> sqlite3.Row:
+    with db() as conn:
+        conn.execute(
+            "INSERT OR IGNORE INTO users (user_id, username, first_name, source, created) VALUES (?, ?, ?, ?, ?)",
+            (tg_user.id, tg_user.username, tg_user.first_name, source or "telegram", time.time()),
+        )
+        conn.execute(
+            "UPDATE users SET username = ?, first_name = ? WHERE user_id = ?",
+            (tg_user.username, tg_user.first_name, tg_user.id),
+        )
+        if source:
+            conn.execute("UPDATE users SET source = ? WHERE user_id = ?", (source, tg_user.id))
+        return conn.execute("SELECT * FROM users WHERE user_id = ?", (tg_user.id,)).fetchone()
+
+
+def update_user(user_id: int, **fields) -> None:
+    cols = ", ".join(f"{k} = ?" for k in fields)
+    with db() as conn:
+        conn.execute(f"UPDATE users SET {cols} WHERE user_id = ?", (*fields.values(), user_id))
+
+
+def get_lead(user_id: int) -> sqlite3.Row | None:
+    with db() as conn:
+        return conn.execute("SELECT * FROM leads WHERE user_id = ?", (user_id,)).fetchone()
+
+
+def cancel_followups(user_id: int) -> None:
+    with db() as conn:
+        conn.execute("UPDATE followups SET done = 1 WHERE user_id = ? AND done = 0", (user_id,))
+
+
+# ---------- уведомления ассистенту ----------
+
+def client_card(user: sqlite3.Row, lead: sqlite3.Row | None) -> str:
+    name = html.escape(user["first_name"] or "без имени")
+    link = f'<a href="tg://user?id={user["user_id"]}">{name}</a>'
+    if user["username"]:
+        link += f" (@{html.escape(user['username'])})"
+    lines = [
+        f"Клиент: {link}",
+        f"Источник: {html.escape(user['source'] or '—')}",
+        f"Тема: {TOPIC_NAMES.get(user['topic'], '—')}",
+        f"Смотрел цену: {'да' if user['price_seen'] else 'нет'}",
+    ]
+    if lead:
+        lines.insert(0, f"Тип заявки: {LEAD_TYPE_NAMES.get(lead['type'], lead['type'])} · статус: {lead['status']}")
+        if lead["city"]:
+            lines.append(f"Город: {html.escape(lead['city'])}")
+    return "\n".join(lines)
+
+
+async def notify_assistant(context: ContextTypes.DEFAULT_TYPE, user_id: int, title: str, extra: str = "") -> bool:
+    """Отправляет уведомление ассистенту. Возвращает False, если отправить не удалось."""
+    if not ASSISTANT_CHAT_ID:
+        log.error("ASSISTANT_CHAT_ID не задан — уведомление не отправлено")
+        return False
+    with db() as conn:
+        user = conn.execute("SELECT * FROM users WHERE user_id = ?", (user_id,)).fetchone()
+    text = f"<b>{title}</b>\n{client_card(user, get_lead(user_id))}"
+    if extra:
+        text += f"\n\n{extra}"
+    text += "\n\n<i>Ответьте на это сообщение (Reply) — бот перешлёт ответ клиенту.</i>"
+    try:
+        msg = await context.bot.send_message(ASSISTANT_CHAT_ID, text, parse_mode=ParseMode.HTML)
+    except TelegramError as e:
+        log.error("Не удалось уведомить ассистента: %s", e)
+        return False
+    with db() as conn:
+        conn.execute("INSERT OR REPLACE INTO relay VALUES (?, ?)", (msg.message_id, user_id))
+    return True
+
+
+# ---------- экраны ----------
+
+def keyboard(screen_id: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        [[InlineKeyboardButton(label, callback_data=target)] for label, target in SCREENS[screen_id]["buttons"]]
+    )
+
+
+async def run_actions(context: ContextTypes.DEFAULT_TYPE, user_id: int, screen_id: str) -> str:
+    """Выполняет действия, связанные с экраном. Может подменить экран (например, на экран ошибки)."""
+    screen = SCREENS[screen_id]
+    fields: dict = {"last_screen": screen_id, "awaiting": None}
+    if "tag" in screen:
+        fields["topic"] = screen["tag"]
+    if screen_id in ("PRICE", "Q_PARTS", "OB_PRICE"):
+        fields["price_seen"] = 1
+    if screen_id in LEAD_TYPES:
+        fields["lead_type"] = LEAD_TYPES[screen_id]
+    if screen_id == "ASK_TEXT":
+        fields["awaiting"] = "question"
+    if screen_id == "CITY":
+        fields["awaiting"] = "city"
+    update_user(user_id, **fields)
+
+    if screen_id == "LEAD_CONFIRM":
+        return await create_lead(context, user_id)
+    if screen_id == "FOLLOW_YES":
+        now = time.time()
+        with db() as conn:
+            conn.execute("UPDATE users SET followup_consent = 1 WHERE user_id = ?", (user_id,))
+            conn.execute("UPDATE followups SET done = 1 WHERE user_id = ? AND done = 0", (user_id,))
+            conn.executemany(
+                "INSERT INTO followups (user_id, screen, due) VALUES (?, ?, ?)",
+                [(user_id, s, now + days * DAY) for s, days in FOLLOWUPS],
+            )
+    if screen_id == "STOP_FOLLOW":
+        update_user(user_id, followup_consent=0)
+        cancel_followups(user_id)
+    return screen_id
+
+
+async def create_lead(context: ContextTypes.DEFAULT_TYPE, user_id: int) -> str:
+    with db() as conn:
+        user = conn.execute("SELECT * FROM users WHERE user_id = ?", (user_id,)).fetchone()
+        existing = conn.execute("SELECT * FROM leads WHERE user_id = ?", (user_id,)).fetchone()
+        lead_type = user["lead_type"] or "program"
+        now = time.time()
+        if existing:
+            conn.execute("UPDATE leads SET type = ?, updated = ? WHERE user_id = ?", (lead_type, now, user_id))
+        else:
+            conn.execute(
+                "INSERT INTO leads (user_id, type, status, consent_at, consent_version, consent_purpose, created, updated)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (user_id, lead_type, "new", now, CONSENT_VERSION,
+                 "передача Telegram-контакта ассистенту для связи по программе", now, now),
+            )
+    title = "🔁 Повторное нажатие «Хочу начать»" if existing else "🆕 Новая заявка"
+    if not await notify_assistant(context, user_id, title):
+        if not existing:
+            with db() as conn:
+                conn.execute("DELETE FROM leads WHERE user_id = ?", (user_id,))
+        return "LEAD_FAIL"
+    cancel_followups(user_id)  # после заявки серия напоминаний не нужна
+    return "LEAD_CONFIRM"
+
+
+async def show(update: Update, context: ContextTypes.DEFAULT_TYPE, screen_id: str, chat_id: int | None = None) -> None:
+    user_id = update.effective_user.id
+    screen_id = await run_actions(context, user_id, screen_id)
+    with db() as conn:
+        conn.execute("INSERT INTO events (user_id, screen, ts) VALUES (?, ?, ?)", (user_id, screen_id, time.time()))
+    text = SCREENS[screen_id]["text"].format(contact=ASSISTANT_CONTACT or "контакт уточняется")
+    await context.bot.send_message(chat_id or update.effective_chat.id, text, reply_markup=keyboard(screen_id))
+
+
+# ---------- обработчики клиента ----------
+
+async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Ссылка вида t.me/<бот>?start=instagram сохраняет источник перехода.
+    source = context.args[0][:64] if context.args else None
+    get_user(update.effective_user, source)
+    menu = ReplyKeyboardMarkup([list(MENU)[:2], list(MENU)[2:]], resize_keyboard=True, is_persistent=True)
+    await update.message.reply_text("Меню всегда внизу 👇", reply_markup=menu)
+    await show(update, context, "START")
+
+
+def command(screen_id: str):
+    async def handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        get_user(update.effective_user)
+        await show(update, context, screen_id)
+    return handler
+
+
+async def on_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    get_user(update.effective_user)
+    if query.data in SCREENS:
+        await show(update, context, query.data)
+
+
+async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    text = update.message.text.strip()
+    user = get_user(update.effective_user)
+    if text in MENU:
+        await show(update, context, MENU[text])
+        return
+
+    if user["awaiting"] == "city":
+        with db() as conn:
+            conn.execute("UPDATE leads SET city = ?, updated = ? WHERE user_id = ?", (text[:100], time.time(), user["user_id"]))
+        ok = await notify_assistant(context, user["user_id"], "📍 Клиент указал город")
+        await show(update, context, "CITY_DONE" if ok else "ASK_FAIL")
+        return
+
+    # Вопрос: и после кнопки «Написать вопрос», и просто текст — ничего не теряется.
+    with db() as conn:
+        conn.execute("UPDATE leads SET question = ?, updated = ? WHERE user_id = ?", (text[:2000], time.time(), user["user_id"]))
+    ok = await notify_assistant(context, user["user_id"], "✍️ Вопрос от клиента", f"«{html.escape(text[:3000])}»")
+    await show(update, context, "ASK_DONE" if ok else "ASK_FAIL")
+
+
+async def on_media(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(
+        "Пожалуйста, не отправляйте сюда документы и фото — напишите вопрос текстом, и я передам его ассистенту."
+    )
+
+
+# ---------- обработчики ассистента ----------
+
+async def assistant_reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    msg = update.message
+    if not msg.reply_to_message:
+        return
+    with db() as conn:
+        row = conn.execute(
+            "SELECT user_id FROM relay WHERE assistant_msg_id = ?", (msg.reply_to_message.message_id,)
+        ).fetchone()
+    if not row:
+        return
+    try:
+        sent = await context.bot.copy_message(row["user_id"], msg.chat_id, msg.message_id)
+    except Forbidden:
+        await msg.reply_text("❌ Клиент заблокировал бота — сообщение не доставлено.")
+        return
+    except TelegramError as e:
+        await msg.reply_text(f"❌ Не удалось отправить: {e}")
+        return
+    with db() as conn:
+        conn.execute("UPDATE leads SET status = 'contacted', updated = ? WHERE user_id = ? AND status = 'new'",
+                     (time.time(), row["user_id"]))
+        conn.execute("INSERT OR REPLACE INTO relay VALUES (?, ?)", (msg.message_id, row["user_id"]))
+    await msg.reply_text("✅ Отправлено клиенту")
+
+
+async def cmd_chatid(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(f"ID этого чата: {update.effective_chat.id}")
+
+
+async def cmd_stats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    since = time.time() - 14 * DAY
+    with db() as conn:
+        def users_on(screen: str) -> int:
+            return conn.execute(
+                "SELECT COUNT(DISTINCT user_id) FROM events WHERE screen = ? AND ts > ?", (screen, since)
+            ).fetchone()[0]
+        started = users_on("START")
+        price = users_on("PRICE")
+        lead_screen = users_on("LEAD")
+        leads = conn.execute("SELECT COUNT(*) FROM leads WHERE created > ?", (since,)).fetchone()[0]
+        questions = users_on("ASK_DONE")
+        sources = conn.execute(
+            "SELECT COALESCE(source, '—'), COUNT(*) FROM users WHERE created > ? GROUP BY 1 ORDER BY 2 DESC", (since,)
+        ).fetchall()
+    await update.message.reply_text(
+        "Статистика за 14 дней (уникальные люди):\n"
+        f"Открыли бота: {started}\nСмотрели цену: {price}\nНажали «Хочу начать»: {lead_screen}\n"
+        f"Оставили заявку: {leads}\nЗадали вопрос: {questions}\n\n"
+        "Источники новых пользователей:\n" + ("\n".join(f"• {s}: {n}" for s, n in sources) or "—")
+    )
+
+
+# ---------- серия напоминаний ----------
+
+async def send_followups(context: ContextTypes.DEFAULT_TYPE) -> None:
+    with db() as conn:
+        due = conn.execute(
+            "SELECT f.id, f.user_id, f.screen, u.followup_consent, l.user_id AS has_lead FROM followups f"
+            " JOIN users u ON u.user_id = f.user_id LEFT JOIN leads l ON l.user_id = f.user_id"
+            " WHERE f.done = 0 AND f.due <= ?",
+            (time.time(),),
+        ).fetchall()
+    for row in due:
+        with db() as conn:
+            conn.execute("UPDATE followups SET done = 1 WHERE id = ?", (row["id"],))
+        if not row["followup_consent"] or row["has_lead"]:
+            continue
+        try:
+            await context.bot.send_message(row["user_id"], SCREENS[row["screen"]]["text"], reply_markup=keyboard(row["screen"]))
+        except Forbidden:
+            cancel_followups(row["user_id"])
+        except TelegramError as e:
+            log.error("Не удалось отправить %s пользователю %s: %s", row["screen"], row["user_id"], e)
+
+
+async def post_init(app: Application) -> None:
+    await app.bot.set_my_commands([
+        BotCommand("start", "Начать сначала"),
+        BotCommand("menu", "Главное меню"),
+        BotCommand("price", "Стоимость"),
+        BotCommand("help", "Частые вопросы"),
+        BotCommand("stop", "Не присылать материалы"),
+    ])
+
+
+def main() -> None:
+    app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
+    assistant = filters.Chat(ASSISTANT_CHAT_ID) if ASSISTANT_CHAT_ID else filters.Chat(chat_id=[])
+
+    app.add_handler(CommandHandler("chatid", cmd_chatid))
+    app.add_handler(CommandHandler("stats", cmd_stats, filters=assistant))
+    app.add_handler(MessageHandler(assistant & filters.REPLY & ~filters.COMMAND, assistant_reply))
+
+    private = filters.ChatType.PRIVATE & ~assistant
+    app.add_handler(CommandHandler("start", cmd_start, filters=private))
+    app.add_handler(CommandHandler("menu", command("START"), filters=private))
+    app.add_handler(CommandHandler("price", command("PRICE"), filters=private))
+    app.add_handler(CommandHandler("help", command("FAQ"), filters=private))
+    app.add_handler(CommandHandler("stop", command("STOP_FOLLOW"), filters=private))
+    app.add_handler(CallbackQueryHandler(on_button))
+    app.add_handler(MessageHandler(private & filters.TEXT & ~filters.COMMAND, on_text))
+    app.add_handler(MessageHandler(private & ~filters.TEXT & ~filters.COMMAND, on_media))
+
+    app.job_queue.run_repeating(send_followups, interval=600, first=30)
+    log.info("Бот запущен")
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
+
+
+if __name__ == "__main__":
+    main()
