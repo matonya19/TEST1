@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.environ.get("COMPOSIO_API_KEY", "")
+API_KEY = os.environ.get("COMPOSIO_API_KEY", "").strip().strip("\"'").removeprefix("COMPOSIO_API_KEY=")
 IG_USERNAME = os.environ.get("IG_USERNAME", "doc.perepelitsa").lstrip("@").lower()
 KEYWORD = os.environ.get("IG_KEYWORD", "генетика")
 TG_BOT_USERNAME = os.environ.get("TG_BOT_USERNAME", "dnk_system_perepelitca_bot").lstrip("@")
