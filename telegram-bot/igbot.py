@@ -34,6 +34,7 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 ASSISTANT_CHAT_ID = os.environ.get("ASSISTANT_CHAT_ID", "")
 
 BASE = "https://backend.composio.dev/api/v3"
+TOOLKIT_VERSION = os.environ.get("COMPOSIO_TOOLKIT_VERSION", "latest")  # без версии Composio берёт старый набор команд
 GRAPH_VERSION = "v21.0"
 DB_PATH = Path(__file__).parent / "igbot.db"
 DAY = 24 * 3600
@@ -64,7 +65,8 @@ class Composio:
     def execute(self, slug: str, arguments: dict) -> dict:
         r = self.http.post(
             f"{BASE}/tools/execute/{slug}",
-            json={"connected_account_id": self.account_id, "user_id": self.user_id, "arguments": arguments},
+            json={"connected_account_id": self.account_id, "user_id": self.user_id, "arguments": arguments,
+                  "version": TOOLKIT_VERSION},
         )
         payload = r.json() if r.content else {}
         if r.status_code >= 400 or not payload.get("successful", False):
