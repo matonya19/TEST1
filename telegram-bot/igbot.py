@@ -59,11 +59,12 @@ class Composio:
     def __init__(self, api_key: str):
         self.http = httpx.Client(headers={"x-api-key": api_key}, timeout=60)
         self.account_id = ""
+        self.user_id = ""
 
     def execute(self, slug: str, arguments: dict) -> dict:
         r = self.http.post(
             f"{BASE}/tools/execute/{slug}",
-            json={"connected_account_id": self.account_id, "arguments": arguments},
+            json={"connected_account_id": self.account_id, "user_id": self.user_id, "arguments": arguments},
         )
         payload = r.json() if r.content else {}
         if r.status_code >= 400 or not payload.get("successful", False):
@@ -75,7 +76,8 @@ class Composio:
     def proxy(self, method: str, endpoint: str, body: dict) -> tuple[int, dict]:
         r = self.http.post(
             f"{BASE}/tools/execute/proxy",
-            json={"endpoint": endpoint, "method": method, "connected_account_id": self.account_id, "body": body},
+            json={"endpoint": endpoint, "method": method, "connected_account_id": self.account_id,
+                  "user_id": self.user_id, "body": body},
         )
         payload = r.json() if r.content else {}
         status = payload.get("status") or r.status_code
@@ -90,6 +92,7 @@ class Composio:
         """Находит подключённый аккаунт Instagram с нужным именем. Возвращает данные профиля."""
         for acc in self.instagram_accounts():
             self.account_id = acc["id"]
+            self.user_id = acc.get("user_id") or os.environ.get("COMPOSIO_USER_ID", "natalie")
             try:
                 info = self.execute("INSTAGRAM_GET_USER_INFO", {"ig_user_id": "me", "fields": "id,user_id,username"})
             except Exception as e:  # noqa: BLE001 — один сломанный аккаунт не должен мешать искать остальные
