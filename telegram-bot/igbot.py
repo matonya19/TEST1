@@ -38,6 +38,7 @@ TOOLKIT_VERSION = os.environ.get("COMPOSIO_TOOLKIT_VERSION", "latest")  # без
 GRAPH_VERSION = "v21.0"
 DB_PATH = Path(__file__).parent / "igbot.db"
 DAY = 24 * 3600
+DM_REPEAT_WINDOW = 10 * 60
 
 LINK = f"https://t.me/{TG_BOT_USERNAME}?start=instagram"
 DM_TEXT = (
@@ -146,10 +147,10 @@ def mark_handled(item_id: str) -> None:
         conn.execute("INSERT OR IGNORE INTO handled VALUES (?, ?)", (item_id, time.time()))
 
 
-def recently_replied(user_id: str) -> bool:
+def recently_replied(user_id: str, window: float = DAY) -> bool:
     with db() as conn:
         row = conn.execute("SELECT ts FROM replied_users WHERE user_id = ?", (user_id,)).fetchone()
-    return bool(row and time.time() - row[0] < DAY)
+    return bool(row and time.time() - row[0] < window)
 
 
 def mark_replied(user_id: str) -> None:
@@ -252,7 +253,9 @@ def check_direct(api: Composio, own_id: str, since: float) -> None:
             mark_handled(msg["id"])
             if ts(msg["created_time"]) < since or not has_keyword(msg.get("message")):
                 continue
-            if recently_replied(sender["id"]):
+            # Человек сам просит в директ — отвечаем, если только не отправляли ссылку прямо сейчас
+            # (например, в ответ на его комментарий минуту назад).
+            if recently_replied(sender["id"], DM_REPEAT_WINDOW):
                 break
             try:
                 api.execute("INSTAGRAM_SEND_TEXT_MESSAGE", {"recipient_id": sender["id"], "text": DM_TEXT})
