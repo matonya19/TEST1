@@ -56,6 +56,7 @@ TOKEN="$(ask TELEGRAM_BOT_TOKEN "Токен бота от @BotFather")"
 CHAT_ID="$(ask ASSISTANT_CHAT_ID "ID чата ассистента (если ещё не знаете — просто Enter)")"
 CONTACT="$(ask ASSISTANT_CONTACT "Контакт ассистента для клиентов, например @username или +7... (можно Enter)")"
 CONSENT="$(current CONSENT_VERSION)"
+COMPOSIO="$(ask COMPOSIO_API_KEY "Ключ Composio для Instagram-автоответчика (если не нужен — Enter)")"
 
 if [ -z "$TOKEN" ]; then
   echo "Без токена бот не запустится. Запустите установку ещё раз и вставьте токен." >&2
@@ -68,6 +69,7 @@ TELEGRAM_BOT_TOKEN=$TOKEN
 ASSISTANT_CHAT_ID=$CHAT_ID
 ASSISTANT_CONTACT=$CONTACT
 CONSENT_VERSION=${CONSENT:-v1}
+COMPOSIO_API_KEY=$COMPOSIO
 EOF
 chown -R dnabot:dnabot "$APP_DIR"
 chmod 600 "$ENV_FILE"
@@ -89,10 +91,41 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
+cat >/etc/systemd/system/$SERVICE-instagram.service <<EOF
+[Unit]
+Description=Instagram keyword autoresponder
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=dnabot
+WorkingDirectory=$BOT_DIR
+ExecStart=$BOT_DIR/venv/bin/python igbot.py
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 systemctl daemon-reload
 systemctl enable -q "$SERVICE"
 systemctl restart "$SERVICE"
 sleep 5
+
+if [ -n "$COMPOSIO" ]; then
+  echo
+  echo "==> Проверяю подключение к Instagram"
+  if runuser -u dnabot -- "$BOT_DIR/venv/bin/python" "$BOT_DIR/igbot.py" --check; then
+    systemctl enable -q "$SERVICE-instagram"
+    systemctl restart "$SERVICE-instagram"
+    echo "✅ Instagram-автоответчик запущен."
+  else
+    echo "❌ Instagram-автоответчик не запущен: проверьте ключ Composio."
+  fi
+else
+  systemctl disable -q --now "$SERVICE-instagram" 2>/dev/null || true
+fi
 
 echo
 if systemctl is-active -q "$SERVICE"; then
