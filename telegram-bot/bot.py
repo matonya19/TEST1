@@ -45,13 +45,15 @@ DAY = 24 * 3600
 LEAD_TYPES = {"LEAD": "program", "LEAD_CHILD": "child", "LEAD_OWN": "existing_test"}
 LEAD_TYPE_NAMES = {"program": "программа", "child": "ребёнок", "existing_test": "уже есть тест"}
 TOPIC_NAMES = {
-    "energy": "энергия и сон",
+    "energy": "энергия, туман в голове",
     "weight": "вес и питание",
-    "age": "возрастные изменения",
-    "vitamins": "витамины и нагрузки",
+    "age": "молодость",
+    "vitamins": "витамины",
     "risks": "риски и профилактика",
     "child": "ребёнок",
     "other": "другая тема",
+    "edema": "отёки",
+    "sport": "тренировки",
     "existing_test": "уже есть тест",
 }
 
