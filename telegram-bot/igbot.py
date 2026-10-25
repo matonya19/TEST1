@@ -269,6 +269,11 @@ def main() -> None:
     if "--check" in sys.argv:
         print(f"OK: найден @{info.get('username')}, автоответчик готов к работе.")
         return
+    try:
+        # Без этой подписки Instagram не даёт приложению отвечать в директ («outside of allowed window»).
+        api.execute("INSTAGRAM_ENABLE_WEBHOOK_SUBSCRIPTIONS", {"subscribed_fields": ["messages", "comments"]})
+    except Exception as e:  # noqa: BLE001
+        log.warning("Не удалось включить подписку на сообщения: %s", e)
     since = started_at()
     log.info("Автоответчик запущен для @%s, слово «%s», проверка каждые %s с", IG_USERNAME, KEYWORD, POLL_SECONDS)
     while True:
