@@ -10,7 +10,7 @@
   --rail-bg:#171b2e; --rail-ink:#f2f4fb; --rail-muted:#a3aac0; --rail-hover:#252a44;
   --accent:#3b4cf0; --accent-ink:#ffffff; --accent-soft:#eceefe;
   --ok:#1d7a4a; --warn:#a9520a; --bad:#b42336;
-  --c-ulyana:#8a3ea8; --c-school:#1238f0; --c-natalia:#1f8fe0; --c-keystone:#141414; --c-roombloom:#d0552f; --c-inbox:#6b7280;
+  --c-ulyana:#8a3ea8; --c-school:#1238f0; --c-natalia:#1f8fe0; --c-keystone:#141414; --c-roombloom:#14a08a; --c-inbox:#6b7280;
   --f-display:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-body:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"Montserrat",system-ui,sans-serif;
@@ -21,14 +21,14 @@
   --rail-bg:#05060a; --rail-ink:#f1f3f8; --rail-muted:#8d94a6; --rail-hover:#1c2029;
   --accent:#8b96ff; --accent-ink:#0d1030; --accent-soft:#252a4a;
   --ok:#4cc488; --warn:#f0a050; --bad:#f07a8a;
-  --c-ulyana:#c58be0; --c-school:#6f8bff; --c-natalia:#6fc0f5; --c-keystone:#3a3a3a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
+  --c-ulyana:#c58be0; --c-school:#6f8bff; --c-natalia:#6fc0f5; --c-keystone:#3a3a3a; --c-roombloom:#5fd6c0; --c-inbox:#9ca3af;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0c0e13; --surface:#1c2029; --ink:#f1f3f8; --muted:#a3aab9; --line:#343a48; --soft:#262b36; --shadow:none;
   --rail-bg:#05060a; --rail-ink:#f1f3f8; --rail-muted:#8d94a6; --rail-hover:#1c2029;
   --accent:#8b96ff; --accent-ink:#0d1030; --accent-soft:#252a4a;
   --ok:#4cc488; --warn:#f0a050; --bad:#f07a8a;
-  --c-ulyana:#c58be0; --c-school:#6f8bff; --c-natalia:#6fc0f5; --c-keystone:#3a3a3a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
+  --c-ulyana:#c58be0; --c-school:#6f8bff; --c-natalia:#6fc0f5; --c-keystone:#3a3a3a; --c-roombloom:#5fd6c0; --c-inbox:#9ca3af;
   color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -199,6 +199,8 @@ section{display:flex;flex-direction:column;gap:12px}
 .hero-min .sub{text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:500}
 .hero-min .rule{opacity:.9;max-width:64px}.hero-min .rule b,.hero-min .rule b+i{display:none}
 .hero-min .addpic{background:#fff;border-color:#c8c8c4}
+.hero-rb{border:0}.hero-rb .addpic{background:#ffffff40;border-color:#1e262655}
+.hero-rb .ico svg{stroke-width:1.4}
 .hero .pic{position:relative;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
 .hero .pic .ava{width:128px;height:128px;box-shadow:0 0 0 4px #ffffffcc,0 10px 30px rgba(10,40,90,.25)}
 .hero .pic label{font-size:12px;font-weight:600;cursor:pointer;color:var(--h-ink);opacity:.8}
@@ -266,7 +268,7 @@ const ICONS={
   school:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/><path d="M22 9v6"/>',
   natalia:'<path d="M7 2c0 5 10 5 10 10S7 17 7 22"/><path d="M17 2c0 5-10 5-10 10s10 5 10 10"/><path d="M8.6 5.5h6.8M10 8.5h4M10 15.5h4M8.6 18.5h6.8"/>',
   keystone:'<path d="M3 5.5h18v5.2H3zM12 10.7 21 18.5H3z" fill="currentColor" stroke="none"/>',
-  roombloom:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
+  roombloom:'<path d="M3.5 11V6a3 3 0 0 1 6 0v5z"/><path d="M6.5 3v8M3.5 7h6"/><path d="M2.5 11.5l1.8 5h3.2M4.3 16.5V21M7.5 16.5V21"/><path d="M9.5 15h12M11 15v6M20 15v6"/><path d="M15 15l.7-3h4.3l-.7 3"/><path d="M15 7.5h5.5M16 7.5V4.5M17.3 7.5V4.5M18.6 7.5l1-2.8"/>',
   inbox:'<path d="M3 13l3-8h12l3 8v6H3z"/><path d="M3 13h5l1 2h6l1-2h5"/>'};
 const ICON_INK={school:'#2ff0d2'};
 const ico=(id,cls='')=>`<span class="ico ${cls}" style="${cc(id)}${ICON_INK[id]?';color:'+ICON_INK[id]:''}"><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[id]||ICONS.inbox}</svg></span>`;
@@ -279,7 +281,7 @@ const HERO={
   school:{bg:'radial-gradient(120% 150% at 85% 10%,#3a63ff 0%,#0b36f2 50%,#0626c2 100%)',ink:'#ffffff',sub:'#c9f5ee',line:'#ffffff',tile:'#2ff0d2',tileInk:'#0b36f2',art:'bubbles'},
   natalia:{bg:'radial-gradient(120% 140% at 80% 20%,#bfe2ff 0%,#8cc6f4 40%,#5fa6e6 100%)',ink:'#0b2f6b',sub:'#1d4a8a',line:'#ffffffd9',tile:'#ffffff',tileInk:'#1f6fc4',art:'dna'},
   keystone:{bg:'linear-gradient(180deg,#ffffff 0%,#f4f4f2 100%)',ink:'#111111',sub:'#6b6b6b',line:'#111111',tile:'transparent',tileInk:'#111111',art:'mark',cls:'hero-min'},
-  roombloom:{bg:'linear-gradient(120deg,#fff1ea 0%,#ffd3c2 55%,#ffad90 100%)',ink:'#5e1f0c',sub:'#87412a',line:'#ffffffb3',tile:'#d0552f',tileInk:'#fff',art:'hex'}};
+  roombloom:{bg:'linear-gradient(160deg,#9be4d7 0%,#8edccf 60%,#7fd3c4 100%)',ink:'#1e2626',sub:'#2c4642',line:'#1e2626',tile:'transparent',tileInk:'#1e2626',art:'room',cls:'hero-min hero-rb',title:'Room & Bloom',subtitle:'Rent & Sale · доступное жильё'}};
 function dnaArt(){
   const W=260,H=200,pts=[];let a='',b='',rungs='';
   for(let i=0;i<=40;i++){const y=i*H/40,x1=W/2+70*Math.sin(i/40*Math.PI*3),x2=W/2-70*Math.sin(i/40*Math.PI*3);
@@ -303,15 +305,18 @@ function bubbleArt(){
 function markArt(){
   return `<svg viewBox="0 0 24 24" style="right:40px;top:50%;transform:translateY(-50%);height:70%;width:auto;opacity:.06"><path d="M3 5.5h18v5.2H3zM12 10.7 21 18.5H3z" fill="currentColor"/></svg>`;
 }
+function roomArt(){
+  return `<svg viewBox="0 0 24 24" style="right:30px;top:50%;transform:translateY(-50%);height:82%;width:auto;opacity:.16" fill="none" stroke="currentColor" stroke-width=".7" stroke-linecap="round" stroke-linejoin="round">${ICONS.roombloom}</svg>`;
+}
 function hero(cid){
   const c=byId(cid),h=HERO[cid],ph=photo(cid);
-  const art=h.art==='dna'?dnaArt()+hexArt(cid):h.art==='bubbles'?bubbleArt():h.art==='mark'?markArt():hexArt(cid);
+  const art=h.art==='dna'?dnaArt()+hexArt(cid):h.art==='bubbles'?bubbleArt():h.art==='mark'?markArt():h.art==='room'?roomArt():hexArt(cid);
   const pic=ph?`<div class="pic">${ava(cid,c.name)}${assets?`<label for="ph-${cid}">Сменить фото</label>`:''}</div>`
     :assets?`<div class="pic"><label class="addpic" for="ph-${cid}">+ Добавить фото</label></div>`:'';
   return `<div class="hero ${h.cls||''}" style="--h-bg:${h.bg};--h-ink:${h.ink};--h-sub:${h.sub};--h-line:${h.line};--h-tile:${h.tile};--h-tile-ink:${h.tileInk}">
     <div class="art">${art}</div>
     ${ico(cid)}
-    <div class="txt"><h1>${esc(c.name)}</h1><div class="sub">${esc(c.desc)}</div><div class="rule"><i></i><b></b><i></i></div></div>
+    <div class="txt"><h1>${esc(h.title||c.name)}</h1><div class="sub">${esc(h.subtitle||c.desc)}</div><div class="rule"><i></i><b></b><i></i></div></div>
     ${pic}<input type="file" accept="image/jpeg,image/png,image/webp" id="ph-${cid}" data-photo="${cid}" hidden>
   </div>`;
 }
