@@ -10,7 +10,7 @@
   --rail-bg:#171b2e; --rail-ink:#f2f4fb; --rail-muted:#a3aac0; --rail-hover:#252a44;
   --accent:#3b4cf0; --accent-ink:#ffffff; --accent-soft:#eceefe;
   --ok:#1d7a4a; --warn:#a9520a; --bad:#b42336;
-  --c-ulyana:#8a3ea8; --c-school:#1f8a52; --c-natalia:#1f78d1; --c-keystone:#9a7a2c; --c-roombloom:#d0552f; --c-inbox:#6b7280;
+  --c-ulyana:#8a3ea8; --c-school:#1238f0; --c-natalia:#1f8fe0; --c-keystone:#9a7a2c; --c-roombloom:#d0552f; --c-inbox:#6b7280;
   --f-display:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-body:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"Montserrat",system-ui,sans-serif;
@@ -21,14 +21,14 @@
   --rail-bg:#05060a; --rail-ink:#f1f3f8; --rail-muted:#8d94a6; --rail-hover:#1c2029;
   --accent:#8b96ff; --accent-ink:#0d1030; --accent-soft:#252a4a;
   --ok:#4cc488; --warn:#f0a050; --bad:#f07a8a;
-  --c-ulyana:#c58be0; --c-school:#5cc58b; --c-natalia:#6fb4f5; --c-keystone:#d5b56a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
+  --c-ulyana:#c58be0; --c-school:#6f8bff; --c-natalia:#6fc0f5; --c-keystone:#d5b56a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0c0e13; --surface:#1c2029; --ink:#f1f3f8; --muted:#a3aab9; --line:#343a48; --soft:#262b36; --shadow:none;
   --rail-bg:#05060a; --rail-ink:#f1f3f8; --rail-muted:#8d94a6; --rail-hover:#1c2029;
   --accent:#8b96ff; --accent-ink:#0d1030; --accent-soft:#252a4a;
   --ok:#4cc488; --warn:#f0a050; --bad:#f07a8a;
-  --c-ulyana:#c58be0; --c-school:#5cc58b; --c-natalia:#6fb4f5; --c-keystone:#d5b56a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
+  --c-ulyana:#c58be0; --c-school:#6f8bff; --c-natalia:#6fc0f5; --c-keystone:#d5b56a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
   color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -188,7 +188,7 @@ section{display:flex;flex-direction:column;gap:12px}
   background:var(--h-bg);color:var(--h-ink);box-shadow:var(--shadow)}
 .hero .art{position:absolute;inset:0;pointer-events:none}
 .hero .art svg{position:absolute;color:var(--h-line)}
-.hero .ico{width:64px;height:58px;background:var(--h-tile);color:var(--h-tile-ink);position:relative}
+.hero .ico{width:64px;height:58px;background:var(--h-tile);color:var(--h-tile-ink)!important;position:relative}
 .hero .txt{position:relative;flex:1;min-width:0}
 .hero h1{font-weight:700;font-size:clamp(22px,3.6vw,32px);letter-spacing:-.02em;line-height:1.15;color:var(--h-ink)}
 .hero .sub{color:var(--h-sub);margin-top:4px;font-weight:500}
@@ -257,20 +257,21 @@ const CLIENTS=[
   {id:'roombloom',name:'Roombloom',short:'Roombloom',desc:'Доступное жильё'},
 ];
 const ICONS={
-  ulyana:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/><path d="M22 9v6"/>',
-  school:'<path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6v14"/>',
+  ulyana:'<path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5z"/><path d="M5 21h14"/>',
+  school:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/><path d="M22 9v6"/>',
   natalia:'<path d="M7 2c0 5 10 5 10 10S7 17 7 22"/><path d="M17 2c0 5-10 5-10 10s10 5 10 10"/><path d="M8.6 5.5h6.8M10 8.5h4M10 15.5h4M8.6 18.5h6.8"/>',
   keystone:'<circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16 7l3 3M13.8 9.2l2 2"/>',
   roombloom:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
   inbox:'<path d="M3 13l3-8h12l3 8v6H3z"/><path d="M3 13h5l1 2h6l1-2h5"/>'};
-const ico=(id,cls='')=>`<span class="ico ${cls}" style="${cc(id)}"><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[id]||ICONS.inbox}</svg></span>`;
+const ICON_INK={school:'#2ff0d2'};
+const ico=(id,cls='')=>`<span class="ico ${cls}" style="${cc(id)}${ICON_INK[id]?';color:'+ICON_INK[id]:''}"><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[id]||ICONS.inbox}</svg></span>`;
 const photo=id=>S.profiles[id]?.photo||'';
 const ava=(id,label='')=>{const p=S.profiles[id]||{};return `<span class="ava" role="img" aria-label="${esc(label)}" style="${cc(id)};background-image:url('${esc(p.photo)}');background-size:${(p.zoom||1)*100}%;background-position:${esc(p.pos||'50% 30%')}"></span>`};
 const avatarOrIco=id=>photo(id)?ava(id):ico(id);
 /* hero themes: each client's header is its own banner, deliberately fixed colors (works on both page themes) */
 const HERO={
   ulyana:{bg:'linear-gradient(120deg,#f6efff 0%,#e2cdfa 55%,#c9a6f0 100%)',ink:'#33115a',sub:'#5b3a82',line:'#ffffffb3',tile:'#7a35b0',tileInk:'#fff',art:'hex'},
-  school:{bg:'linear-gradient(120deg,#ecfaf1 0%,#c4ecd3 55%,#93d9ae 100%)',ink:'#0d3f24',sub:'#2f5f44',line:'#ffffffb3',tile:'#1f8a52',tileInk:'#fff',art:'hex'},
+  school:{bg:'radial-gradient(120% 150% at 85% 10%,#3a63ff 0%,#0b36f2 50%,#0626c2 100%)',ink:'#ffffff',sub:'#c9f5ee',line:'#ffffff',tile:'#2ff0d2',tileInk:'#0b36f2',art:'bubbles'},
   natalia:{bg:'radial-gradient(120% 140% at 80% 20%,#bfe2ff 0%,#8cc6f4 40%,#5fa6e6 100%)',ink:'#0b2f6b',sub:'#1d4a8a',line:'#ffffffd9',tile:'#ffffff',tileInk:'#1f6fc4',art:'dna'},
   keystone:{bg:'linear-gradient(120deg,#1d1d22 0%,#2c2a2a 55%,#4a3f2a 100%)',ink:'#f5e7c3',sub:'#cdbb8f',line:'#d5b56a55',tile:'#d5b56a',tileInk:'#1d1d22',art:'hex'},
   roombloom:{bg:'linear-gradient(120deg,#fff1ea 0%,#ffd3c2 55%,#ffad90 100%)',ink:'#5e1f0c',sub:'#87412a',line:'#ffffffb3',tile:'#d0552f',tileInk:'#fff',art:'hex'}};
@@ -291,9 +292,12 @@ function hexArt(id,big){
     :[hx(30,30,26,ICONS[id]),hx(80,110,20,''),hx(150,40,16,'')].join('');
   return `<svg viewBox="0 0 200 200" style="${id==='natalia'?'right:150px;top:-6px;height:115%;opacity:.85':'right:-10px;top:-20px;height:140%;opacity:.7'};width:auto" fill="none" stroke="currentColor">${extra}</svg>`;
 }
+function bubbleArt(){
+  return `<svg viewBox="0 0 200 120" style="right:150px;top:8px;height:85%;width:auto"><g fill="currentColor"><circle cx="40" cy="30" r="19"/><circle cx="96" cy="52" r="14"/><circle cx="52" cy="92" r="10"/></g></svg>`;
+}
 function hero(cid){
   const c=byId(cid),h=HERO[cid],ph=photo(cid);
-  const art=(h.art==='dna'?dnaArt()+hexArt(cid):hexArt(cid));
+  const art=h.art==='dna'?dnaArt()+hexArt(cid):h.art==='bubbles'?bubbleArt():hexArt(cid);
   const pic=ph?`<div class="pic">${ava(cid,c.name)}${assets?`<label for="ph-${cid}">Сменить фото</label>`:''}</div>`
     :assets?`<div class="pic"><label class="addpic" for="ph-${cid}">+ Добавить фото</label></div>`:'';
   return `<div class="hero" style="--h-bg:${h.bg};--h-ink:${h.ink};--h-sub:${h.sub};--h-line:${h.line};--h-tile:${h.tile};--h-tile-ink:${h.tileInk}">
