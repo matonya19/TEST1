@@ -10,7 +10,7 @@
   --rail-bg:#171b2e; --rail-ink:#f2f4fb; --rail-muted:#a3aac0; --rail-hover:#252a44;
   --accent:#3b4cf0; --accent-ink:#ffffff; --accent-soft:#eceefe;
   --ok:#1d7a4a; --warn:#a9520a; --bad:#b42336;
-  --c-ulyana:#8a3ea8; --c-school:#2f6fd6; --c-natalia:#0f8a7e; --c-keystone:#9a7a2c; --c-roombloom:#d0552f; --c-inbox:#6b7280;
+  --c-ulyana:#8a3ea8; --c-school:#1f8a52; --c-natalia:#1f78d1; --c-keystone:#9a7a2c; --c-roombloom:#d0552f; --c-inbox:#6b7280;
   --f-display:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-body:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"Montserrat",system-ui,sans-serif;
@@ -21,14 +21,14 @@
   --rail-bg:#05060a; --rail-ink:#f1f3f8; --rail-muted:#8d94a6; --rail-hover:#1c2029;
   --accent:#8b96ff; --accent-ink:#0d1030; --accent-soft:#252a4a;
   --ok:#4cc488; --warn:#f0a050; --bad:#f07a8a;
-  --c-ulyana:#c58be0; --c-school:#79a6f2; --c-natalia:#4cc3b5; --c-keystone:#d5b56a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
+  --c-ulyana:#c58be0; --c-school:#5cc58b; --c-natalia:#6fb4f5; --c-keystone:#d5b56a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0c0e13; --surface:#1c2029; --ink:#f1f3f8; --muted:#a3aab9; --line:#343a48; --soft:#262b36; --shadow:none;
   --rail-bg:#05060a; --rail-ink:#f1f3f8; --rail-muted:#8d94a6; --rail-hover:#1c2029;
   --accent:#8b96ff; --accent-ink:#0d1030; --accent-soft:#252a4a;
   --ok:#4cc488; --warn:#f0a050; --bad:#f07a8a;
-  --c-ulyana:#c58be0; --c-school:#79a6f2; --c-natalia:#4cc3b5; --c-keystone:#d5b56a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
+  --c-ulyana:#c58be0; --c-school:#5cc58b; --c-natalia:#6fb4f5; --c-keystone:#d5b56a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
   color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -177,6 +177,30 @@ section{display:flex;flex-direction:column;gap:12px}
 
 /* client header */
 .chead{border-left:6px solid var(--cc);padding-left:16px}
+.ico{display:inline-grid;place-items:center;flex:none;color:#fff;background:var(--cc);clip-path:polygon(25% 4%,75% 4%,100% 50%,75% 96%,25% 96%,0 50%)}
+.ico svg{width:58%;height:58%;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.nav .ico{width:22px;height:20px}
+.ava{flex:none;border-radius:50%;background-color:var(--soft);background-repeat:no-repeat;display:block}
+.cc-top{display:flex;gap:12px;align-items:center}
+.cc-top .ico{width:44px;height:40px}
+.cc-top .ava{width:44px;height:44px;box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--cc)}
+.hero{position:relative;overflow:hidden;border-radius:22px;padding:26px 28px;min-height:150px;display:flex;align-items:center;gap:20px;
+  background:var(--h-bg);color:var(--h-ink);box-shadow:var(--shadow)}
+.hero .art{position:absolute;inset:0;pointer-events:none}
+.hero .art svg{position:absolute;color:var(--h-line)}
+.hero .ico{width:64px;height:58px;background:var(--h-tile);color:var(--h-tile-ink);position:relative}
+.hero .txt{position:relative;flex:1;min-width:0}
+.hero h1{font-weight:700;font-size:clamp(22px,3.6vw,32px);letter-spacing:-.02em;line-height:1.15;color:var(--h-ink)}
+.hero .sub{color:var(--h-sub);margin-top:4px;font-weight:500}
+.hero .rule{display:flex;align-items:center;gap:6px;margin-top:10px;color:var(--h-ink);opacity:.55;max-width:240px}
+.hero .rule i{flex:1;height:1px;background:currentColor}.hero .rule b{width:6px;height:6px;border-radius:50%;background:currentColor}
+.hero .pic{position:relative;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+.hero .pic .ava{width:128px;height:128px;box-shadow:0 0 0 4px #ffffffcc,0 10px 30px rgba(10,40,90,.25)}
+.hero .pic label{font-size:12px;font-weight:600;cursor:pointer;color:var(--h-ink);opacity:.8}
+.hero .pic label:hover{opacity:1;text-decoration:underline}
+.hero .addpic{width:128px;height:128px;border-radius:50%;border:2px dashed var(--h-line);display:grid;place-items:center;text-align:center;font-weight:600;font-size:13px;color:var(--h-ink);cursor:pointer;background:#ffffff22;padding:12px}
+@media (max-width:640px){.hero .art{opacity:.45}.hero{padding:20px 18px;gap:14px;align-items:flex-start}.hero .pic .ava,.hero .addpic{width:76px;height:76px}.hero .addpic{font-size:11px;padding:6px}.hero .ico{width:46px;height:42px}.hero>.ico{display:none}}
+
 .profile textarea{width:100%;min-height:150px;resize:vertical}
 .two{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
 @media (max-width:860px){.two{grid-template-columns:minmax(0,1fr)}}
@@ -232,6 +256,53 @@ const CLIENTS=[
   {id:'keystone',name:'Keystone',short:'Keystone',desc:'Агентство элитной недвижимости'},
   {id:'roombloom',name:'Roombloom',short:'Roombloom',desc:'Доступное жильё'},
 ];
+const ICONS={
+  ulyana:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/><path d="M22 9v6"/>',
+  school:'<path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6v14"/>',
+  natalia:'<path d="M7 2c0 5 10 5 10 10S7 17 7 22"/><path d="M17 2c0 5-10 5-10 10s10 5 10 10"/><path d="M8.6 5.5h6.8M10 8.5h4M10 15.5h4M8.6 18.5h6.8"/>',
+  keystone:'<circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16 7l3 3M13.8 9.2l2 2"/>',
+  roombloom:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
+  inbox:'<path d="M3 13l3-8h12l3 8v6H3z"/><path d="M3 13h5l1 2h6l1-2h5"/>'};
+const ico=(id,cls='')=>`<span class="ico ${cls}" style="${cc(id)}"><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[id]||ICONS.inbox}</svg></span>`;
+const photo=id=>S.profiles[id]?.photo||'';
+const ava=(id,label='')=>{const p=S.profiles[id]||{};return `<span class="ava" role="img" aria-label="${esc(label)}" style="${cc(id)};background-image:url('${esc(p.photo)}');background-size:${(p.zoom||1)*100}%;background-position:${esc(p.pos||'50% 30%')}"></span>`};
+const avatarOrIco=id=>photo(id)?ava(id):ico(id);
+/* hero themes: each client's header is its own banner, deliberately fixed colors (works on both page themes) */
+const HERO={
+  ulyana:{bg:'linear-gradient(120deg,#f6efff 0%,#e2cdfa 55%,#c9a6f0 100%)',ink:'#33115a',sub:'#5b3a82',line:'#ffffffb3',tile:'#7a35b0',tileInk:'#fff',art:'hex'},
+  school:{bg:'linear-gradient(120deg,#ecfaf1 0%,#c4ecd3 55%,#93d9ae 100%)',ink:'#0d3f24',sub:'#2f5f44',line:'#ffffffb3',tile:'#1f8a52',tileInk:'#fff',art:'hex'},
+  natalia:{bg:'radial-gradient(120% 140% at 80% 20%,#bfe2ff 0%,#8cc6f4 40%,#5fa6e6 100%)',ink:'#0b2f6b',sub:'#1d4a8a',line:'#ffffffd9',tile:'#ffffff',tileInk:'#1f6fc4',art:'dna'},
+  keystone:{bg:'linear-gradient(120deg,#1d1d22 0%,#2c2a2a 55%,#4a3f2a 100%)',ink:'#f5e7c3',sub:'#cdbb8f',line:'#d5b56a55',tile:'#d5b56a',tileInk:'#1d1d22',art:'hex'},
+  roombloom:{bg:'linear-gradient(120deg,#fff1ea 0%,#ffd3c2 55%,#ffad90 100%)',ink:'#5e1f0c',sub:'#87412a',line:'#ffffffb3',tile:'#d0552f',tileInk:'#fff',art:'hex'}};
+function dnaArt(){
+  const W=260,H=200,pts=[];let a='',b='',rungs='';
+  for(let i=0;i<=40;i++){const y=i*H/40,x1=W/2+70*Math.sin(i/40*Math.PI*3),x2=W/2-70*Math.sin(i/40*Math.PI*3);
+    a+=(i?'L':'M')+x1.toFixed(1)+' '+y.toFixed(1);b+=(i?'L':'M')+x2.toFixed(1)+' '+y.toFixed(1);
+    if(i%2===0)rungs+=`<line x1="${x1.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y.toFixed(1)}" stroke-width="1.2" opacity=".55"/><circle cx="${x1.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="currentColor" stroke="none"/><circle cx="${x2.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="currentColor" stroke="none"/>`;}
+  return `<svg viewBox="0 0 ${W} ${H}" style="right:-20px;top:-10px;height:120%;width:auto" fill="none" stroke="currentColor" stroke-width="2.2"><path d="${a}"/><path d="${b}"/>${rungs}</svg>`;
+}
+function hexArt(id,big){
+  const hx=(x,y,r,inner)=>{const p=[0,1,2,3,4,5].map(k=>{const t=Math.PI/3*k;return (x+r*Math.cos(t)).toFixed(1)+','+(y+r*Math.sin(t)).toFixed(1)}).join(' ');
+    return `<polygon points="${p}" stroke-width="1.4"/>${inner?`<g transform="translate(${x-r*.42} ${y-r*.42}) scale(${r*.84/24})" stroke-width="${2.2*24/(r*.84)}">${inner}</g>`:''}`};
+  const extra=id==='natalia'?[
+    hx(40,40,30,'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/><path d="M6 12h3l1.5-2 2 4 1.5-2h4"/>'),
+    hx(120,95,26,'<path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a3 3 0 0 0-3-1z"/><path d="M15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1"/>'),
+    hx(45,150,26,'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M12 9v6M9 12h6"/>')].join('')
+    :[hx(30,30,26,ICONS[id]),hx(80,110,20,''),hx(150,40,16,'')].join('');
+  return `<svg viewBox="0 0 200 200" style="${id==='natalia'?'right:150px;top:-6px;height:115%;opacity:.85':'right:-10px;top:-20px;height:140%;opacity:.7'};width:auto" fill="none" stroke="currentColor">${extra}</svg>`;
+}
+function hero(cid){
+  const c=byId(cid),h=HERO[cid],ph=photo(cid);
+  const art=(h.art==='dna'?dnaArt()+hexArt(cid):hexArt(cid));
+  const pic=ph?`<div class="pic">${ava(cid,c.name)}${assets?`<label for="ph-${cid}">Сменить фото</label>`:''}</div>`
+    :assets?`<div class="pic"><label class="addpic" for="ph-${cid}">+ Добавить фото</label></div>`:'';
+  return `<div class="hero" style="--h-bg:${h.bg};--h-ink:${h.ink};--h-sub:${h.sub};--h-line:${h.line};--h-tile:${h.tile};--h-tile-ink:${h.tileInk}">
+    <div class="art">${art}</div>
+    ${ico(cid)}
+    <div class="txt"><h1>${esc(c.name)}</h1><div class="sub">${esc(c.desc)}</div><div class="rule"><i></i><b></b><i></i></div></div>
+    ${pic}<input type="file" accept="image/jpeg,image/png,image/webp" id="ph-${cid}" data-photo="${cid}" hidden>
+  </div>`;
+}
 const INBOX={id:'inbox',name:'Входящие',short:'Входящие',desc:'Быстрые мысли, разобрать в понедельник'};
 const ALL=[...CLIENTS,INBOX];
 const byId=id=>ALL.find(c=>c.id===id)||INBOX;
@@ -263,7 +334,7 @@ const cc=id=>`--cc:var(--c-${byId(id).id})`;
 
 /* ---------- store ---------- */
 const S={items:[],metrics:[],advice:{},profiles:{},ready:false,live:false};
-let db=null;
+let db=null,assets=null;
 const LS='smm-pult-local';
 function loadLocal(){try{const j=JSON.parse(localStorage.getItem(LS)||'{}');Object.assign(S,{items:j.items||[],metrics:j.metrics||[],advice:j.advice||{},profiles:j.profiles||{}})}catch(e){}}
 function saveLocal(){try{localStorage.setItem(LS,JSON.stringify({items:S.items,metrics:S.metrics,advice:S.advice,profiles:S.profiles}))}catch(e){}}
@@ -272,6 +343,7 @@ async function initStore(){
   try{db=window.claude?.use?await window.claude.use('db'):null}catch(e){db=null}
   if(!db){loadLocal();S.ready=true;render();return}
   S.live=true;
+  window.claude.use('assets').then(a=>{assets=a;render()}).catch(()=>{});
   const fail=e=>toast(e?.code==='revoked'?'Доступ к данным закрыт':'Не удалось загрузить данные. Обновите страницу.');
   db.collection('items').onSnapshot(s=>{S.items=s.docs.map(d=>({...d.data(),id:d.id}));S.ready=true;render()},fail);
   db.collection('metrics').onSnapshot(s=>{S.metrics=s.docs.map(d=>({...d.data(),id:d.id}));render()},fail);
@@ -322,9 +394,9 @@ function rail(){
     n('week','<span class="glyph"></span>Неделя')+
     n('plan','<span class="glyph" style="border-radius:50%"></span>Контент-план')+
     `<div class="rail-label">Клиенты</div>`+
-    CLIENTS.map(c=>n(c.id,`<span class="dot"></span>${esc(c.short)}<span class="cnt">${openTasks(c.id).length||''}</span>`,cc(c.id))).join('')+
+    CLIENTS.map(c=>n(c.id,`${ico(c.id)}${esc(c.short)}<span class="cnt">${openTasks(c.id).length||''}</span>`,cc(c.id))).join('')+
     `<div class="rail-label">Разобрать</div>`+
-    n('inbox',`<span class="dot"></span>Входящие<span class="cnt">${inboxN||''}</span>`,cc('inbox'));
+    n('inbox',`${ico('inbox')}Входящие<span class="cnt">${inboxN||''}</span>`,cc('inbox'));
 }
 
 function rowItem(it,{showClient=false}={}){
@@ -360,7 +432,7 @@ function viewWeek(){
     const posts=items(i=>i.client===c.id&&i.kind==='post'&&i.date>=mISO&&i.date<=sISO);
     const wk=ot.filter(i=>!i.date||i.date<=sISO).slice(0,4);
     return `<div class="card cc" style="${cc(c.id)}">
-      <div><h3>${esc(c.name)}</h3><div class="desc">${esc(c.desc)}</div></div>
+      <div class="cc-top">${avatarOrIco(c.id)}<div><h3>${esc(c.name)}</h3><div class="desc">${esc(c.desc)}</div></div></div>
       <div class="nums"><div><b>${ot.length}</b><span>задач открыто</span></div><div><b>${posts.filter(p=>p.status==='done').length}/${posts.length}</b><span>постов за неделю</span></div></div>
       <div class="mini">${wk.length?wk.map(i=>`<label><input type="checkbox" class="chk" data-check="${i.id}"><span>${esc(i.title)}${i.date?` <span class="mono" style="color:var(--muted)">${dShort(i.date)}</span>`:''}</span></label>`).join(''):`<span style="color:var(--muted);font-size:14px">Задач на неделю нет</span>`}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto"><button class="btn sm solid" data-go="${c.id}">Открыть</button><button class="btn sm ghost" data-new="task" data-client="${c.id}">+ задача</button></div>
@@ -417,7 +489,7 @@ function viewClient(cid){
     return `<div class="head"><div class="grow chead" style="${cc(cid)}"><h1>Входящие</h1><div class="sub">Всё, что записали на бегу. В понедельник откройте каждую запись и выберите клиента.</div></div></div>${list(a,{},'Пусто. Все мысли разобраны.')}`;
   }
   const tabs=`<div class="seg" role="tablist" style="${cc(cid)}">${TABS.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${U.tab===k}">${l}</button>`).join('')}</div>`;
-  return `<div class="head"><div class="grow chead" style="${cc(cid)}"><h1>${esc(c.name)}</h1><div class="sub">${esc(c.desc)}</div></div></div>${tabs}${tabBody(cid)}`;
+  return `${hero(cid)}${tabs}${tabBody(cid)}`;
 }
 function tabBody(cid){
   const of=k=>items(i=>i.client===cid&&i.kind===k);
@@ -591,7 +663,7 @@ document.addEventListener('click',async e=>{
   else if(d.poff){U.planOff=d.poff==='0'?0:U.planOff+Number(d.poff);render()}
   else if(d.filter){U.filter.has(d.filter)?U.filter.delete(d.filter):U.filter.add(d.filter);render()}
   else if(d.toplan){const it=S.items.find(i=>i.id===d.toplan);if(it)openEditor({...it,kind:'post',status:'todo',date:it.date||todayISO()})}
-  else if(d.saveprof){const v=document.getElementById('prof-'+d.saveprof).value;await write('profiles',d.saveprof,{about:v,at:Date.now()});toast('Сохранено')}
+  else if(d.saveprof){const v=document.getElementById('prof-'+d.saveprof).value;await write('profiles',d.saveprof,{...(S.profiles[d.saveprof]||{}),about:v,at:Date.now()});toast('Сохранено')}
   else if(d.advise){advise(d.advise)}
   else if(d.genideas){genIdeas(d.genideas)}
   else if(d.close!==undefined){closeEditor()}
@@ -601,6 +673,14 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('change',async e=>{
   const t=e.target;
+  if(t.dataset.photo&&t.files&&t.files[0]){
+    const cid=t.dataset.photo,f=t.files[0];
+    if(!assets){toast('Фото можно загрузить, когда страница открыта в Claude');return}
+    toast('Загружаю фото…');
+    try{const r=await assets.upload(f);await write('profiles',cid,{...(S.profiles[cid]||{}),photo:r.url,photoId:r.id});toast('Фото сохранено')}
+    catch(err){toast('Не получилось загрузить фото, попробуйте файл поменьше')}
+    return;
+  }
   if(t.dataset.check){const it=S.items.find(i=>i.id===t.dataset.check);if(it){await saveItem({...it,status:t.checked?'done':'todo'})}}
   if(t.id==='ed-kind'||t.id==='ed-client'){readEditor();drawEditor()}
 });
