@@ -123,6 +123,12 @@ section{display:flex;flex-direction:column;gap:12px}
 .tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--soft);color:var(--ink);white-space:nowrap}
 .tag .dot{width:7px;height:7px}
 .tag.late{background:none;color:var(--bad);padding:0}
+.plat{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;color:#fff;white-space:nowrap;letter-spacing:.01em;width:max-content;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:inline-block}
+.plat-ig{background:linear-gradient(90deg,#f58529,#dd2a7b 55%,#8134af)}
+.plat-yt{background:#e62117}
+.plat-tg{background:#229ed9}
+.plat-th{background:#111;outline:1px solid #ffffff33}
+.fchip .plat{margin-right:2px}
 .tag.claude{background:var(--accent-soft);color:var(--ink)}
 .st-todo{color:var(--muted)} .st-doing{color:var(--warn)} .st-done{color:var(--ok)}
 .clip{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;color:var(--muted);font-size:14px;margin-top:4px;overflow-wrap:anywhere}
@@ -390,7 +396,15 @@ async function remove(col,id){
 const saveItem=it=>{const {id,...b}=it;b.updatedAt=Date.now();return write('items',id,b)};
 
 /* ---------- ui state ---------- */
-const U={view:'week',tab:'overview',weekOff:0,planMode:'week',planOff:0,filter:new Set(CLIENTS.map(c=>c.id)),busy:{}};
+const PLATFORMS={
+  ig:{name:'Instagram',short:'IG',formats:['Reels','Пост','Карусель','Сторис']},
+  yt:{name:'YouTube',short:'YT',formats:['Shorts','Длинное видео']},
+  tg:{name:'Telegram',short:'TG',formats:['Пост','Статья']},
+  th:{name:'Threads',short:'Threads',formats:['Пост']}};
+const FMT_SHORT={'Длинное видео':'Видео'};
+const platLabel=it=>it.platform&&PLATFORMS[it.platform]?`<span class="plat plat-${it.platform}" title="${esc(platText(it))}">${PLATFORMS[it.platform].short}${it.format?' · '+esc(FMT_SHORT[it.format]||it.format):''}</span>`:'';
+const platText=it=>it.platform&&PLATFORMS[it.platform]?PLATFORMS[it.platform].name+(it.format?' '+it.format:''):'';
+const U={view:'week',tab:'overview',weekOff:0,planMode:'week',planOff:0,filter:new Set(CLIENTS.map(c=>c.id)),pfilter:new Set([...Object.keys(PLATFORMS),'none']),busy:{}};
 try{const v=JSON.parse(localStorage.getItem('smm-pult-ui')||'{}');if(v.view)U.view=v.view;if(v.tab)U.tab=v.tab;if(v.planMode)U.planMode=v.planMode}catch(e){}
 const remember=()=>{try{localStorage.setItem('smm-pult-ui',JSON.stringify({view:U.view,tab:U.tab,planMode:U.planMode}))}catch(e){}};
 
@@ -434,7 +448,7 @@ function rowItem(it,{showClient=false}={}){
         ${it.kind!=='task'?`<span>${esc(KINDS[it.kind]||'')}</span>`:''}
         ${it.date?`<span class="${late?'tag late':''}">${late?'просрочено · ':''}${dShort(it.date)}</span>`:''}
         ${it.status==='doing'?`<span class="st-doing">В работе</span>`:''}
-        ${it.rubric?`<span>#${esc(it.rubric)}</span>`:''}
+        ${platLabel(it)}${it.rubric?`<span>#${esc(it.rubric)}</span>`:''}
         ${it.by==='claude'?`<span class="tag claude">от Claude</span>`:''}
         ${it.url?`<a href="${esc(it.url)}" target="_blank" rel="noopener" data-stop>открыть ссылку ↗</a>`:''}
       </div>
@@ -478,9 +492,9 @@ function viewWeek(){
 /* ----- content plan ----- */
 function planBlock(clientId){
   const ids=clientId?[clientId]:[...U.filter];
-  const posts=items(i=>i.kind==='post'&&i.date&&ids.includes(i.client));
+  const posts=items(i=>i.kind==='post'&&i.date&&ids.includes(i.client)&&U.pfilter.has(PLATFORMS[i.platform]?i.platform:'none'));
   const t=todayISO();
-  const card=p=>`<button class="post ${p.status==='done'?'done':''}" style="${cc(p.client)}" data-edit="${p.id}"><span class="pt">${esc(p.title||'Без названия')}</span><span class="pm">${clientId?'':esc(byId(p.client).short)+' · '}${stLabel(p)}${p.rubric?' · #'+esc(p.rubric):''}</span></button>`;
+  const card=p=>`<button class="post ${p.status==='done'?'done':''}" style="${cc(p.client)}" data-edit="${p.id}">${platLabel(p)}<span class="pt">${esc(p.title||'Без названия')}</span><span class="pm">${clientId?'':esc(byId(p.client).short)+' · '}${stLabel(p)}${p.rubric?' · #'+esc(p.rubric):''}</span></button>`;
   let body,label;
   if(U.planMode==='week'){
     const mon=addDays(monday(new Date()),U.planOff*7);label=range(mon,addDays(mon,6));
@@ -497,6 +511,7 @@ function planBlock(clientId){
   return `<div class="plan-bar"><div class="toggle"><button data-pmode="week" aria-pressed="${U.planMode==='week'}">Неделя</button><button data-pmode="month" aria-pressed="${U.planMode==='month'}">Месяц</button></div>
     <button class="btn sm" data-poff="-1" aria-label="Назад">←</button><button class="btn sm" data-poff="0">Сегодня</button><button class="btn sm" data-poff="1" aria-label="Вперёд">→</button>
     <span class="range">${label}</span></div>
+    <div class="filters">${Object.entries(PLATFORMS).map(([k,v])=>`<button class="fchip" data-pfilter="${k}" aria-pressed="${U.pfilter.has(k)}"><span class="plat plat-${k}">${v.short}</span>${v.name}</button>`).join('')}<button class="fchip" data-pfilter="none" aria-pressed="${U.pfilter.has('none')}">Без площадки</button></div>
     ${clientId?'':`<div class="filters">${CLIENTS.map(c=>`<button class="fchip" style="${cc(c.id)}" data-filter="${c.id}" aria-pressed="${U.filter.has(c.id)}"><span class="dot"></span>${esc(c.short)}</button>`).join('')}</div>`}
     ${body}`;
 }
@@ -603,7 +618,7 @@ function context(cid){
 Метрики по неделям (старые → новые):
 ${ms.map(m=>`${m.week}: ${MF.map(([k,l])=>`${l}=${m[k]??'—'}`).join('; ')}${m.note?'; заметка: '+m.note:''}`).join('\n')||'нет данных'}
 Посты за последние 5 недель:
-${posts.map(p=>`${p.date} [${stLabel(p)}] ${p.rubric?'#'+p.rubric+' ':''}${p.title}`).join('\n')||'нет'}
+${posts.map(p=>`${p.date} [${stLabel(p)}] ${platText(p)?platText(p)+' ':''}${p.rubric?'#'+p.rubric+' ':''}${p.title}`).join('\n')||'нет'}
 Сделано за 2 недели: ${done.join('; ')||'нет данных'}`.slice(0,12000);
 }
 async function advise(cid){
@@ -621,11 +636,11 @@ async function genIdeas(cid){
   U.busy['g'+cid]=true;render();
   try{
     const have=items(i=>i.client===cid&&(i.kind==='idea'||i.kind==='post')).slice(-40).map(i=>i.title).join('; ');
-    const arr=await s.json(`Ты SMM-стратег. Придумай 5 свежих идей публикаций для клиента.\n\n${context(cid)}\nУже есть идеи и посты (не повторяй): ${have||'нет'}\n\nОтветь только JSON-массивом из 5 объектов {"title": "короткий заголовок идеи", "body": "2–4 предложения: суть, формат (рилс/карусель/сторис/пост), крючок для первой строки", "rubric": "рубрика"}.`,{cache:false});
+    const arr=await s.json(`Ты SMM-стратег. Придумай 5 свежих идей публикаций для клиента.\n\n${context(cid)}\nУже есть идеи и посты (не повторяй): ${have||'нет'}\n\nОтветь только JSON-массивом из 5 объектов {"title": "короткий заголовок идеи", "body": "2–4 предложения: суть и крючок для первой строки", "rubric": "рубрика", "platform": "ig|yt|tg|th", "format": "для ig: Reels|Пост|Карусель|Сторис; для yt: Shorts|Длинное видео; для tg: Пост|Статья; для th: Пост"}. Распредели идеи по разным площадкам и форматам.`,{cache:false});
     const now=Date.now();
     for(const [k,x] of (Array.isArray(arr)?arr:[]).slice(0,5).entries()){
       if(!x||!x.title)continue;
-      await saveItem({id:newId(),client:cid,kind:'idea',title:String(x.title).slice(0,200),body:String(x.body||''),rubric:String(x.rubric||''),status:'todo',by:'claude',week:iso(monday(new Date())),createdAt:now+k});
+      await saveItem({id:newId(),client:cid,kind:'idea',title:String(x.title).slice(0,200),body:String(x.body||''),rubric:String(x.rubric||''),platform:PLATFORMS[x.platform]?String(x.platform):'',format:PLATFORMS[x.platform]?.formats.includes(x.format)?String(x.format):(PLATFORMS[x.platform]?.formats[0]||''),status:'todo',by:'claude',week:iso(monday(new Date())),createdAt:now+k});
     }
     toast('Идеи добавлены');
   }catch(e){if(e?.code!=='cancelled')toast(sampleErr(e))}
@@ -648,6 +663,8 @@ function drawEditor(){
     <label class="f"><span>${it.kind==='text'||it.kind==='post'?'Текст поста':'Описание / подробности'}</span><textarea class="field" id="ed-body" placeholder="${it.kind==='text'||it.kind==='post'?'Вставьте сюда текст целиком':'Подробности, шаги, мысли'}">${esc(it.body||'')}</textarea></label>
     <div class="row2"><label class="f"><span>${it.kind==='post'?'Дата публикации':'Срок'}</span><input class="field" type="date" id="ed-date" value="${esc(it.date||'')}"></label>
       <label class="f"><span>Статус</span><select class="field" id="ed-status">${Object.entries(st).map(([k,l])=>`<option value="${k}" ${(it.status||'todo')===k?'selected':''}>${l}</option>`).join('')}</select></label></div>
+    ${['post','idea','text'].includes(it.kind)?`<div class="row2"><label class="f"><span>Площадка</span><select class="field" id="ed-platform"><option value="">Не выбрана</option>${Object.entries(PLATFORMS).map(([k,v])=>`<option value="${k}" ${it.platform===k?'selected':''}>${v.name}</option>`).join('')}</select></label>
+      <label class="f"><span>Формат</span><select class="field" id="ed-format" ${PLATFORMS[it.platform]?'':'disabled'}>${PLATFORMS[it.platform]?PLATFORMS[it.platform].formats.map(f=>`<option ${it.format===f?'selected':''}>${f}</option>`).join(''):'<option value="">Сначала площадка</option>'}</select></label></div>`:''}
     <div class="row2"><label class="f"><span>Рубрика</span><input class="field" id="ed-rubric" list="ed-rl" value="${esc(it.rubric||'')}" autocomplete="off"><datalist id="ed-rl">${rubrics.map(r=>`<option value="${esc(r)}">`).join('')}</datalist></label>
       <label class="f"><span>Ссылка (чат GPT, документ, пост)</span><input class="field" type="url" id="ed-url" value="${esc(it.url||'')}" placeholder="https://chatgpt.com/share/…"></label></div>
     <div class="acts"><button class="btn primary" type="submit">Сохранить</button><button class="btn" type="button" data-close>Отмена</button>
@@ -660,6 +677,7 @@ function drawEditor(){
 function readEditor(){
   const g=id=>document.getElementById(id)?.value??'';
   Object.assign(editing,{kind:g('ed-kind'),client:g('ed-client'),title:g('ed-title').trim(),body:g('ed-body'),date:g('ed-date'),status:g('ed-status'),rubric:g('ed-rubric').trim(),url:g('ed-url').trim()});
+  if(document.getElementById('ed-platform')){const pl=g('ed-platform');editing.platform=pl;const fs=PLATFORMS[pl]?.formats||[];editing.format=fs.includes(g('ed-format'))?g('ed-format'):(fs[0]||'')}
 }
 const closeEditor=()=>{document.getElementById('overlay').hidden=true;editing=null};
 function newItem(kind,client,extra={}){
@@ -673,7 +691,7 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hid
 const go=v=>{U.view=v;if(!CLIENTS.some(c=>c.id===v))U.tab='overview';remember();render();window.scrollTo(0,0)};
 
 document.addEventListener('click',async e=>{
-  const t=e.target.closest('[data-go],[data-tab],[data-new],[data-edit],[data-week],[data-pmode],[data-poff],[data-filter],[data-toplan],[data-saveprof],[data-advise],[data-genideas],[data-close],[data-del],[data-copy],[data-stop],#fab');
+  const t=e.target.closest('[data-go],[data-tab],[data-new],[data-edit],[data-week],[data-pmode],[data-poff],[data-filter],[data-pfilter],[data-toplan],[data-saveprof],[data-advise],[data-genideas],[data-close],[data-del],[data-copy],[data-stop],#fab');
   if(!t)return;
   if(t.dataset.stop!==undefined)return;
   const d=t.dataset;
@@ -684,6 +702,7 @@ document.addEventListener('click',async e=>{
   else if(d.week){U.weekOff=d.week==='0'?0:U.weekOff+Number(d.week);render()}
   else if(d.pmode){U.planMode=d.pmode;U.planOff=0;remember();render()}
   else if(d.poff){U.planOff=d.poff==='0'?0:U.planOff+Number(d.poff);render()}
+  else if(d.pfilter){U.pfilter.has(d.pfilter)?U.pfilter.delete(d.pfilter):U.pfilter.add(d.pfilter);render()}
   else if(d.filter){U.filter.has(d.filter)?U.filter.delete(d.filter):U.filter.add(d.filter);render()}
   else if(d.toplan){const it=S.items.find(i=>i.id===d.toplan);if(it)openEditor({...it,kind:'post',status:'todo',date:it.date||todayISO()})}
   else if(d.saveprof){const v=document.getElementById('prof-'+d.saveprof).value;await write('profiles',d.saveprof,{...(S.profiles[d.saveprof]||{}),about:v,at:Date.now()});toast('Сохранено')}
@@ -705,7 +724,7 @@ document.addEventListener('change',async e=>{
     return;
   }
   if(t.dataset.check){const it=S.items.find(i=>i.id===t.dataset.check);if(it){await saveItem({...it,status:t.checked?'done':'todo'})}}
-  if(t.id==='ed-kind'||t.id==='ed-client'){readEditor();drawEditor()}
+  if(t.id==='ed-kind'||t.id==='ed-client'||t.id==='ed-platform'){readEditor();drawEditor()}
 });
 document.addEventListener('submit',async e=>{
   e.preventDefault();
