@@ -129,6 +129,10 @@ section{display:flex;flex-direction:column;gap:12px}
 .plat-tg{background:#229ed9}
 .plat-th{background:#111;outline:1px solid #ffffff33}
 .fchip .plat{margin-right:2px}
+.svc{flex:none;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:7px;background:var(--accent-soft);color:var(--ink);margin-top:2px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+a.btn{text-decoration:none;color:var(--ink)}
+.lacts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:none}
+@media (max-width:640px){.row:has(.lacts){flex-wrap:wrap}.row .lacts{width:100%;justify-content:flex-start;padding-left:0}}
 .tag.claude{background:var(--accent-soft);color:var(--ink)}
 .st-todo{color:var(--muted)} .st-doing{color:var(--warn)} .st-done{color:var(--ok)}
 .clip{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;color:var(--muted);font-size:14px;margin-top:4px;overflow-wrap:anywhere}
@@ -335,13 +339,18 @@ function hero(cid){
 const INBOX={id:'inbox',name:'Входящие',short:'Входящие',desc:'Быстрые мысли, разобрать в понедельник'};
 const ALL=[...CLIENTS,INBOX];
 const byId=id=>ALL.find(c=>c.id===id)||INBOX;
-const KINDS={task:'Задача',post:'Пост в контент-план',idea:'Идея',text:'Текст',rubric:'Рубрика',chat:'Чат GPT',note:'Заметка'};
+const KINDS={task:'Задача',post:'Пост в контент-план',idea:'Идея',text:'Текст',rubric:'Рубрика',chat:'Чат GPT',link:'Ссылка',note:'Заметка'};
+const LINK_CATS={video:'Видео и исходники',docs:'Документы и таблицы',access:'Доступы и кабинеты',refs:'Референсы и вдохновение',other:'Другое'};
+const SERVICES=[[/disk\.yandex|yadi\.sk/,'Яндекс Диск'],[/drive\.google|docs\.google/,'Google Drive'],[/cloud\.mail\.ru/,'Облако Mail'],[/dropbox/,'Dropbox'],[/icloud/,'iCloud'],[/figma/,'Figma'],[/canva/,'Canva'],[/notion/,'Notion'],[/t\.me|telegram/,'Telegram'],[/youtu/,'YouTube'],[/instagram/,'Instagram'],[/pinterest/,'Pinterest'],[/chatgpt|openai/,'ChatGPT']];
+const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return ''}};
+const service=u=>{const h=host(u);const m=SERVICES.find(([r])=>r.test(h));return m?m[1]:h};
+const normUrl=u=>{u=(u||'').trim();if(!u)return '';return /^[a-z][a-z0-9+.-]*:\/\//i.test(u)?u:'https://'+u.replace(/^\/+/,'')};
 const STATUS={
   post:{todo:'Запланирован',doing:'В работе',done:'Опубликован'},
   def:{todo:'Надо сделать',doing:'В работе',done:'Готово'}};
 const stLabel=(it)=>(it.kind==='post'?STATUS.post:STATUS.def)[it.status||'todo'];
-const TABS=[['overview','Обзор'],['tasks','Задачи'],['plan','Контент-план'],['ideas','Идеи и тексты'],['rubrics','Рубрики'],['chats','Чаты GPT'],['notes','Заметки'],['stats','Аналитика']];
-const TAB_KIND={tasks:'task',plan:'post',ideas:'idea',rubrics:'rubric',chats:'chat',notes:'note',stats:'note',overview:'task'};
+const TABS=[['overview','Обзор'],['tasks','Задачи'],['plan','Контент-план'],['ideas','Идеи и тексты'],['rubrics','Рубрики'],['chats','Чаты GPT'],['links','Ссылки'],['notes','Заметки'],['stats','Аналитика']];
+const TAB_KIND={tasks:'task',plan:'post',ideas:'idea',rubrics:'rubric',chats:'chat',links:'link',notes:'note',stats:'note',overview:'task'};
 
 /* dates */
 const pad=n=>String(n).padStart(2,'0');
@@ -421,6 +430,7 @@ function paint(){
   if(paint.last!==U.view){paint.last=U.view;const cur=document.querySelector('.nav[aria-current="true"]');if(cur&&innerWidth<=860)try{cur.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}}
   const v=document.getElementById('view');
   v.innerHTML=U.view==='week'?viewWeek():U.view==='plan'?viewPlanPage():viewClient(U.view);
+  if(paint.lastTab!==U.view+U.tab){paint.lastTab=U.view+U.tab;const st=v.querySelector('.seg [aria-selected="true"]');if(st)try{st.parentElement.scrollLeft=st.offsetLeft-st.parentElement.clientWidth/2+st.clientWidth/2}catch(e){}}
   if(keep){const el=document.getElementById(keep.id);if(el){if(el.value!==undefined&&!el.dataset.fresh)el.value=keep.v;el.focus();try{el.setSelectionRange(keep.s,keep.e)}catch(e){}}}
 }
 
@@ -455,6 +465,9 @@ function rowItem(it,{showClient=false}={}){
       ${it.body&&it.kind!=='task'?`<div class="clip">${esc(it.body)}</div>`:''}
     </div></div>`;
 }
+const linkRow=it=>`<div class="row"><span class="svc" title="${esc(host(it.url))}">${esc(service(it.url)||'Ссылка')}</span>
+  <div class="body" data-edit="${it.id}"><div class="t">${esc(it.title||host(it.url)||'Без названия')}</div><div class="meta"><span>${esc(host(it.url))}</span>${it.body?`<span>${esc(it.body.slice(0,120))}</span>`:''}</div></div>
+  <div class="lacts">${it.url?`<a class="btn sm" href="${esc(it.url)}" target="_blank" rel="noopener" data-stop>Открыть ↗</a><button class="btn sm ghost" type="button" data-copyurl="${it.id}">Копировать</button>`:''}</div></div>`;
 const list=(arr,opt,emptyText)=>arr.length?`<div class="list">${arr.map(i=>rowItem(i,opt)).join('')}</div>`:`<div class="empty">${emptyText}</div>`;
 
 /* ----- week ----- */
@@ -479,7 +492,7 @@ function viewWeek(){
       <div style="display:flex;gap:6px"><button class="btn sm" data-week="-1" aria-label="Прошлая неделя">←</button>${isCur?'':`<button class="btn sm" data-week="0">Сейчас</button>`}<button class="btn sm" data-week="1" aria-label="Следующая неделя">→</button></div></div>
     ${S.live||!S.ready?'':`<div class="banner">Сейчас записи хранятся только в этом браузере. Откройте страницу в приложении Claude, чтобы они синхронизировались между телефоном и компьютером.</div>`}
     <section><div class="sec-h"><h2>Быстро записать мысль</h2><span class="hint">Улетит во «Входящие» или сразу клиенту</span></div>
-      <form class="qc" id="qc"><input type="text" id="qc-text" placeholder="Например: снять рилс про ипотеку для молодых семей" autocomplete="off">
+      <form class="qc" id="qc"><input type="text" id="qc-text" placeholder="Мысль, задача или ссылка на облако" autocomplete="off">
         <select id="qc-client" aria-label="Клиент">${ALL.map(c=>`<option value="${c.id}" ${c.id==='inbox'?'selected':''}>${esc(c.short)}</option>`).join('')}</select>
         <select id="qc-kind" aria-label="Тип"><option value="idea">Идея</option><option value="task">Задача</option><option value="note">Заметка</option></select>
         <button class="btn primary" type="submit">Добавить</button></form></section>
@@ -550,6 +563,7 @@ function tabBody(cid){
     <div class="two">
       <section><div class="sec-h"><h2>Открытые задачи</h2>${newBtn('task','задача')}</div>${list(ot,{},'Задач нет.')}</section>
       <section><div class="sec-h"><h2>Последние чаты GPT</h2></div>${list(chats,{},'Ссылок на чаты пока нет.')}
+        ${(()=>{const ls=of('link').sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,4);return `<div class="sec-h" style="margin-top:8px"><h2>Последние ссылки</h2><span class="sp"></span><button class="btn sm ghost" data-tab="links">Все ссылки →</button></div>${ls.length?`<div class="list">${ls.map(linkRow).join('')}</div>`:'<div class="empty">Ссылок пока нет.</div>'}`})()}
         ${adv?`<div class="card"><div class="sec-h" style="margin-bottom:6px"><h2>Последний разбор Claude</h2><span class="hint">${new Date(adv.at).toLocaleDateString('ru-RU')}</span></div><div class="clip" style="-webkit-line-clamp:6">${esc(adv.text)}</div><button class="btn sm ghost" data-tab="stats">Весь разбор →</button></div>`:''}</section>
     </div>`;}
   case 'tasks':{
@@ -570,6 +584,12 @@ function tabBody(cid){
     const cnt=r=>items(i=>i.client===cid&&i.kind==='post'&&i.rubric===r.title).length;
     return `<section><div class="sec-h"><h2>Рубрикатор</h2><span class="hint">рубрики подставляются в посты контент-плана</span>${newBtn('rubric','рубрика')}</div>
       ${a.length?`<div class="list">${a.map(r=>rowItem(r).replace('<div class="meta">',`<div class="meta"><span>${cnt(r)} постов в плане</span>`)).join('')}</div>`:`<div class="empty">Добавьте рубрики: например «Экспертное», «Кейсы», «Личное», «Продающее». У каждой можно описать формат и частоту.</div>`}</section>`;}
+  case 'links':{
+    const a=of('link').sort((x,y)=>(y.createdAt||0)-(x.createdAt||0));
+    if(!a.length)return `<section><div class="sec-h"><h2>Ссылки</h2><span class="hint">облако с видео, документы, доступы, референсы</span>${newBtn('link','ссылка')}</div><div class="empty">Сохраняйте сюда ссылки на облако с исходниками, таблицы, кабинеты и референсы. Можно просто вставить ссылку в «Быстро записать мысль» на главной, и она сама попадёт в ссылки.</div></section>`;
+    const groups=Object.entries(LINK_CATS).map(([k,l])=>[l,a.filter(i=>(LINK_CATS[i.cat]?i.cat:'other')===k)]).filter(([,x])=>x.length);
+    return `<section><div class="sec-h"><h2>Ссылки</h2><span class="hint">облако с видео, документы, доступы, референсы</span>${newBtn('link','ссылка')}</div></section>`+
+      groups.map(([l,x])=>`<section><div class="sec-h"><h2 style="font-size:15px">${l}</h2><span class="hint">${x.length}</span></div><div class="list">${x.map(linkRow).join('')}</div></section>`).join('');}
   case 'chats':{
     const a=of('chat').sort((x,y)=>(y.createdAt||0)-(x.createdAt||0));
     return `<section><div class="sec-h"><h2>Чаты ChatGPT</h2><span class="hint">ссылка и пара слов, о чём чат</span>${newBtn('chat','чат')}</div>
@@ -659,14 +679,16 @@ function drawEditor(){
     <h2>${isNew?'Новая запись':'Запись'}</h2>
     <div class="row2"><label class="f"><span>Тип</span><select class="field" id="ed-kind">${Object.entries(KINDS).map(([k,l])=>`<option value="${k}" ${it.kind===k?'selected':''}>${l}</option>`).join('')}</select></label>
       <label class="f"><span>Клиент</span><select class="field" id="ed-client">${ALL.map(c=>`<option value="${c.id}" ${it.client===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label></div>
-    <label class="f"><span>${it.kind==='chat'?'О чём этот чат':'Заголовок'}</span><input class="field" id="ed-title" value="${esc(it.title||'')}" required autocomplete="off"></label>
-    <label class="f"><span>${it.kind==='text'||it.kind==='post'?'Текст поста':'Описание / подробности'}</span><textarea class="field" id="ed-body" placeholder="${it.kind==='text'||it.kind==='post'?'Вставьте сюда текст целиком':'Подробности, шаги, мысли'}">${esc(it.body||'')}</textarea></label>
+    ${it.kind==='link'?`<label class="f"><span>Ссылка</span><input class="field" id="ed-url" inputmode="url" value="${esc(it.url||'')}" placeholder="https://disk.yandex.ru/…" autocomplete="off"></label>`:''}
+    <label class="f"><span>${it.kind==='chat'?'О чём этот чат':it.kind==='link'?'Что по ссылке':'Заголовок'}</span><input class="field" id="ed-title" value="${esc(it.title||'')}" ${it.kind==='link'?'placeholder="Например: исходники видео, съёмка 20 октября"':''} required autocomplete="off"></label>
+    <label class="f"><span>${it.kind==='text'||it.kind==='post'?'Текст поста':'Описание / подробности'}</span><textarea class="field" id="ed-body" ${it.kind==='link'?'style="min-height:90px"':''} placeholder="${it.kind==='text'||it.kind==='post'?'Вставьте сюда текст целиком':'Подробности, шаги, мысли'}">${esc(it.body||'')}</textarea></label>
+    ${it.kind==='link'?`<div class="row2"><label class="f"><span>Раздел</span><select class="field" id="ed-cat">${Object.entries(LINK_CATS).map(([k,l])=>`<option value="${k}" ${(it.cat||'video')===k?'selected':''}>${l}</option>`).join('')}</select></label><span></span></div>`:`
     <div class="row2"><label class="f"><span>${it.kind==='post'?'Дата публикации':'Срок'}</span><input class="field" type="date" id="ed-date" value="${esc(it.date||'')}"></label>
-      <label class="f"><span>Статус</span><select class="field" id="ed-status">${Object.entries(st).map(([k,l])=>`<option value="${k}" ${(it.status||'todo')===k?'selected':''}>${l}</option>`).join('')}</select></label></div>
+      <label class="f"><span>Статус</span><select class="field" id="ed-status">${Object.entries(st).map(([k,l])=>`<option value="${k}" ${(it.status||'todo')===k?'selected':''}>${l}</option>`).join('')}</select></label></div>`}
     ${['post','idea','text'].includes(it.kind)?`<div class="row2"><label class="f"><span>Площадка</span><select class="field" id="ed-platform"><option value="">Не выбрана</option>${Object.entries(PLATFORMS).map(([k,v])=>`<option value="${k}" ${it.platform===k?'selected':''}>${v.name}</option>`).join('')}</select></label>
       <label class="f"><span>Формат</span><select class="field" id="ed-format" ${PLATFORMS[it.platform]?'':'disabled'}>${PLATFORMS[it.platform]?PLATFORMS[it.platform].formats.map(f=>`<option ${it.format===f?'selected':''}>${f}</option>`).join(''):'<option value="">Сначала площадка</option>'}</select></label></div>`:''}
-    <div class="row2"><label class="f"><span>Рубрика</span><input class="field" id="ed-rubric" list="ed-rl" value="${esc(it.rubric||'')}" autocomplete="off"><datalist id="ed-rl">${rubrics.map(r=>`<option value="${esc(r)}">`).join('')}</datalist></label>
-      <label class="f"><span>Ссылка (чат GPT, документ, пост)</span><input class="field" type="url" id="ed-url" value="${esc(it.url||'')}" placeholder="https://chatgpt.com/share/…"></label></div>
+    ${it.kind==='link'?'':`<div class="row2"><label class="f"><span>Рубрика</span><input class="field" id="ed-rubric" list="ed-rl" value="${esc(it.rubric||'')}" autocomplete="off"><datalist id="ed-rl">${rubrics.map(r=>`<option value="${esc(r)}">`).join('')}</datalist></label>
+      <label class="f"><span>Ссылка (чат GPT, документ, пост)</span><input class="field" id="ed-url" value="${esc(it.url||'')}" placeholder="https://chatgpt.com/share/…" inputmode="url"></label></div>`}
     <div class="acts"><button class="btn primary" type="submit">Сохранить</button><button class="btn" type="button" data-close>Отмена</button>
       ${it.body?`<button class="btn ghost" type="button" data-copy>Копировать текст</button>`:''}<span class="sp"></span>
       ${isNew?'':`<button class="btn ${confirmDel?'danger':'ghost'}" type="button" data-del>${confirmDel?'Точно удалить?':'Удалить'}</button>`}</div>
@@ -676,7 +698,7 @@ function drawEditor(){
 }
 function readEditor(){
   const g=id=>document.getElementById(id)?.value??'';
-  Object.assign(editing,{kind:g('ed-kind'),client:g('ed-client'),title:g('ed-title').trim(),body:g('ed-body'),date:g('ed-date'),status:g('ed-status'),rubric:g('ed-rubric').trim(),url:g('ed-url').trim()});
+  Object.assign(editing,{kind:g('ed-kind'),client:g('ed-client'),title:g('ed-title').trim(),body:g('ed-body'),date:g('ed-date'),status:g('ed-status'),rubric:g('ed-rubric').trim(),url:normUrl(g('ed-url')),cat:g('ed-cat')||editing.cat||''});
   if(document.getElementById('ed-platform')){const pl=g('ed-platform');editing.platform=pl;const fs=PLATFORMS[pl]?.formats||[];editing.format=fs.includes(g('ed-format'))?g('ed-format'):(fs[0]||'')}
 }
 const closeEditor=()=>{document.getElementById('overlay').hidden=true;editing=null};
@@ -691,7 +713,7 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hid
 const go=v=>{U.view=v;if(!CLIENTS.some(c=>c.id===v))U.tab='overview';remember();render();window.scrollTo(0,0)};
 
 document.addEventListener('click',async e=>{
-  const t=e.target.closest('[data-go],[data-tab],[data-new],[data-edit],[data-week],[data-pmode],[data-poff],[data-filter],[data-pfilter],[data-toplan],[data-saveprof],[data-advise],[data-genideas],[data-close],[data-del],[data-copy],[data-stop],#fab');
+  const t=e.target.closest('[data-go],[data-tab],[data-new],[data-edit],[data-week],[data-pmode],[data-poff],[data-filter],[data-pfilter],[data-toplan],[data-saveprof],[data-advise],[data-genideas],[data-close],[data-del],[data-copy],[data-copyurl],[data-stop],#fab');
   if(!t)return;
   if(t.dataset.stop!==undefined)return;
   const d=t.dataset;
@@ -710,6 +732,7 @@ document.addEventListener('click',async e=>{
   else if(d.genideas){genIdeas(d.genideas)}
   else if(d.close!==undefined){closeEditor()}
   else if(d.del!==undefined){if(!confirmDel){readEditor();confirmDel=true;drawEditor()}else{const id=editing.id;closeEditor();await remove('items',id);toast('Удалено')}}
+  else if(d.copyurl){const it=S.items.find(i=>i.id===d.copyurl);try{await navigator.clipboard.writeText(it.url);toast('Ссылка скопирована')}catch(err){toast(it.url)}}
   else if(d.copy!==undefined){const txt=document.getElementById('ed-body').value;try{await navigator.clipboard.writeText(txt);toast('Текст скопирован')}catch(err){const ta=document.getElementById('ed-body');ta.focus();ta.select();toast('Выделено, нажмите «Копировать»')}}
   else if(t.id==='fab'){const k=U.view==='plan'?'post':U.view==='week'||U.view==='inbox'?'idea':TAB_KIND[U.tab]||'task';newItem(k,null)}
 });
@@ -733,10 +756,12 @@ document.addEventListener('submit',async e=>{
     const inp=document.getElementById('qc-text');const v=inp.value.trim();if(!v)return;
     const client=document.getElementById('qc-client').value,kind=document.getElementById('qc-kind').value;
     inp.value='';inp.dataset.fresh='1';
+    const isUrl=/^(https?:\/\/|www\.)\S+$/i.test(v)||/^[\w-]+(\.[\w-]+)+\/\S*$/.test(v);
+    if(isUrl){const u=normUrl(v);await saveItem({id:newId(),client,kind:'link',cat:'video',title:service(u),url:u,body:'',status:'todo',date:'',createdAt:Date.now()});delete inp.dataset.fresh;toast('Ссылка сохранена: '+byId(client).short+'. Откройте её, чтобы подписать.');return}
     await saveItem({id:newId(),client,kind,title:v,body:'',status:'todo',date:'',createdAt:Date.now()});
     delete inp.dataset.fresh;toast(client==='inbox'?'Записано во «Входящие»':'Записано: '+byId(client).short);
   }else if(f.id==='ed'){
-    readEditor();if(!editing.title){document.getElementById('ed-title').focus();return}
+    readEditor();if(!editing.title&&editing.kind==='link'&&editing.url)editing.title=service(editing.url);if(!editing.title){document.getElementById('ed-title').focus();return}
     const it=editing;closeEditor();await saveItem(it);toast('Сохранено');
   }else if(f.id==='mform'){
     const cid=f.dataset.client,wk=iso(monday(new Date()));const body={client:cid,week:wk,at:Date.now()};
