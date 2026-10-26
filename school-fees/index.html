@@ -175,10 +175,30 @@
     border-color: var(--border);
   }
   td input[type="number"] {
-    width: 90px;
+    width: 80px;
     padding: 5px 6px;
   }
   td input[type="number"]:disabled { opacity: 0.45; }
+  .cash-toggle {
+    font-size: 14px;
+    line-height: 1;
+    padding: 5px 7px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    opacity: 0.35;
+    filter: grayscale(1);
+  }
+  .cash-toggle.active {
+    opacity: 1;
+    filter: none;
+    border-color: #d9a441;
+    background: #fbf0d9;
+  }
+  @media (prefers-color-scheme: dark) {
+    .cash-toggle.active { background: #3a2f12; }
+  }
+  .status-cell { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   dialog {
     border: none;
     border-radius: var(--radius);
@@ -436,6 +456,7 @@
     let paidCount = 0;
     let excusedCount = 0;
     let collected = 0;
+    let cashCollected = 0;
     data.students.forEach(function (s) {
       const p = collection.payments[s.id];
       const status = paymentStatus(p);
@@ -443,11 +464,13 @@
         excusedCount++;
       } else if (status === 'paid') {
         paidCount++;
-        collected += (p && typeof p.amount === 'number' ? p.amount : collection.amount);
+        const amt = p && typeof p.amount === 'number' ? p.amount : collection.amount;
+        collected += amt;
+        if (p && p.cash) cashCollected += amt;
       }
     });
     const total = data.students.length - excusedCount;
-    return { total: total, paidCount: paidCount, excusedCount: excusedCount, collected: collected, expected: total * collection.amount };
+    return { total: total, paidCount: paidCount, excusedCount: excusedCount, collected: collected, cashCollected: cashCollected, expected: total * collection.amount };
   }
 
   function renderCollectionsList() {
@@ -507,7 +530,10 @@
     const statsEl = document.getElementById('collection-stats');
     statsEl.innerHTML = '';
     const cards = [
-      { lbl: 'Собрано', val: formatMoney(stats.collected) + ' из ' + formatMoney(stats.expected) },
+      {
+        lbl: 'Собрано' + (stats.cashCollected ? ' (из них 💵 ' + formatMoney(stats.cashCollected) + ')' : ''),
+        val: formatMoney(stats.collected) + ' из ' + formatMoney(stats.expected)
+      },
       { lbl: 'Сдали', val: stats.paidCount + ' из ' + stats.total },
       { lbl: 'Не сдали', val: String(stats.total - stats.paidCount) },
       { lbl: 'Не идёт', val: String(stats.excusedCount) }
@@ -539,7 +565,8 @@
       const payment = collection.payments[student.id] || null;
       const status = paymentStatus(payment);
       const amount = payment && typeof payment.amount === 'number' ? payment.amount : collection.amount;
-      if (status === 'paid') paidNames.push(student.name);
+      const cash = !!(payment && payment.cash);
+      if (status === 'paid') paidNames.push(student.name + (cash ? ' 💵' : ''));
       else if (status === 'excused') excusedNames.push(student.name);
       else unpaidNames.push(student.name);
 
@@ -549,6 +576,8 @@
       nameTd.textContent = student.name;
 
       const statusTd = document.createElement('td');
+      statusTd.className = 'status-cell';
+
       const statusBtn = document.createElement('button');
       statusBtn.className = 'status-btn' + (status !== 'unpaid' ? ' ' + status : '');
       statusBtn.textContent = STATUS_LABEL[status];
@@ -556,13 +585,31 @@
         const next = STATUS_ORDER[(STATUS_ORDER.indexOf(status) + 1) % STATUS_ORDER.length];
         const current = collection.payments[student.id] || { status: 'unpaid', amount: collection.amount };
         current.status = next;
+        if (next !== 'paid') current.cash = false;
         delete current.paid;
         collection.payments[student.id] = current;
         saveData();
         renderCollectionDetail(collection.id);
         renderCollectionsList();
       });
+
+      const cashBtn = document.createElement('button');
+      cashBtn.type = 'button';
+      cashBtn.className = 'cash-toggle' + (cash ? ' active' : '');
+      cashBtn.textContent = '💵';
+      cashBtn.title = cash ? 'Оплачено наличными — нажмите, чтобы снять отметку' : 'Отметить, что оплатил(а) наличными';
+      cashBtn.hidden = status !== 'paid';
+      cashBtn.addEventListener('click', function () {
+        const current = collection.payments[student.id] || { status: 'paid', amount: collection.amount };
+        current.cash = !cash;
+        collection.payments[student.id] = current;
+        saveData();
+        renderCollectionDetail(collection.id);
+        renderCollectionsList();
+      });
+
       statusTd.appendChild(statusBtn);
+      statusTd.appendChild(cashBtn);
 
       const amountTd = document.createElement('td');
       const amountInput = document.createElement('input');
