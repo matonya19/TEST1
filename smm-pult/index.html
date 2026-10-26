@@ -1,0 +1,618 @@
+<title>SMM-пульт</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: left rail with clients (desktop) / sticky chip rail on top (phone) + one work column */
+:root{
+  --bg:#eef1f0; --surface:#ffffff; --ink:#15211f; --muted:#5d6b68; --line:#d8dfdd; --soft:#e4e9e7;
+  --accent:#2747d8; --accent-ink:#ffffff; --accent-soft:#e3e8fc;
+  --ok:#1d7a4a; --warn:#a9520a; --bad:#b42336;
+  --c-ulyana:#8a3ea8; --c-school:#2f6fd6; --c-natalia:#0f8a7e; --c-keystone:#9a7a2c; --c-roombloom:#d0552f; --c-inbox:#6b7280;
+  --f-display:"Unbounded","Manrope",system-ui,sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1514; --surface:#172020; --ink:#e6edeb; --muted:#93a29f; --line:#2a3634; --soft:#1f2928;
+  --accent:#8199ff; --accent-ink:#0b1020; --accent-soft:#232c4d;
+  --ok:#4cc488; --warn:#f0a050; --bad:#f07a8a;
+  --c-ulyana:#c58be0; --c-school:#79a6f2; --c-natalia:#4cc3b5; --c-keystone:#d5b56a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1514; --surface:#172020; --ink:#e6edeb; --muted:#93a29f; --line:#2a3634; --soft:#1f2928;
+  --accent:#8199ff; --accent-ink:#0b1020; --accent-soft:#232c4d;
+  --ok:#4cc488; --warn:#f0a050; --bad:#f07a8a;
+  --c-ulyana:#c58be0; --c-school:#79a6f2; --c-natalia:#4cc3b5; --c-keystone:#d5b56a; --c-roombloom:#f08a66; --c-inbox:#9ca3af;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+h1,h2,h3{text-wrap:balance;margin:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100%}
+.rail{position:sticky;top:0;height:100vh;overflow:auto;border-right:1px solid var(--line);background:var(--surface);
+  padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:16px;display:flex;flex-direction:column;gap:4px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:-.01em;padding:4px 10px 14px}
+.brand small{display:block;font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--muted);letter-spacing:0}
+.rail-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:14px 10px 4px}
+.nav{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;text-align:left;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap}
+.nav:hover{background:var(--soft)}
+.nav[aria-current="true"]{background:var(--accent-soft);color:var(--ink)}
+.nav .cnt{margin-left:auto;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;background:var(--cc,var(--c-inbox))}
+.nav .glyph{width:10px;height:10px;flex:none;border:2px solid var(--muted);border-radius:3px}
+
+main{min-width:0;padding-block:28px 120px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+
+@media (max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+  .rail{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;height:auto;flex-direction:row;align-items:center;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);
+    padding-block:8px;padding-right:max(16px,env(safe-area-inset-right,0px));scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+  .brand,.rail-label{display:none}
+  .nav{width:auto;padding:7px 12px;border:1px solid var(--line);border-radius:999px;font-size:14px}
+  .nav .cnt{margin-left:2px}
+  main{padding-block:18px 120px}
+  .wrap{gap:22px}
+}
+
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 20px}
+.head h1{font-family:var(--f-display);font-weight:700;font-size:clamp(22px,4vw,30px);letter-spacing:-.02em;line-height:1.15}
+.head .sub{color:var(--muted);margin-top:4px}
+.head .grow{flex:1 1 260px;min-width:0}
+.mono{font-family:var(--f-mono);font-size:12px;letter-spacing:.01em}
+
+section{display:flex;flex-direction:column;gap:12px}
+.sec-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sec-h h2{font-family:var(--f-display);font-weight:500;font-size:16px;letter-spacing:-.01em}
+.sec-h .hint{color:var(--muted);font-size:13px}
+.sec-h .sp{flex:1}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+.empty{color:var(--muted);font-size:14px;padding:14px 16px;border:1px dashed var(--line);border-radius:var(--r)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:none;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);background:var(--soft)}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:4px 9px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+
+.seg{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);margin-inline:-2px;padding-inline:2px}
+.seg::-webkit-scrollbar{display:none}
+.seg button{border:0;background:none;padding:9px 12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.seg button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--cc,var(--accent))}
+.toggle{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.toggle button{border:0;background:var(--surface);padding:6px 12px;font-weight:600;font-size:13px;cursor:pointer;color:var(--muted)}
+.toggle button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+/* rows */
+.list{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.row{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-top:1px solid var(--line);min-width:0}
+.row:first-child{border-top:0}
+.row .body{flex:1;min-width:0;cursor:pointer}
+.row .t{font-weight:600;overflow-wrap:anywhere}
+.row.done .t{text-decoration:line-through;color:var(--muted)}
+.row .meta{display:flex;flex-wrap:wrap;gap:4px 10px;color:var(--muted);font-size:12.5px;margin-top:2px;align-items:center}
+.chk{appearance:none;width:20px;height:20px;border:2px solid var(--muted);border-radius:6px;margin-top:2px;flex:none;cursor:pointer;display:grid;place-items:center;background:var(--surface)}
+.chk:checked{background:var(--ok);border-color:var(--ok)}
+.chk:checked::after{content:"";width:5px;height:10px;border:solid var(--surface);border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--soft);color:var(--ink);white-space:nowrap}
+.tag .dot{width:7px;height:7px}
+.tag.late{background:none;color:var(--bad);padding:0}
+.tag.claude{background:var(--accent-soft);color:var(--ink)}
+.st-todo{color:var(--muted)} .st-doing{color:var(--warn)} .st-done{color:var(--ok)}
+.clip{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;color:var(--muted);font-size:14px;margin-top:4px;overflow-wrap:anywhere}
+
+/* client cards on the week */
+.cc{display:flex;flex-direction:column;gap:12px;border-top:4px solid var(--cc)}
+.cc h3{font-family:var(--f-display);font-weight:500;font-size:15px;letter-spacing:-.01em}
+.cc .desc{color:var(--muted);font-size:13px;margin-top:2px}
+.nums{display:flex;gap:18px}
+.nums div{display:flex;flex-direction:column}
+.nums b{font-family:var(--f-display);font-weight:500;font-size:20px;font-variant-numeric:tabular-nums}
+.nums span{font-size:12px;color:var(--muted)}
+.mini{display:flex;flex-direction:column;gap:6px}
+.mini label{display:flex;gap:8px;align-items:flex-start;font-size:14px;cursor:pointer}
+.mini label .chk{width:17px;height:17px;margin-top:1px}
+
+/* quick capture */
+.qc{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.qc input[type=text]{flex:1 1 280px;min-width:0}
+.field,.qc input,.qc select{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 12px}
+
+/* content plan */
+.plan-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.plan-bar .range{font-weight:700;min-width:0}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.fchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:13px;font-weight:600;cursor:pointer}
+.fchip[aria-pressed="false"]{opacity:.45}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px;display:flex;flex-direction:column;gap:6px;min-height:150px;min-width:0}
+.day.today{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.day-h{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.day-h b{font-family:var(--f-display);font-weight:500;font-size:18px;font-variant-numeric:tabular-nums}
+.day-h span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.post{border:0;text-align:left;background:var(--soft);border-left:3px solid var(--cc);border-radius:6px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
+.post .pt{font-size:13px;font-weight:600;overflow-wrap:anywhere;line-height:1.3}
+.post .pm{font-size:11.5px;color:var(--muted)}
+.post.done .pt{text-decoration:line-through;color:var(--muted)}
+.add-day{margin-top:auto;border:1px dashed var(--line);background:none;border-radius:6px;padding:4px;color:var(--muted);cursor:pointer;font-size:13px}
+.add-day:hover{color:var(--ink);border-color:var(--muted)}
+@media (max-width:860px){
+  .week{grid-template-columns:minmax(0,1fr)}
+  .day{min-height:0}
+  .day .add-day{align-self:flex-start;padding:4px 10px}
+}
+.agenda{display:flex;flex-direction:column;gap:10px}
+.agenda .ad{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;align-items:start}
+.agenda .ad-d{font-weight:700;padding-top:6px}
+.agenda .ad-d span{display:block;color:var(--muted);font-weight:500;font-size:12px}
+.agenda .ad-p{display:flex;flex-direction:column;gap:6px}
+
+/* client header */
+.chead{border-left:5px solid var(--cc);padding-left:14px}
+.profile textarea{width:100%;min-height:150px;resize:vertical}
+.two{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
+@media (max-width:860px){.two{grid-template-columns:minmax(0,1fr)}}
+
+/* stats */
+.mform{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.mform label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);font-weight:600}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:14px}
+th,td{text-align:right;padding:8px 12px;border-top:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:600;border-top:0}
+th:first-child,td:first-child{text-align:left}
+.up{color:var(--ok);font-size:12px} .down{color:var(--bad);font-size:12px}
+.advice{white-space:pre-wrap;font-size:14.5px;overflow-wrap:anywhere}
+
+/* fab + sheet */
+.fab{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:20;
+  border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;border-radius:999px;padding:14px 20px;font-size:15px;cursor:pointer;box-shadow:0 6px 20px rgba(20,30,60,.25);display:flex;gap:8px;align-items:center}
+.fab b{font-size:20px;line-height:1}
+.overlay{position:fixed;inset:0;z-index:30;background:rgba(10,16,15,.45);display:flex;align-items:center;justify-content:center;padding:20px}
+.sheet{background:var(--surface);border-radius:14px;width:min(640px,100%);max-height:calc(100% - 20px);overflow:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.sheet h2{font-family:var(--f-display);font-weight:500;font-size:18px}
+.sheet .f{display:flex;flex-direction:column;gap:4px}
+.sheet .f>span{font-size:13px;font-weight:600;color:var(--muted)}
+.sheet .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sheet textarea{min-height:180px;resize:vertical}
+.sheet .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px}
+.sheet .acts .sp{flex:1}
+@media (max-width:640px){
+  .overlay{align-items:flex-end;padding:0}
+  .sheet{border-radius:16px 16px 0 0;max-height:92%;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));
+    padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .sheet .row2{grid-template-columns:1fr}
+}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:40;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-weight:600;font-size:14px;max-width:calc(100% - 32px)}
+.banner{background:var(--accent-soft);border-radius:var(--r);padding:10px 14px;font-size:14px}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(12px);opacity:.6}}}
+</style>
+
+<div class="app">
+  <nav class="rail" id="rail" aria-label="Разделы"></nav>
+  <main><div class="wrap" id="view"></div></main>
+</div>
+<button class="fab" id="fab" type="button"><b>+</b> Записать</button>
+<div class="overlay" id="overlay" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const CLIENTS=[
+  {id:'ulyana',name:'Ульяна Павлова',short:'Ульяна',desc:'Предприниматель, учредитель трёх школ'},
+  {id:'school',name:'Школа российская онлайн',short:'Школа онлайн',desc:'Онлайн-школа'},
+  {id:'natalia',name:'Наталья Перепелица',short:'Наталья',desc:'Врач превентивной медицины, косметолог, генетик'},
+  {id:'keystone',name:'Keystone',short:'Keystone',desc:'Агентство элитной недвижимости'},
+  {id:'roombloom',name:'Roombloom',short:'Roombloom',desc:'Доступное жильё'},
+];
+const INBOX={id:'inbox',name:'Входящие',short:'Входящие',desc:'Быстрые мысли, разобрать в понедельник'};
+const ALL=[...CLIENTS,INBOX];
+const byId=id=>ALL.find(c=>c.id===id)||INBOX;
+const KINDS={task:'Задача',post:'Пост в контент-план',idea:'Идея',text:'Текст',rubric:'Рубрика',chat:'Чат GPT',note:'Заметка'};
+const STATUS={
+  post:{todo:'Запланирован',doing:'В работе',done:'Опубликован'},
+  def:{todo:'Надо сделать',doing:'В работе',done:'Готово'}};
+const stLabel=(it)=>(it.kind==='post'?STATUS.post:STATUS.def)[it.status||'todo'];
+const TABS=[['overview','Обзор'],['tasks','Задачи'],['plan','Контент-план'],['ideas','Идеи и тексты'],['rubrics','Рубрики'],['chats','Чаты GPT'],['notes','Заметки'],['stats','Аналитика']];
+const TAB_KIND={tasks:'task',plan:'post',ideas:'idea',rubrics:'rubric',chats:'chat',notes:'note',stats:'note',overview:'task'};
+
+/* dates */
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const monday=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const DOW=['пн','вт','ср','чт','пт','сб','вс'];
+const MON=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const MONS=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+const MONTH=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const todayISO=()=>iso(new Date());
+const dShort=s=>{const d=parse(s);return `${d.getDate()} ${MONS[d.getMonth()]}, ${DOW[(d.getDay()+6)%7]}`};
+const range=(a,b)=>a.getMonth()===b.getMonth()?`${a.getDate()}–${b.getDate()} ${MON[b.getMonth()]}`:`${a.getDate()} ${MON[a.getMonth()]} – ${b.getDate()} ${MON[b.getMonth()]}`;
+
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const newId=()=>'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const cc=id=>`--cc:var(--c-${byId(id).id})`;
+
+/* ---------- store ---------- */
+const S={items:[],metrics:[],advice:{},profiles:{},ready:false,live:false};
+let db=null;
+const LS='smm-pult-local';
+function loadLocal(){try{const j=JSON.parse(localStorage.getItem(LS)||'{}');Object.assign(S,{items:j.items||[],metrics:j.metrics||[],advice:j.advice||{},profiles:j.profiles||{}})}catch(e){}}
+function saveLocal(){try{localStorage.setItem(LS,JSON.stringify({items:S.items,metrics:S.metrics,advice:S.advice,profiles:S.profiles}))}catch(e){}}
+const toMap=snap=>Object.fromEntries(snap.docs.map(d=>[d.id,d.data()]));
+async function initStore(){
+  try{db=window.claude?.use?await window.claude.use('db'):null}catch(e){db=null}
+  if(!db){loadLocal();S.ready=true;render();return}
+  S.live=true;
+  const fail=e=>toast(e?.code==='revoked'?'Доступ к данным закрыт':'Не удалось загрузить данные. Обновите страницу.');
+  db.collection('items').onSnapshot(s=>{S.items=s.docs.map(d=>({...d.data(),id:d.id}));S.ready=true;render()},fail);
+  db.collection('metrics').onSnapshot(s=>{S.metrics=s.docs.map(d=>({...d.data(),id:d.id}));render()},fail);
+  db.collection('advice').onSnapshot(s=>{S.advice=toMap(s);render()},fail);
+  db.collection('profiles').onSnapshot(s=>{S.profiles=toMap(s);render()},fail);
+}
+async function write(col,id,body){
+  if(S.live){
+    try{await db.collection(col).doc(id).set(body)}
+    catch(e){toast(e?.code==='quota_exceeded'?'Место в базе закончилось: удалите старые записи':'Не сохранилось, попробуйте ещё раз');throw e}
+  }else{
+    if(col==='items'||col==='metrics'){const arr=S[col];const i=arr.findIndex(x=>x.id===id);const v={...body,id};i<0?arr.push(v):arr[i]=v}
+    else S[col][id]=body;
+    saveLocal();render();
+  }
+}
+async function remove(col,id){
+  if(S.live){try{await db.collection(col).doc(id).delete()}catch(e){toast('Не удалилось, попробуйте ещё раз')}}
+  else{S[col]=S[col].filter(x=>x.id!==id);saveLocal();render()}
+}
+const saveItem=it=>{const {id,...b}=it;b.updatedAt=Date.now();return write('items',id,b)};
+
+/* ---------- ui state ---------- */
+const U={view:'week',tab:'overview',weekOff:0,planMode:'week',planOff:0,filter:new Set(CLIENTS.map(c=>c.id)),busy:{}};
+try{const v=JSON.parse(localStorage.getItem('smm-pult-ui')||'{}');if(v.view)U.view=v.view;if(v.tab)U.tab=v.tab;if(v.planMode)U.planMode=v.planMode}catch(e){}
+const remember=()=>{try{localStorage.setItem('smm-pult-ui',JSON.stringify({view:U.view,tab:U.tab,planMode:U.planMode}))}catch(e){}};
+
+const items=(f)=>S.items.filter(f);
+const openTasks=cid=>items(i=>i.client===cid&&i.kind==='task'&&i.status!=='done');
+const sortTasks=a=>a.sort((x,y)=>(x.date||'9')<(y.date||'9')?-1:(x.date||'9')>(y.date||'9')?1:(y.createdAt||0)-(x.createdAt||0));
+
+/* ---------- render ---------- */
+let raf=0;
+function render(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;paint()})}
+function paint(){
+  const a=document.activeElement, keep=a&&a.id?{id:a.id,v:a.value,s:a.selectionStart,e:a.selectionEnd}:null;
+  document.getElementById('rail').innerHTML=rail();
+  const v=document.getElementById('view');
+  v.innerHTML=U.view==='week'?viewWeek():U.view==='plan'?viewPlanPage():viewClient(U.view);
+  if(keep){const el=document.getElementById(keep.id);if(el){if(el.value!==undefined&&!el.dataset.fresh)el.value=keep.v;el.focus();try{el.setSelectionRange(keep.s,keep.e)}catch(e){}}}
+}
+
+function rail(){
+  const n=(id,label,extra='',cur)=>`<button class="nav" data-go="${id}" aria-current="${U.view===id}" style="${extra}">${label}</button>`;
+  const inboxN=items(i=>i.client==='inbox'&&i.status!=='done').length;
+  return `<div class="brand">SMM-пульт<small>${dShort(todayISO())}</small></div>`+
+    n('week','<span class="glyph"></span>Неделя')+
+    n('plan','<span class="glyph" style="border-radius:50%"></span>Контент-план')+
+    `<div class="rail-label">Клиенты</div>`+
+    CLIENTS.map(c=>n(c.id,`<span class="dot"></span>${esc(c.short)}<span class="cnt">${openTasks(c.id).length||''}</span>`,cc(c.id))).join('')+
+    `<div class="rail-label">Разобрать</div>`+
+    n('inbox',`<span class="dot"></span>Входящие<span class="cnt">${inboxN||''}</span>`,cc('inbox'));
+}
+
+function rowItem(it,{showClient=false}={}){
+  const late=it.date&&it.date<todayISO()&&it.status!=='done'&&(it.kind==='task'||it.kind==='post');
+  const canCheck=it.kind==='task'||it.kind==='post';
+  return `<div class="row ${it.status==='done'?'done':''}">
+    ${canCheck?`<input type="checkbox" class="chk" data-check="${it.id}" ${it.status==='done'?'checked':''} aria-label="Готово">`:`<span class="dot" style="${cc(it.client)};margin-top:7px"></span>`}
+    <div class="body" data-edit="${it.id}">
+      <div class="t">${esc(it.title||'Без названия')}</div>
+      <div class="meta">
+        ${showClient?`<span class="tag" style="${cc(it.client)}"><span class="dot"></span>${esc(byId(it.client).short)}</span>`:''}
+        ${it.kind!=='task'?`<span>${esc(KINDS[it.kind]||'')}</span>`:''}
+        ${it.date?`<span class="${late?'tag late':''}">${late?'просрочено · ':''}${dShort(it.date)}</span>`:''}
+        ${it.status==='doing'?`<span class="st-doing">В работе</span>`:''}
+        ${it.rubric?`<span>#${esc(it.rubric)}</span>`:''}
+        ${it.by==='claude'?`<span class="tag claude">от Claude</span>`:''}
+        ${it.url?`<a href="${esc(it.url)}" target="_blank" rel="noopener" data-stop>открыть ссылку ↗</a>`:''}
+      </div>
+      ${it.body&&it.kind!=='task'?`<div class="clip">${esc(it.body)}</div>`:''}
+    </div></div>`;
+}
+const list=(arr,opt,emptyText)=>arr.length?`<div class="list">${arr.map(i=>rowItem(i,opt)).join('')}</div>`:`<div class="empty">${emptyText}</div>`;
+
+/* ----- week ----- */
+function viewWeek(){
+  const mon=addDays(monday(new Date()),U.weekOff*7), sun=addDays(mon,6), mISO=iso(mon), sISO=iso(sun), t=todayISO();
+  const isCur=U.weekOff===0;
+  const today=sortTasks(items(i=>(i.kind==='task'||i.kind==='post')&&i.status!=='done'&&i.date&&i.date<=t&&i.client!=='inbox'));
+  const ideas=items(i=>i.by==='claude'&&i.week===mISO&&i.kind==='idea');
+  const inbox=items(i=>i.client==='inbox').sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  const cards=CLIENTS.map(c=>{
+    const ot=sortTasks(openTasks(c.id));
+    const posts=items(i=>i.client===c.id&&i.kind==='post'&&i.date>=mISO&&i.date<=sISO);
+    const wk=ot.filter(i=>!i.date||i.date<=sISO).slice(0,4);
+    return `<div class="card cc" style="${cc(c.id)}">
+      <div><h3>${esc(c.name)}</h3><div class="desc">${esc(c.desc)}</div></div>
+      <div class="nums"><div><b>${ot.length}</b><span>задач открыто</span></div><div><b>${posts.filter(p=>p.status==='done').length}/${posts.length}</b><span>постов за неделю</span></div></div>
+      <div class="mini">${wk.length?wk.map(i=>`<label><input type="checkbox" class="chk" data-check="${i.id}"><span>${esc(i.title)}${i.date?` <span class="mono" style="color:var(--muted)">${dShort(i.date)}</span>`:''}</span></label>`).join(''):`<span style="color:var(--muted);font-size:14px">Задач на неделю нет</span>`}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto"><button class="btn sm" data-go="${c.id}">Открыть</button><button class="btn sm ghost" data-new="task" data-client="${c.id}">+ задача</button></div>
+    </div>`}).join('');
+  const ideasBy=CLIENTS.map(c=>{const a=ideas.filter(i=>i.client===c.id);return a.length?`<div class="card" style="${cc(c.id)};display:flex;flex-direction:column;gap:8px;border-top:4px solid var(--cc)"><b>${esc(c.name)}</b>${a.map(i=>`<div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:1;min-width:0;cursor:pointer" data-edit="${i.id}"><div style="font-weight:600">${esc(i.title)}</div>${i.body?`<div class="clip">${esc(i.body)}</div>`:''}</div><button class="btn sm" data-toplan="${i.id}">В план</button></div>`).join('')}</div>`:''}).join('');
+  return `<div class="head"><div class="grow"><h1>Неделя ${range(mon,sun)}</h1><div class="sub">${isCur?'Текущая неделя':U.weekOff<0?'Прошедшая неделя':'Следующая неделя'} · 5 клиентов</div></div>
+      <div style="display:flex;gap:6px"><button class="btn sm" data-week="-1" aria-label="Прошлая неделя">←</button>${isCur?'':`<button class="btn sm" data-week="0">Сейчас</button>`}<button class="btn sm" data-week="1" aria-label="Следующая неделя">→</button></div></div>
+    ${S.live||!S.ready?'':`<div class="banner">Сейчас записи хранятся только в этом браузере. Откройте страницу в приложении Claude, чтобы они синхронизировались между телефоном и компьютером.</div>`}
+    <section><div class="sec-h"><h2>Быстро записать мысль</h2><span class="hint">Улетит во «Входящие» или сразу клиенту</span></div>
+      <form class="qc" id="qc"><input type="text" id="qc-text" placeholder="Например: снять рилс про ипотеку для молодых семей" autocomplete="off">
+        <select id="qc-client" aria-label="Клиент">${ALL.map(c=>`<option value="${c.id}" ${c.id==='inbox'?'selected':''}>${esc(c.short)}</option>`).join('')}</select>
+        <select id="qc-kind" aria-label="Тип"><option value="idea">Идея</option><option value="task">Задача</option><option value="note">Заметка</option></select>
+        <button class="btn primary" type="submit">Добавить</button></form></section>
+    <section><div class="sec-h"><h2>Сегодня и просрочено</h2><span class="hint">${dShort(t)}</span></div>${list(today,{showClient:true},'На сегодня задач и постов нет. Добавьте их с датой, и они появятся здесь.')}</section>
+    <section><div class="sec-h"><h2>Клиенты</h2></div><div class="grid">${cards}</div></section>
+    <section><div class="sec-h"><h2>Идеи Claude на эту неделю</h2><span class="hint">приходят по понедельникам утром</span></div>${ideasBy?`<div class="grid">${ideasBy}</div>`:`<div class="empty">Каждый понедельник утром здесь будут появляться идеи публикаций для каждого клиента. Хорошая идея ставится в контент-план одной кнопкой.</div>`}</section>
+    <section><div class="sec-h"><h2>Входящие</h2><span class="hint">откройте запись и выберите клиента</span></div>${list(inbox,{},'Пусто. Все мысли разобраны по клиентам.')}</section>`;
+}
+
+/* ----- content plan ----- */
+function planBlock(clientId){
+  const ids=clientId?[clientId]:[...U.filter];
+  const posts=items(i=>i.kind==='post'&&i.date&&ids.includes(i.client));
+  const t=todayISO();
+  const card=p=>`<button class="post ${p.status==='done'?'done':''}" style="${cc(p.client)}" data-edit="${p.id}"><span class="pt">${esc(p.title||'Без названия')}</span><span class="pm">${clientId?'':esc(byId(p.client).short)+' · '}${stLabel(p)}${p.rubric?' · #'+esc(p.rubric):''}</span></button>`;
+  let body,label;
+  if(U.planMode==='week'){
+    const mon=addDays(monday(new Date()),U.planOff*7);label=range(mon,addDays(mon,6));
+    body=`<div class="week">${[0,1,2,3,4,5,6].map(k=>{const d=iso(addDays(mon,k));const ps=posts.filter(p=>p.date===d);
+      return `<div class="day ${d===t?'today':''}"><div class="day-h"><b>${parse(d).getDate()}</b><span>${DOW[k]}</span></div>${ps.map(card).join('')}<button class="add-day" data-new="post" data-date="${d}" data-client="${clientId||''}">+ пост</button></div>`}).join('')}</div>`;
+  }else{
+    const now=new Date();const m=new Date(now.getFullYear(),now.getMonth()+U.planOff,1);const e=new Date(m.getFullYear(),m.getMonth()+1,0);
+    label=`${MONTH[m.getMonth()]} ${m.getFullYear()}`;
+    const ps=posts.filter(p=>p.date>=iso(m)&&p.date<=iso(e)).sort((a,b)=>a.date<b.date?-1:1);
+    const days=[...new Set(ps.map(p=>p.date))];
+    body=days.length?`<div class="agenda">${days.map(d=>`<div class="ad"><div class="ad-d">${parse(d).getDate()} ${MONS[parse(d).getMonth()]}<span>${DOW[(parse(d).getDay()+6)%7]}${d===t?' · сегодня':''}</span></div><div class="ad-p">${ps.filter(p=>p.date===d).map(card).join('')}</div></div>`).join('')}</div>`
+      :`<div class="empty">В этом месяце постов пока нет. Добавьте первый кнопкой «Записать» или через недельный вид.</div>`;
+  }
+  return `<div class="plan-bar"><div class="toggle"><button data-pmode="week" aria-pressed="${U.planMode==='week'}">Неделя</button><button data-pmode="month" aria-pressed="${U.planMode==='month'}">Месяц</button></div>
+    <button class="btn sm" data-poff="-1" aria-label="Назад">←</button><button class="btn sm" data-poff="0">Сегодня</button><button class="btn sm" data-poff="1" aria-label="Вперёд">→</button>
+    <span class="range">${label}</span></div>
+    ${clientId?'':`<div class="filters">${CLIENTS.map(c=>`<button class="fchip" style="${cc(c.id)}" data-filter="${c.id}" aria-pressed="${U.filter.has(c.id)}"><span class="dot"></span>${esc(c.short)}</button>`).join('')}</div>`}
+    ${body}`;
+}
+function viewPlanPage(){
+  return `<div class="head"><div class="grow"><h1>Контент-план</h1><div class="sub">Все клиенты на одном экране. Нажмите на клиента, чтобы скрыть или показать.</div></div></div><section>${planBlock(null)}</section>`;
+}
+
+/* ----- client ----- */
+function viewClient(cid){
+  const c=byId(cid);
+  if(cid==='inbox'){
+    const a=items(i=>i.client==='inbox').sort((x,y)=>(y.createdAt||0)-(x.createdAt||0));
+    return `<div class="head"><div class="grow chead" style="${cc(cid)}"><h1>Входящие</h1><div class="sub">Всё, что записали на бегу. В понедельник откройте каждую запись и выберите клиента.</div></div></div>${list(a,{},'Пусто. Все мысли разобраны.')}`;
+  }
+  const tabs=`<div class="seg" role="tablist" style="${cc(cid)}">${TABS.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${U.tab===k}">${l}</button>`).join('')}</div>`;
+  return `<div class="head"><div class="grow chead" style="${cc(cid)}"><h1>${esc(c.name)}</h1><div class="sub">${esc(c.desc)}</div></div></div>${tabs}${tabBody(cid)}`;
+}
+function tabBody(cid){
+  const of=k=>items(i=>i.client===cid&&i.kind===k);
+  const newBtn=(k,l)=>`<span class="sp"></span><button class="btn sm primary" data-new="${k}" data-client="${cid}">+ ${l}</button>`;
+  switch(U.tab){
+  case 'overview':{
+    const p=S.profiles[cid]||{};
+    const ot=sortTasks(openTasks(cid)).slice(0,6);
+    const t=todayISO();
+    const nextPosts=items(i=>i.client===cid&&i.kind==='post'&&i.date>=t&&i.status!=='done').sort((a,b)=>a.date<b.date?-1:1).slice(0,5);
+    const chats=of('chat').sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,4);
+    const adv=S.advice[cid];
+    return `<div class="two">
+      <section class="profile"><div class="sec-h"><h2>О клиенте</h2><span class="hint">ниша, цели, тон, площадки, контакты, доступы</span></div>
+        <textarea class="field" id="prof-${cid}" placeholder="Цели на квартал, целевая аудитория, тон общения, площадки и ссылки на аккаунты, контакты, что нельзя делать…">${esc(p.about||'')}</textarea>
+        <div><button class="btn sm" data-saveprof="${cid}">Сохранить</button>${p.at?` <span class="hint mono" style="color:var(--muted)">сохранено ${new Date(p.at).toLocaleDateString('ru-RU')}</span>`:''}</div>
+      </section>
+      <section><div class="sec-h"><h2>Ближайшие посты</h2></div>${list(nextPosts,{},'Постов впереди нет.')}</section>
+    </div>
+    <div class="two">
+      <section><div class="sec-h"><h2>Открытые задачи</h2>${newBtn('task','задача')}</div>${list(ot,{},'Задач нет.')}</section>
+      <section><div class="sec-h"><h2>Последние чаты GPT</h2></div>${list(chats,{},'Ссылок на чаты пока нет.')}
+        ${adv?`<div class="card"><div class="sec-h" style="margin-bottom:6px"><h2>Последний разбор Claude</h2><span class="hint">${new Date(adv.at).toLocaleDateString('ru-RU')}</span></div><div class="clip" style="-webkit-line-clamp:6">${esc(adv.text)}</div><button class="btn sm ghost" data-tab="stats">Весь разбор →</button></div>`:''}</section>
+    </div>`;}
+  case 'tasks':{
+    const a=of('task');
+    const g=s=>sortTasks(a.filter(i=>(i.status||'todo')===s));
+    const done=a.filter(i=>i.status==='done').sort((x,y)=>(y.updatedAt||0)-(x.updatedAt||0)).slice(0,15);
+    return `<section><div class="sec-h"><h2>В работе</h2>${newBtn('task','задача')}</div>${list(g('doing'),{},'Ничего не в работе.')}</section>
+      <section><div class="sec-h"><h2>Надо сделать</h2></div>${list(g('todo'),{},'Список пуст.')}</section>
+      <section><div class="sec-h"><h2>Сделано</h2><span class="hint">последние 15</span></div>${list(done,{},'Пока ничего не отмечено.')}</section>`;}
+  case 'plan': return `<section>${planBlock(cid)}</section>`;
+  case 'ideas':{
+    const a=items(i=>i.client===cid&&(i.kind==='idea'||i.kind==='text')).sort((x,y)=>(y.createdAt||0)-(x.createdAt||0));
+    return `<section><div class="sec-h"><h2>Идеи и тексты</h2><span class="hint">черновики, заготовки постов, всё, что придумали</span><span class="sp"></span>
+      <button class="btn sm" data-genideas="${cid}" ${U.busy['g'+cid]?'disabled':''}>${U.busy['g'+cid]?'Claude думает…':'Придумать 5 идей с Claude'}</button><button class="btn sm primary" data-new="idea" data-client="${cid}">+ идея</button><button class="btn sm primary" data-new="text" data-client="${cid}">+ текст</button></div>
+      ${a.length?`<div class="list">${a.map(i=>rowItem(i).replace('</div></div>',`</div>${i.kind==='idea'?`<button class="btn sm" data-toplan="${i.id}">В план</button>`:''}</div>`)).join('')}</div>`:`<div class="empty">Сюда складываются идеи и готовые тексты. Нажмите «+ текст» и вставьте черновик целиком, его можно скопировать отсюда в один клик.</div>`}</section>`;}
+  case 'rubrics':{
+    const a=of('rubric').sort((x,y)=>(x.createdAt||0)-(y.createdAt||0));
+    const cnt=r=>items(i=>i.client===cid&&i.kind==='post'&&i.rubric===r.title).length;
+    return `<section><div class="sec-h"><h2>Рубрикатор</h2><span class="hint">рубрики подставляются в посты контент-плана</span>${newBtn('rubric','рубрика')}</div>
+      ${a.length?`<div class="list">${a.map(r=>rowItem(r).replace('<div class="meta">',`<div class="meta"><span>${cnt(r)} постов в плане</span>`)).join('')}</div>`:`<div class="empty">Добавьте рубрики: например «Экспертное», «Кейсы», «Личное», «Продающее». У каждой можно описать формат и частоту.</div>`}</section>`;}
+  case 'chats':{
+    const a=of('chat').sort((x,y)=>(y.createdAt||0)-(x.createdAt||0));
+    return `<section><div class="sec-h"><h2>Чаты ChatGPT</h2><span class="hint">ссылка и пара слов, о чём чат</span>${newBtn('chat','чат')}</div>
+      ${list(a,{},'В ChatGPT нажмите «Поделиться», скопируйте ссылку на чат и сохраните её здесь с коротким описанием. Больше не придётся искать, где что придумано.')}</section>`;}
+  case 'notes':{
+    const a=of('note').sort((x,y)=>(y.createdAt||0)-(x.createdAt||0));
+    return `<section><div class="sec-h"><h2>Заметки</h2>${newBtn('note','заметка')}</div>${list(a,{},'Заметок пока нет.')}</section>`;}
+  case 'stats': return statsTab(cid);
+  }
+  return '';
+}
+
+/* ----- analytics ----- */
+const MF=[['followers','Подписчики'],['reach','Охват за неделю'],['views','Просмотры'],['er','Вовлечённость, %'],['leads','Заявки / сообщения']];
+function statsTab(cid){
+  const mon=iso(monday(new Date()));
+  const ms=S.metrics.filter(m=>m.client===cid).sort((a,b)=>a.week<b.week?1:-1);
+  const cur=ms.find(m=>m.week===mon)||{};
+  const adv=S.advice[cid];
+  const delta=(a,b)=>{if(a==null||b==null||a===''||b==='')return '';const d=Number(a)-Number(b);if(!isFinite(d)||d===0)return '';return ` <span class="${d>0?'up':'down'}">${d>0?'▲':'▼'}${Math.abs(Math.round(d*10)/10).toLocaleString('ru-RU')}</span>`};
+  const fmt=v=>v===''||v==null?'—':Number(v).toLocaleString('ru-RU');
+  return `<section><div class="sec-h"><h2>Цифры за неделю ${range(parse(mon),addDays(parse(mon),6))}</h2><span class="hint">раз в неделю переносите из статистики соцсетей, это 2 минуты</span></div>
+    <form class="card" id="mform" data-client="${cid}" style="display:flex;flex-direction:column;gap:12px">
+      <div class="mform">${MF.map(([k,l])=>`<label>${l}<input class="field" id="m-${cid}-${k}" name="${k}" inputmode="decimal" value="${esc(cur[k]??'')}"></label>`).join('')}</div>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);font-weight:600">Что заметили за неделю<input class="field" id="m-${cid}-note" name="note" value="${esc(cur.note||'')}" placeholder="Например: рилс про анализы залетел, сторис просели"></label>
+      <div><button class="btn primary" type="submit">Сохранить неделю</button></div></form></section>
+    <section><div class="sec-h"><h2>Динамика</h2></div>${ms.length?`<div class="tbl-wrap"><table><thead><tr><th>Неделя</th>${MF.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${ms.slice(0,12).map((m,i)=>{const p=ms[i+1]||{};return `<tr><td>${range(parse(m.week),addDays(parse(m.week),6))}</td>${MF.map(([k])=>`<td>${fmt(m[k])}${delta(m[k],p[k])}</td>`).join('')}</tr>`}).join('')}</tbody></table></div>`:`<div class="empty">После первой сохранённой недели здесь появится таблица с ростом и падением.</div>`}</section>
+    <section><div class="sec-h"><h2>Разбор и рекомендации Claude</h2>${adv?`<span class="hint">${new Date(adv.at).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})}</span>`:''}<span class="sp"></span><button class="btn sm primary" data-advise="${cid}" ${U.busy['a'+cid]?'disabled':''}>${U.busy['a'+cid]?'Claude думает…':'Разобрать неделю с Claude'}</button></div>
+      <div class="card advice" id="adv-${cid}">${adv?esc(adv.text):'<span style="color:var(--muted)">Claude посмотрит цифры, контент-план и выполненные задачи и даст 3 действия на следующую неделю. Каждый понедельник разбор обновляется сам.</span>'}</div></section>`;
+}
+
+/* ---------- Claude ---------- */
+let samplerP=null;
+const sampler=()=>samplerP||(samplerP=(window.claude?.use?window.claude.use('sample'):Promise.resolve(null)).catch(()=>null));
+const sampleErr=e=>({not_granted:'Доступ к Claude не разрешён для этой страницы',rate_limited:'Слишком много запросов, попробуйте позже',sampling_disabled:'Claude недоступен для этого аккаунта',session_expired:'Войдите в Claude заново'}[e?.code]||'Claude не ответил, попробуйте ещё раз');
+function context(cid){
+  const c=byId(cid),p=S.profiles[cid]||{};
+  const since=iso(addDays(new Date(),-35));
+  const ms=S.metrics.filter(m=>m.client===cid).sort((a,b)=>a.week<b.week?-1:1).slice(-8);
+  const posts=items(i=>i.client===cid&&i.kind==='post'&&i.date>=since).sort((a,b)=>a.date<b.date?-1:1);
+  const rub=items(i=>i.client===cid&&i.kind==='rubric').map(r=>r.title);
+  const done=items(i=>i.client===cid&&i.kind==='task'&&i.status==='done'&&(i.updatedAt||0)>Date.now()-14*864e5).map(i=>i.title);
+  return `Клиент: ${c.name} — ${c.desc}.
+О клиенте: ${(p.about||'нет данных').slice(0,2500)}
+Рубрики: ${rub.join(', ')||'не заданы'}
+Метрики по неделям (старые → новые):
+${ms.map(m=>`${m.week}: ${MF.map(([k,l])=>`${l}=${m[k]??'—'}`).join('; ')}${m.note?'; заметка: '+m.note:''}`).join('\n')||'нет данных'}
+Посты за последние 5 недель:
+${posts.map(p=>`${p.date} [${stLabel(p)}] ${p.rubric?'#'+p.rubric+' ':''}${p.title}`).join('\n')||'нет'}
+Сделано за 2 недели: ${done.join('; ')||'нет данных'}`.slice(0,12000);
+}
+async function advise(cid){
+  const s=await sampler();if(!s){toast('Claude доступен, когда страница открыта в приложении Claude');return}
+  U.busy['a'+cid]=true;render();
+  const out=()=>document.getElementById('adv-'+cid);
+  try{
+    const {text}=await s(`Ты опытный SMM-стратег. Ниже данные одного клиента SMM-специалиста.\n\n${context(cid)}\n\nНапиши по-русски, коротко и конкретно, обычным текстом без markdown-разметки (списки через «— »):\n1. Что происходит с аккаунтом (2–3 пункта, опираясь на цифры; если цифр нет, скажи, каких не хватает).\n2. Три конкретных действия на следующую неделю.\n3. Три идеи постов с рубрикой и форматом (рилс, карусель, сторис, пост).`,{onText:({text})=>{const el=out();if(el)el.textContent=text}});
+    await write('advice',cid,{text,at:Date.now(),by:'page'});
+  }catch(e){if(e?.code!=='cancelled')toast(sampleErr(e))}
+  finally{U.busy['a'+cid]=false;render()}
+}
+async function genIdeas(cid){
+  const s=await sampler();if(!s){toast('Claude доступен, когда страница открыта в приложении Claude');return}
+  U.busy['g'+cid]=true;render();
+  try{
+    const have=items(i=>i.client===cid&&(i.kind==='idea'||i.kind==='post')).slice(-40).map(i=>i.title).join('; ');
+    const arr=await s.json(`Ты SMM-стратег. Придумай 5 свежих идей публикаций для клиента.\n\n${context(cid)}\nУже есть идеи и посты (не повторяй): ${have||'нет'}\n\nОтветь только JSON-массивом из 5 объектов {"title": "короткий заголовок идеи", "body": "2–4 предложения: суть, формат (рилс/карусель/сторис/пост), крючок для первой строки", "rubric": "рубрика"}.`,{cache:false});
+    const now=Date.now();
+    for(const [k,x] of (Array.isArray(arr)?arr:[]).slice(0,5).entries()){
+      if(!x||!x.title)continue;
+      await saveItem({id:newId(),client:cid,kind:'idea',title:String(x.title).slice(0,200),body:String(x.body||''),rubric:String(x.rubric||''),status:'todo',by:'claude',week:iso(monday(new Date())),createdAt:now+k});
+    }
+    toast('Идеи добавлены');
+  }catch(e){if(e?.code!=='cancelled')toast(sampleErr(e))}
+  finally{U.busy['g'+cid]=false;render()}
+}
+
+/* ---------- editor sheet ---------- */
+let editing=null,confirmDel=false;
+function openEditor(it){editing={...it};confirmDel=false;drawEditor()}
+function drawEditor(){
+  const it=editing,o=document.getElementById('overlay');
+  const rubrics=items(i=>i.client===it.client&&i.kind==='rubric').map(r=>r.title);
+  const isNew=!S.items.some(x=>x.id===it.id);
+  const st=it.kind==='post'?STATUS.post:STATUS.def;
+  o.innerHTML=`<form class="sheet" id="ed" role="dialog" aria-modal="true" aria-label="Запись">
+    <h2>${isNew?'Новая запись':'Запись'}</h2>
+    <div class="row2"><label class="f"><span>Тип</span><select class="field" id="ed-kind">${Object.entries(KINDS).map(([k,l])=>`<option value="${k}" ${it.kind===k?'selected':''}>${l}</option>`).join('')}</select></label>
+      <label class="f"><span>Клиент</span><select class="field" id="ed-client">${ALL.map(c=>`<option value="${c.id}" ${it.client===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label></div>
+    <label class="f"><span>${it.kind==='chat'?'О чём этот чат':'Заголовок'}</span><input class="field" id="ed-title" value="${esc(it.title||'')}" required autocomplete="off"></label>
+    <label class="f"><span>${it.kind==='text'||it.kind==='post'?'Текст поста':'Описание / подробности'}</span><textarea class="field" id="ed-body" placeholder="${it.kind==='text'||it.kind==='post'?'Вставьте сюда текст целиком':'Подробности, шаги, мысли'}">${esc(it.body||'')}</textarea></label>
+    <div class="row2"><label class="f"><span>${it.kind==='post'?'Дата публикации':'Срок'}</span><input class="field" type="date" id="ed-date" value="${esc(it.date||'')}"></label>
+      <label class="f"><span>Статус</span><select class="field" id="ed-status">${Object.entries(st).map(([k,l])=>`<option value="${k}" ${(it.status||'todo')===k?'selected':''}>${l}</option>`).join('')}</select></label></div>
+    <div class="row2"><label class="f"><span>Рубрика</span><input class="field" id="ed-rubric" list="ed-rl" value="${esc(it.rubric||'')}" autocomplete="off"><datalist id="ed-rl">${rubrics.map(r=>`<option value="${esc(r)}">`).join('')}</datalist></label>
+      <label class="f"><span>Ссылка (чат GPT, документ, пост)</span><input class="field" type="url" id="ed-url" value="${esc(it.url||'')}" placeholder="https://chatgpt.com/share/…"></label></div>
+    <div class="acts"><button class="btn primary" type="submit">Сохранить</button><button class="btn" type="button" data-close>Отмена</button>
+      ${it.body?`<button class="btn ghost" type="button" data-copy>Копировать текст</button>`:''}<span class="sp"></span>
+      ${isNew?'':`<button class="btn ${confirmDel?'danger':'ghost'}" type="button" data-del>${confirmDel?'Точно удалить?':'Удалить'}</button>`}</div>
+  </form>`;
+  o.hidden=false;
+  if(isNew)setTimeout(()=>document.getElementById('ed-title')?.focus(),30);
+}
+function readEditor(){
+  const g=id=>document.getElementById(id)?.value??'';
+  Object.assign(editing,{kind:g('ed-kind'),client:g('ed-client'),title:g('ed-title').trim(),body:g('ed-body'),date:g('ed-date'),status:g('ed-status'),rubric:g('ed-rubric').trim(),url:g('ed-url').trim()});
+}
+const closeEditor=()=>{document.getElementById('overlay').hidden=true;editing=null};
+function newItem(kind,client,extra={}){
+  const c=client||(U.view!=='week'&&U.view!=='plan'?U.view:'inbox');
+  openEditor({id:newId(),kind,client:c,title:'',body:'',status:'todo',date:kind==='post'?todayISO():'',createdAt:Date.now(),...extra});
+}
+
+/* ---------- events ---------- */
+let toastT;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2600)}
+const go=v=>{U.view=v;if(!CLIENTS.some(c=>c.id===v))U.tab='overview';remember();render();window.scrollTo(0,0)};
+
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('[data-go],[data-tab],[data-new],[data-edit],[data-week],[data-pmode],[data-poff],[data-filter],[data-toplan],[data-saveprof],[data-advise],[data-genideas],[data-close],[data-del],[data-copy],[data-stop],#fab');
+  if(!t)return;
+  if(t.dataset.stop!==undefined)return;
+  const d=t.dataset;
+  if(d.go){if(U.view!==d.go&&CLIENTS.some(c=>c.id===d.go))U.tab='overview';U.view=d.go;remember();render();window.scrollTo(0,0)}
+  else if(d.tab){U.tab=d.tab;remember();render()}
+  else if(d.new){newItem(d.new,d.client||null,d.date?{date:d.date}:{})}
+  else if(d.edit){const it=S.items.find(i=>i.id===d.edit);if(it)openEditor(it)}
+  else if(d.week){U.weekOff=d.week==='0'?0:U.weekOff+Number(d.week);render()}
+  else if(d.pmode){U.planMode=d.pmode;U.planOff=0;remember();render()}
+  else if(d.poff){U.planOff=d.poff==='0'?0:U.planOff+Number(d.poff);render()}
+  else if(d.filter){U.filter.has(d.filter)?U.filter.delete(d.filter):U.filter.add(d.filter);render()}
+  else if(d.toplan){const it=S.items.find(i=>i.id===d.toplan);if(it)openEditor({...it,kind:'post',status:'todo',date:it.date||todayISO()})}
+  else if(d.saveprof){const v=document.getElementById('prof-'+d.saveprof).value;await write('profiles',d.saveprof,{about:v,at:Date.now()});toast('Сохранено')}
+  else if(d.advise){advise(d.advise)}
+  else if(d.genideas){genIdeas(d.genideas)}
+  else if(d.close!==undefined){closeEditor()}
+  else if(d.del!==undefined){if(!confirmDel){readEditor();confirmDel=true;drawEditor()}else{const id=editing.id;closeEditor();await remove('items',id);toast('Удалено')}}
+  else if(d.copy!==undefined){const txt=document.getElementById('ed-body').value;try{await navigator.clipboard.writeText(txt);toast('Текст скопирован')}catch(err){const ta=document.getElementById('ed-body');ta.focus();ta.select();toast('Выделено, нажмите «Копировать»')}}
+  else if(t.id==='fab'){const k=U.view==='plan'?'post':U.view==='week'||U.view==='inbox'?'idea':TAB_KIND[U.tab]||'task';newItem(k,null)}
+});
+document.addEventListener('change',async e=>{
+  const t=e.target;
+  if(t.dataset.check){const it=S.items.find(i=>i.id===t.dataset.check);if(it){await saveItem({...it,status:t.checked?'done':'todo'})}}
+  if(t.id==='ed-kind'||t.id==='ed-client'){readEditor();drawEditor()}
+});
+document.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const f=e.target;
+  if(f.id==='qc'){
+    const inp=document.getElementById('qc-text');const v=inp.value.trim();if(!v)return;
+    const client=document.getElementById('qc-client').value,kind=document.getElementById('qc-kind').value;
+    inp.value='';inp.dataset.fresh='1';
+    await saveItem({id:newId(),client,kind,title:v,body:'',status:'todo',date:'',createdAt:Date.now()});
+    delete inp.dataset.fresh;toast(client==='inbox'?'Записано во «Входящие»':'Записано: '+byId(client).short);
+  }else if(f.id==='ed'){
+    readEditor();if(!editing.title){document.getElementById('ed-title').focus();return}
+    const it=editing;closeEditor();await saveItem(it);toast('Сохранено');
+  }else if(f.id==='mform'){
+    const cid=f.dataset.client,wk=iso(monday(new Date()));const body={client:cid,week:wk,at:Date.now()};
+    for(const [k] of MF){const v=f.elements[k].value.replace(',','.').replace(/\s/g,'');body[k]=v===''?null:Number(v)}
+    body.note=f.elements.note.value.trim();
+    await write('metrics',cid+'_'+wk,body);toast('Неделя сохранена');
+  }
+});
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeEditor()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&editing)closeEditor()});
+
+render();
+initStore();
+</script>
