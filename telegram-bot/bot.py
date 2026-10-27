@@ -394,15 +394,71 @@ async def post_init(app: Application) -> None:
     ])
 
 
+# ---------- личка Натальи (Telegram для бизнеса) ----------
+
+BUSINESS_KEYWORD = os.environ.get("BUSINESS_KEYWORD", "генетика")
+BUSINESS_REPEAT_WINDOW = 10 * 60
+BUSINESS_TEXT = (
+    "Здравствуйте! Спасибо за интерес к генетике 🙂\n\n"
+    "Всё о системе «ДНК-здоровье» — что показывает тест, как всё проходит и сколько стоит — я собрала в боте. "
+    "Там же можно задать вопрос или оставить заявку, мой ассистент ответит лично."
+)
+business_replied: dict[int, float] = {}
+
+
+def has_business_keyword(text: str | None) -> bool:
+    norm = (text or "").lower().replace("ё", "е")
+    return BUSINESS_KEYWORD.lower().replace("ё", "е")[:-1] in norm  # «генетик» ловит «генетика», «генетику»
+
+
+async def on_business_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Сообщение в личку Натальи. Отвечаем только на кодовое слово и только собеседнику, не самой Наталье."""
+    msg = update.business_message
+    if not msg or not msg.from_user or msg.from_user.id != msg.chat.id:
+        return  # это написала сама Наталья
+    if not has_business_keyword(msg.text or msg.caption):
+        return
+    now = time.time()
+    if now - business_replied.get(msg.chat.id, 0) < BUSINESS_REPEAT_WINDOW:
+        return
+    business_replied[msg.chat.id] = now
+    link = f"https://t.me/{context.bot.username}?start=tg_dm"
+    try:
+        await context.bot.send_message(
+            msg.chat.id,
+            BUSINESS_TEXT,
+            business_connection_id=msg.business_connection_id,
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("👉 Узнать о программе", url=link)]]),
+        )
+    except TelegramError as e:
+        log.error("Не удалось ответить в личке Натальи: %s", e)
+        return
+    name = html.escape(msg.from_user.full_name or "без имени")
+    if msg.from_user.username:
+        name += f" (@{html.escape(msg.from_user.username)})"
+    if ASSISTANT_CHAT_ID:
+        try:
+            await context.bot.send_message(
+                ASSISTANT_CHAT_ID,
+                f"💬 Личка Натальи в Telegram: {name} написал(а) «{BUSINESS_KEYWORD}» — отправила ссылку на бота.",
+                parse_mode=ParseMode.HTML,
+            )
+        except TelegramError as e:
+            log.warning("Не удалось уведомить ассистента: %s", e)
+
+
 def main() -> None:
     app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
     assistant = filters.Chat(ASSISTANT_CHAT_ID) if ASSISTANT_CHAT_ID else filters.Chat(chat_id=[])
 
+    app.add_handler(MessageHandler(filters.UpdateType.BUSINESS_MESSAGE, on_business_message))
     app.add_handler(CommandHandler("chatid", cmd_chatid))
     app.add_handler(CommandHandler("stats", cmd_stats, filters=assistant))
-    app.add_handler(MessageHandler(assistant & filters.REPLY & ~filters.COMMAND, assistant_reply))
+    app.add_handler(MessageHandler(filters.UpdateType.MESSAGE & assistant & filters.REPLY & ~filters.COMMAND,
+                                   assistant_reply))
 
-    private = filters.ChatType.PRIVATE & ~assistant
+    # Только обычные сообщения боту: переписка из лички Натальи сюда попадать не должна.
+    private = filters.UpdateType.MESSAGE & filters.ChatType.PRIVATE & ~assistant
     app.add_handler(CommandHandler("start", cmd_start, filters=private))
     app.add_handler(CommandHandler("menu", command("START"), filters=private))
     app.add_handler(CommandHandler("price", command("PRICE"), filters=private))
