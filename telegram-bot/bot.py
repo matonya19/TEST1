@@ -5,6 +5,7 @@
 """
 
 import html
+import httpx
 import logging
 import os
 import sqlite3
@@ -406,6 +407,57 @@ async def post_init(app: Application) -> None:
     ])
 
 
+# ---------- баланс сервера Serverspace ----------
+
+SERVERSPACE_API_KEY = os.environ.get("SERVERSPACE_API_KEY", "").strip()
+SERVERSPACE_MIN_BALANCE = float(os.environ.get("SERVERSPACE_MIN_BALANCE", "300"))
+SERVERSPACE_HOSTS = ("https://api.serverspace.ru", "https://api.serverspace.io")
+
+
+async def serverspace_balance() -> tuple[float, str]:
+    last_error = ""
+    async with httpx.AsyncClient(timeout=30) as client:
+        for host in SERVERSPACE_HOSTS:
+            try:
+                r = await client.get(f"{host}/api/v1/project", headers={"X-API-KEY": SERVERSPACE_API_KEY})
+            except httpx.HTTPError as e:
+                last_error = str(e)
+                continue
+            if r.status_code == 200:
+                project = r.json().get("project", {})
+                return float(project.get("balance", 0)), project.get("currency", "")
+            last_error = f"{host}: HTTP {r.status_code}"
+    raise RuntimeError(last_error)
+
+
+async def check_server_balance(context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not (SERVERSPACE_API_KEY and ASSISTANT_CHAT_ID):
+        return
+    try:
+        balance, currency = await serverspace_balance()
+    except Exception as e:  # noqa: BLE001
+        log.warning("Не удалось узнать баланс Serverspace: %s", e)
+        return
+    log.info("Баланс Serverspace: %s %s", balance, currency)
+    if balance < SERVERSPACE_MIN_BALANCE:
+        await context.bot.send_message(
+            ASSISTANT_CHAT_ID,
+            f"⚠️ На сервере Serverspace осталось {balance:.0f} {currency}. Пополните баланс, "
+            "иначе сервер отключат и боты перестанут отвечать.",
+        )
+
+
+async def cmd_balance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not SERVERSPACE_API_KEY:
+        await update.message.reply_text("Ключ Serverspace не задан.")
+        return
+    try:
+        balance, currency = await serverspace_balance()
+        await update.message.reply_text(f"Баланс Serverspace: {balance:.2f} {currency}")
+    except Exception as e:  # noqa: BLE001
+        await update.message.reply_text(f"Не удалось узнать баланс: {e}")
+
+
 # ---------- личка Натальи (Telegram для бизнеса) ----------
 
 BUSINESS_KEYWORD = os.environ.get("BUSINESS_KEYWORD", "генетика")
@@ -466,6 +518,7 @@ def main() -> None:
     app.add_handler(MessageHandler(filters.UpdateType.BUSINESS_MESSAGE, on_business_message))
     app.add_handler(CommandHandler("chatid", cmd_chatid))
     app.add_handler(CommandHandler("stats", cmd_stats, filters=assistant))
+    app.add_handler(CommandHandler("balance", cmd_balance, filters=assistant))
     app.add_handler(MessageHandler(filters.UpdateType.MESSAGE & assistant & filters.REPLY & ~filters.COMMAND,
                                    assistant_reply))
 
@@ -481,6 +534,7 @@ def main() -> None:
     app.add_handler(MessageHandler(private & ~filters.TEXT & ~filters.COMMAND, on_media))
 
     app.job_queue.run_repeating(send_followups, interval=600, first=30)
+    app.job_queue.run_repeating(check_server_balance, interval=DAY, first=60)
     log.info("Бот запущен")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
