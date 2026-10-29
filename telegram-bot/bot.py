@@ -228,6 +228,7 @@ async def show(update: Update, context: ContextTypes.DEFAULT_TYPE, screen_id: st
     screen_id = await run_actions(context, user_id, screen_id)
     with db() as conn:
         conn.execute("INSERT INTO events (user_id, screen, ts) VALUES (?, ?, ?)", (user_id, screen_id, time.time()))
+    log.info("update %s от %s → экран %s", update.update_id, user_id, screen_id)
     await send_screen(context, chat_id or update.effective_chat.id, screen_id)
 
 
