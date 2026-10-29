@@ -223,8 +223,17 @@ async def create_lead(context: ContextTypes.DEFAULT_TYPE, user_id: int) -> str:
     return "LEAD_CONFIRM"
 
 
+DUPLICATE_WINDOW = 3  # секунды: повторный запрос того же экрана за это время — двойное нажатие
+last_shown: dict[int, tuple[str, float]] = {}
+
+
 async def show(update: Update, context: ContextTypes.DEFAULT_TYPE, screen_id: str, chat_id: int | None = None) -> None:
     user_id = update.effective_user.id
+    prev_screen, prev_ts = last_shown.get(user_id, ("", 0.0))
+    if prev_screen == screen_id and time.time() - prev_ts < DUPLICATE_WINDOW:
+        log.info("update %s от %s → экран %s пропущен (повтор)", update.update_id, user_id, screen_id)
+        return
+    last_shown[user_id] = (screen_id, time.time())
     screen_id = await run_actions(context, user_id, screen_id)
     with db() as conn:
         conn.execute("INSERT INTO events (user_id, screen, ts) VALUES (?, ?, ?)", (user_id, screen_id, time.time()))
@@ -261,8 +270,10 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Ссылка вида t.me/<бот>?start=instagram сохраняет источник перехода.
     source = context.args[0][:64] if context.args else None
     get_user(update.effective_user, source)
-    menu = ReplyKeyboardMarkup([list(MENU)], resize_keyboard=True, is_persistent=True)
-    await update.message.reply_text("Меню всегда внизу 👇", reply_markup=menu)
+    prev_screen, prev_ts = last_shown.get(update.effective_user.id, ("", 0.0))
+    if not (prev_screen == "START" and time.time() - prev_ts < DUPLICATE_WINDOW):
+        menu = ReplyKeyboardMarkup([list(MENU)], resize_keyboard=True, is_persistent=True)
+        await update.message.reply_text("Меню всегда внизу 👇", reply_markup=menu)
     await show(update, context, "START")
 
 
