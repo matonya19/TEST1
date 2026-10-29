@@ -14,6 +14,7 @@
 import logging
 import os
 import sqlite3
+from contextlib import contextmanager
 import sys
 import time
 from datetime import datetime
@@ -114,7 +115,7 @@ def items(data: dict) -> list:
 
 # ---------- состояние ----------
 
-def db() -> sqlite3.Connection:
+def _connect() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
     conn.executescript(
         """
@@ -125,6 +126,25 @@ def db() -> sqlite3.Connection:
         """
     )
     return conn
+
+
+_schema_ready = False
+
+
+@contextmanager
+def db():
+    """Соединение с базой, которое всегда закрывается: иначе за сутки копятся открытые файлы
+    и SQLite начинает падать с «unable to open database file»."""
+    global _schema_ready
+    conn = _connect() if not _schema_ready else sqlite3.connect(DB_PATH)
+    _schema_ready = True
+    if False:
+        conn.row_factory = sqlite3.Row
+    try:
+        with conn:
+            yield conn
+    finally:
+        conn.close()
 
 
 def started_at() -> float:
@@ -284,10 +304,17 @@ def main() -> None:
         log.warning("Не удалось включить подписку на сообщения: %s", e)
     since = started_at()
     log.info("Автоответчик запущен для @%s, слово «%s», проверка каждые %s с", IG_USERNAME, KEYWORD, POLL_SECONDS)
+    db_failures = 0
     while True:
         for step in (check_comments, check_direct):
             try:
                 step(api, own_id, since)
+                db_failures = 0
+            except sqlite3.Error as e:
+                db_failures += 1
+                log.error("%s: база недоступна (%s), подряд: %s", step.__name__, e, db_failures)
+                if db_failures >= 3:
+                    sys.exit("База недоступна — перезапуск")  # systemd запустит программу заново
             except Exception as e:  # noqa: BLE001 — сбой одной проверки не должен останавливать автоответчик
                 log.error("%s: %s", step.__name__, e)
         time.sleep(POLL_SECONDS)

@@ -9,6 +9,7 @@ import httpx
 import logging
 import os
 import sqlite3
+from contextlib import contextmanager
 import time
 from pathlib import Path
 
@@ -65,7 +66,7 @@ log = logging.getLogger("dna-bot")
 
 # ---------- база данных ----------
 
-def db() -> sqlite3.Connection:
+def _connect() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.executescript(
@@ -84,6 +85,25 @@ def db() -> sqlite3.Connection:
         """
     )
     return conn
+
+
+_schema_ready = False
+
+
+@contextmanager
+def db():
+    """Соединение с базой, которое всегда закрывается: иначе за сутки копятся открытые файлы
+    и SQLite начинает падать с «unable to open database file»."""
+    global _schema_ready
+    conn = _connect() if not _schema_ready else sqlite3.connect(DB_PATH)
+    _schema_ready = True
+    if True:
+        conn.row_factory = sqlite3.Row
+    try:
+        with conn:
+            yield conn
+    finally:
+        conn.close()
 
 
 def get_user(tg_user, source: str | None = None) -> sqlite3.Row:
