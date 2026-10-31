@@ -11,6 +11,8 @@ import os
 import sqlite3
 from contextlib import contextmanager
 import time
+from datetime import time as dtime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -82,6 +84,9 @@ def _connect() -> sqlite3.Connection:
             id INTEGER PRIMARY KEY, user_id INTEGER, screen TEXT, due REAL, done INTEGER DEFAULT 0);
         CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, user_id INTEGER, screen TEXT, ts REAL);
         CREATE TABLE IF NOT EXISTS relay (assistant_msg_id INTEGER PRIMARY KEY, user_id INTEGER);
+        CREATE TABLE IF NOT EXISTS channel_posts (
+            chat_id INTEGER, message_id INTEGER, username TEXT, title TEXT, media_group TEXT, ts REAL,
+            PRIMARY KEY (chat_id, message_id));
         """
     )
     return conn
@@ -478,6 +483,94 @@ async def cmd_balance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         await update.message.reply_text(f"Не удалось узнать баланс: {e}")
 
 
+# ---------- еженедельный дайджест канала ----------
+
+DIGEST_TITLE_LIMIT = 90
+
+
+def post_title(text: str | None) -> str:
+    """Первая непустая строка поста, обрезанная до разумной длины."""
+    for line in (text or "").splitlines():
+        line = line.strip()
+        if line:
+            return line if len(line) <= DIGEST_TITLE_LIMIT else line[: DIGEST_TITLE_LIMIT - 1].rstrip() + "…"
+    return ""
+
+
+def post_link(chat_id: int, username: str | None, message_id: int) -> str:
+    if username:
+        return f"https://t.me/{username}/{message_id}"
+    return f"https://t.me/c/{str(chat_id).removeprefix('-100')}/{message_id}"  # закрытый канал
+
+
+async def on_channel_post(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    post = update.channel_post
+    title = post_title(post.text or post.caption)
+    with db() as conn:
+        if post.media_group_id:
+            # Альбом приходит несколькими сообщениями — в дайджест попадает одно, с подписью.
+            row = conn.execute(
+                "SELECT message_id, title FROM channel_posts WHERE chat_id = ? AND media_group = ?",
+                (post.chat.id, post.media_group_id),
+            ).fetchone()
+            if row:
+                if title and not row["title"]:
+                    conn.execute("UPDATE channel_posts SET title = ? WHERE chat_id = ? AND message_id = ?",
+                                 (title, post.chat.id, row["message_id"]))
+                return
+        conn.execute(
+            "INSERT OR IGNORE INTO channel_posts VALUES (?, ?, ?, ?, ?, ?)",
+            (post.chat.id, post.message_id, post.chat.username, title, post.media_group_id, time.time()),
+        )
+    log.info("Пост в канале %s сохранён для дайджеста", post.chat.id)
+
+
+def build_digest(chat_id: int) -> str | None:
+    with db() as conn:
+        rows = conn.execute(
+            "SELECT message_id, username, title FROM channel_posts WHERE chat_id = ? AND ts > ? ORDER BY ts",
+            (chat_id, time.time() - 7 * DAY),
+        ).fetchall()
+    if not rows:
+        return None
+    lines = ["📌 <b>Что было на канале за неделю</b>", ""]
+    for r in rows:
+        title = html.escape(r["title"] or "Пост с фото или видео")
+        lines.append(f'• <a href="{post_link(chat_id, r["username"], r["message_id"])}">{title}</a>')
+    lines += ["", "Сохраните, чтобы не потерять 💛"]
+    return "\n".join(lines)
+
+
+def digest_channels() -> list[int]:
+    with db() as conn:
+        rows = conn.execute("SELECT DISTINCT chat_id FROM channel_posts WHERE ts > ?", (time.time() - 7 * DAY,))
+        return [r["chat_id"] for r in rows]
+
+
+async def send_weekly_digest(context: ContextTypes.DEFAULT_TYPE) -> None:
+    for chat_id in digest_channels():
+        text = build_digest(chat_id)
+        if not text:
+            continue
+        try:
+            await context.bot.send_message(chat_id, text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+            log.info("Дайджест опубликован в канале %s", chat_id)
+        except TelegramError as e:
+            log.error("Не удалось опубликовать дайджест в канале %s: %s", chat_id, e)
+
+
+async def cmd_digest(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Предпросмотр дайджеста в группе ассистента — в канал ничего не уходит."""
+    channels = digest_channels()
+    if not channels:
+        await update.message.reply_text("За последнюю неделю бот не видел постов в канале. "
+                                        "Проверьте, что он добавлен в канал администратором.")
+        return
+    for chat_id in channels:
+        await update.message.reply_text(build_digest(chat_id), parse_mode=ParseMode.HTML,
+                                        disable_web_page_preview=True)
+
+
 # ---------- личка Натальи (Telegram для бизнеса) ----------
 
 BUSINESS_KEYWORD = os.environ.get("BUSINESS_KEYWORD", "генетика")
@@ -539,6 +632,8 @@ def main() -> None:
     app.add_handler(CommandHandler("chatid", cmd_chatid))
     app.add_handler(CommandHandler("stats", cmd_stats, filters=assistant))
     app.add_handler(CommandHandler("balance", cmd_balance, filters=assistant))
+    app.add_handler(CommandHandler("digest", cmd_digest, filters=assistant))
+    app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POST, on_channel_post))
     app.add_handler(MessageHandler(filters.UpdateType.MESSAGE & assistant & filters.REPLY & ~filters.COMMAND,
                                    assistant_reply))
 
@@ -555,6 +650,8 @@ def main() -> None:
 
     app.job_queue.run_repeating(send_followups, interval=600, first=30)
     app.job_queue.run_repeating(check_server_balance, interval=DAY, first=60)
+    # Воскресенье, 19:00 по Москве (в python-telegram-bot 0 = воскресенье).
+    app.job_queue.run_daily(send_weekly_digest, time=dtime(19, 0, tzinfo=ZoneInfo("Europe/Moscow")), days=(0,))
     log.info("Бот запущен")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
