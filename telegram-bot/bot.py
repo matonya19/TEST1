@@ -624,6 +624,47 @@ async def on_business_message(update: Update, context: ContextTypes.DEFAULT_TYPE
             log.warning("Не удалось уведомить ассистента: %s", e)
 
 
+# ---------- комментарии в канале ----------
+
+COMMENT_TEXT = (
+    "Спасибо за интерес к генетике 🙂 Всё о системе «ДНК-здоровье» — что показывает тест, как всё проходит "
+    "и сколько стоит — в боте. Там же можно задать вопрос или оставить заявку."
+)
+comment_replied: dict[int, float] = {}
+
+
+async def on_group_comment(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Комментарий под постом канала (группа обсуждения). Отвечаем только на кодовое слово."""
+    msg = update.message
+    if not msg.from_user or msg.from_user.is_bot or not has_business_keyword(msg.text or msg.caption):
+        return
+    now = time.time()
+    if now - comment_replied.get(msg.from_user.id, 0) < BUSINESS_REPEAT_WINDOW:
+        return
+    comment_replied[msg.from_user.id] = now
+    link = f"https://t.me/{context.bot.username}?start=tg_comments"
+    try:
+        await msg.reply_text(
+            COMMENT_TEXT,
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("👉 Узнать о программе", url=link)]]),
+        )
+    except TelegramError as e:
+        log.error("Не удалось ответить на комментарий: %s", e)
+        return
+    if ASSISTANT_CHAT_ID:
+        name = html.escape(msg.from_user.full_name or "без имени")
+        if msg.from_user.username:
+            name += f" (@{html.escape(msg.from_user.username)})"
+        try:
+            await context.bot.send_message(
+                ASSISTANT_CHAT_ID,
+                f"💬 Комментарий в канале: {name} написал(а) «{BUSINESS_KEYWORD}» — ответила ссылкой на бота.",
+                parse_mode=ParseMode.HTML,
+            )
+        except TelegramError as e:
+            log.warning("Не удалось уведомить ассистента: %s", e)
+
+
 def main() -> None:
     app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
     assistant = filters.Chat(ASSISTANT_CHAT_ID) if ASSISTANT_CHAT_ID else filters.Chat(chat_id=[])
@@ -634,6 +675,8 @@ def main() -> None:
     app.add_handler(CommandHandler("balance", cmd_balance, filters=assistant))
     app.add_handler(CommandHandler("digest", cmd_digest, filters=assistant))
     app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POST, on_channel_post))
+    app.add_handler(MessageHandler(
+        filters.UpdateType.MESSAGE & filters.ChatType.GROUPS & ~assistant & ~filters.COMMAND, on_group_comment))
     app.add_handler(MessageHandler(filters.UpdateType.MESSAGE & assistant & filters.REPLY & ~filters.COMMAND,
                                    assistant_reply))
 
