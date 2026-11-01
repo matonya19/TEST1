@@ -5,6 +5,8 @@
 """
 
 import html
+from datetime import datetime
+from html.parser import HTMLParser
 import httpx
 import logging
 import os
@@ -571,6 +573,118 @@ async def cmd_digest(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
                                         disable_web_page_preview=True)
 
 
+class ChannelPageParser(HTMLParser):
+    """Разбирает публичную страницу t.me/s/<канал>: номер поста, дата, текст."""
+
+    def __init__(self):
+        super().__init__()
+        self.posts: list[dict] = []
+        self._cur: dict | None = None
+        self._text_depth = 0
+        self._buf: list[str] = []
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        cls = a.get("class") or ""
+        if tag == "div" and "tgme_widget_message " in cls + " " and a.get("data-post"):
+            self._cur = {"id": int(a["data-post"].rsplit("/", 1)[1]), "text": "", "ts": 0.0}
+            self.posts.append(self._cur)
+        elif self._cur is not None and tag == "div" and "tgme_widget_message_text" in cls and not self._cur["text"]:
+            self._text_depth, self._buf = 1, []
+        elif self._text_depth:
+            if tag == "div":
+                self._text_depth += 1
+            if tag == "br":
+                self._buf.append("\n")
+        if self._cur is not None and tag == "time" and a.get("datetime") and not self._cur["ts"]:
+            self._cur["ts"] = datetime.fromisoformat(a["datetime"]).timestamp()
+
+    def handle_endtag(self, tag):
+        if self._text_depth and tag == "div":
+            self._text_depth -= 1
+            if not self._text_depth and self._cur is not None:
+                self._cur["text"] = "".join(self._buf)
+
+    def handle_data(self, data):
+        if self._text_depth:
+            self._buf.append(data)
+
+
+async def fetch_channel_posts(username: str, pages: int) -> list[dict]:
+    posts: dict[int, dict] = {}
+    url = f"https://t.me/s/{username}"
+    async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+        for _ in range(pages):
+            r = await client.get(url)
+            r.raise_for_status()
+            parser = ChannelPageParser()
+            parser.feed(r.text)
+            if not parser.posts:
+                break
+            for p in parser.posts:
+                posts.setdefault(p["id"], p)
+            url = f"https://t.me/s/{username}?before={min(p['id'] for p in parser.posts)}"
+    return sorted(posts.values(), key=lambda p: p["id"])
+
+
+def digest_text(header: str, rows: list[tuple[str, str]]) -> list[str]:
+    """Собирает дайджест и режет на сообщения не длиннее лимита Telegram."""
+    chunks, cur = [], [header, ""]
+    for link, title in rows:
+        line = f'• <a href="{link}">{html.escape(title)}</a>'
+        if len("\n".join(cur + [line])) > 3800:
+            chunks.append("\n".join(cur))
+            cur = []
+        cur.append(line)
+    cur += ["", "Сохраните, чтобы не потерять 💛"]
+    chunks.append("\n".join(cur))
+    return chunks
+
+
+async def cmd_import(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """/import doc_perepelitsa [страниц] — забрать старые посты открытого канала и показать дайджест."""
+    if not context.args:
+        await update.message.reply_text("Напишите так: /import название_канала (например, /import doc_perepelitsa)")
+        return
+    username = context.args[0].lstrip("@").removeprefix("https://t.me/").strip("/")
+    pages = int(context.args[1]) if len(context.args) > 1 and context.args[1].isdigit() else 10
+    await update.message.reply_text("Собираю посты канала, это займёт до минуты…")
+    try:
+        chat = await context.bot.get_chat(f"@{username}")
+        posts = await fetch_channel_posts(username, pages)
+    except Exception as e:  # noqa: BLE001
+        await update.message.reply_text(f"Не получилось собрать посты: {e}")
+        return
+    with db() as conn:
+        for p in posts:
+            conn.execute("INSERT OR IGNORE INTO channel_posts VALUES (?, ?, ?, ?, ?, ?)",
+                         (chat.id, p["id"], username, post_title(p["text"]), None, p["ts"] or time.time()))
+    rows = [(post_link(chat.id, username, p["id"]), post_title(p["text"]) or "Пост с фото или видео")
+            for p in reversed(posts)]
+    if not rows:
+        await update.message.reply_text("На странице канала постов не нашлось. Канал точно открытый?")
+        return
+    context.bot_data["full_digest"] = (chat.id, rows)
+    for chunk in digest_text(f"📚 <b>Все публикации канала</b> ({len(rows)})", rows):
+        await update.message.reply_text(chunk, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+    await update.message.reply_text("Это черновик, в канал ничего не ушло. Чтобы опубликовать — /postall")
+
+
+async def cmd_postall(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    data = context.bot_data.get("full_digest")
+    if not data:
+        await update.message.reply_text("Сначала соберите дайджест командой /import название_канала")
+        return
+    chat_id, rows = data
+    try:
+        for chunk in digest_text(f"📚 <b>Все публикации канала</b>", rows):
+            await context.bot.send_message(chat_id, chunk, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+    except TelegramError as e:
+        await update.message.reply_text(f"Не удалось опубликовать: {e}")
+        return
+    await update.message.reply_text("✅ Опубликовано в канале")
+
+
 # ---------- личка Натальи (Telegram для бизнеса) ----------
 
 BUSINESS_KEYWORD = os.environ.get("BUSINESS_KEYWORD", "генетика")
@@ -674,6 +788,8 @@ def main() -> None:
     app.add_handler(CommandHandler("stats", cmd_stats, filters=assistant))
     app.add_handler(CommandHandler("balance", cmd_balance, filters=assistant))
     app.add_handler(CommandHandler("digest", cmd_digest, filters=assistant))
+    app.add_handler(CommandHandler("import", cmd_import, filters=assistant))
+    app.add_handler(CommandHandler("postall", cmd_postall, filters=assistant))
     app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POST, on_channel_post))
     app.add_handler(MessageHandler(
         filters.UpdateType.MESSAGE & filters.ChatType.GROUPS & ~assistant & ~filters.COMMAND, on_group_comment))
