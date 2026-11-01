@@ -33,6 +33,7 @@ from telegram.ext import (
     CommandHandler,
     ContextTypes,
     MessageHandler,
+    TypeHandler,
     filters,
 )
 
@@ -779,10 +780,22 @@ async def on_group_comment(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             log.warning("Не удалось уведомить ассистента: %s", e)
 
 
+async def log_incoming(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Запись о каждом входящем событии — чтобы было видно, что бот получает (без текста клиентов)."""
+    chat = update.effective_chat
+    msg = update.effective_message
+    kind = next((k for k in ("message", "business_message", "channel_post", "callback_query", "edited_message",
+                             "my_chat_member", "chat_member") if getattr(update, k, None)), "other")
+    is_cmd = bool(msg and msg.text and msg.text.startswith("/"))
+    log.info("входящее %s: %s, чат %s (%s)%s", update.update_id, kind, chat.id if chat else "-",
+             chat.type if chat else "-", f", команда {msg.text.split()[0]}" if is_cmd else "")
+
+
 def main() -> None:
     app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
     assistant = filters.Chat(ASSISTANT_CHAT_ID) if ASSISTANT_CHAT_ID else filters.Chat(chat_id=[])
 
+    app.add_handler(TypeHandler(Update, log_incoming), group=-1)
     app.add_handler(MessageHandler(filters.UpdateType.BUSINESS_MESSAGE, on_business_message))
     app.add_handler(CommandHandler("chatid", cmd_chatid))
     app.add_handler(CommandHandler("stats", cmd_stats, filters=assistant))
