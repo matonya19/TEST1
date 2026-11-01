@@ -376,7 +376,14 @@ async def assistant_reply(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 
 async def cmd_chatid(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(f"ID этого чата: {update.effective_chat.id}")
+    log.info("/chatid в чате %s — отвечаю", update.effective_chat.id)
+    msg = await context.bot.send_message(update.effective_chat.id, f"ID этого чата: {update.effective_chat.id}")
+    log.info("/chatid: ответ отправлен, сообщение %s", msg.message_id)
+
+
+async def on_error(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    log.error("Ошибка при обработке %s: %r", getattr(update, "update_id", "-"), context.error,
+              exc_info=context.error)
 
 
 async def cmd_stats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -795,6 +802,7 @@ def main() -> None:
     app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
     assistant = filters.Chat(ASSISTANT_CHAT_ID) if ASSISTANT_CHAT_ID else filters.Chat(chat_id=[])
 
+    app.add_error_handler(on_error)
     app.add_handler(TypeHandler(Update, log_incoming), group=-1)
     app.add_handler(MessageHandler(filters.UpdateType.BUSINESS_MESSAGE, on_business_message))
     app.add_handler(CommandHandler("chatid", cmd_chatid))
