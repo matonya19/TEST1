@@ -92,6 +92,10 @@ def _connect() -> sqlite3.Connection:
             PRIMARY KEY (chat_id, message_id));
         """
     )
+    try:
+        conn.execute("ALTER TABLE channel_posts ADD COLUMN excerpt TEXT")
+    except sqlite3.OperationalError:
+        pass  # колонка уже есть
     return conn
 
 
@@ -507,6 +511,43 @@ def post_title(text: str | None) -> str:
     return ""
 
 
+DIGEST_EXCERPT_LIMIT = 220
+DIGEST_INTRO = "Привет! 👋 Собрала для вас всё самое полезное за неделю — если что-то пропустили, самое время прочитать 👇"
+
+
+FULL_INTRO = "Собрала в одном месте все полезные публикации канала — сохраняйте и возвращайтесь 👇"
+
+
+def post_excerpt(text: str | None) -> str:
+    """2–3 предложения после первой строки — коротко, о чём пост."""
+    lines = [l.strip() for l in (text or "").splitlines() if l.strip()]
+    body = " ".join(lines[1:])
+    if not body:
+        return ""
+    if len(body) <= DIGEST_EXCERPT_LIMIT:
+        return body
+    cut = body[:DIGEST_EXCERPT_LIMIT]
+    end = max(cut.rfind(". "), cut.rfind("! "), cut.rfind("? "))
+    return cut[: end + 1] if end > 80 else cut.rsplit(" ", 1)[0].rstrip(",;:—-") + "…"
+
+
+def digest_chunks(header: str, rows: list[tuple[str, str, str]], intro: str = DIGEST_INTRO) -> list[str]:
+    """Дайджест: заголовок, вступление, по каждому посту — ссылка и пара предложений. Режется под лимит Telegram."""
+    chunks, cur = [], [header, "", intro, ""]
+    for link, title, excerpt in rows:
+        block = f'🔹 <b><a href="{link}">{html.escape(title)}</a></b>'
+        if excerpt:
+            block += "\n" + html.escape(excerpt)
+        block += "\n"
+        if len("\n".join(cur + [block])) > 3800:
+            chunks.append("\n".join(cur).rstrip())
+            cur = []
+        cur.append(block)
+    cur.append("Сохраните, чтобы не потерять 💛")
+    chunks.append("\n".join(cur))
+    return chunks
+
+
 def post_link(chat_id: int, username: str | None, message_id: int) -> str:
     if username:
         return f"https://t.me/{username}/{message_id}"
@@ -525,30 +566,31 @@ async def on_channel_post(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             ).fetchone()
             if row:
                 if title and not row["title"]:
-                    conn.execute("UPDATE channel_posts SET title = ? WHERE chat_id = ? AND message_id = ?",
-                                 (title, post.chat.id, row["message_id"]))
+                    conn.execute("UPDATE channel_posts SET title = ?, excerpt = ? WHERE chat_id = ? AND message_id = ?",
+                                 (title, post_excerpt(post.text or post.caption), post.chat.id, row["message_id"]))
                 return
         conn.execute(
-            "INSERT OR IGNORE INTO channel_posts VALUES (?, ?, ?, ?, ?, ?)",
-            (post.chat.id, post.message_id, post.chat.username, title, post.media_group_id, time.time()),
+            "INSERT OR IGNORE INTO channel_posts (chat_id, message_id, username, title, media_group, ts, excerpt)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (post.chat.id, post.message_id, post.chat.username, title, post.media_group_id, time.time(),
+             post_excerpt(post.text or post.caption)),
         )
     log.info("Пост в канале %s сохранён для дайджеста", post.chat.id)
 
 
-def build_digest(chat_id: int) -> str | None:
+def build_digest(chat_id: int) -> list[str] | None:
+    """Дайджест за 7 дней. Посты без текста (только фото или видео) не попадают."""
     with db() as conn:
         rows = conn.execute(
-            "SELECT message_id, username, title FROM channel_posts WHERE chat_id = ? AND ts > ? ORDER BY ts",
+            "SELECT message_id, username, title, excerpt FROM channel_posts "
+            "WHERE chat_id = ? AND ts > ? AND title != '' ORDER BY ts",
             (chat_id, time.time() - 7 * DAY),
         ).fetchall()
     if not rows:
         return None
-    lines = ["📌 <b>Что было на канале за неделю</b>", ""]
-    for r in rows:
-        title = html.escape(r["title"] or "Пост с фото или видео")
-        lines.append(f'• <a href="{post_link(chat_id, r["username"], r["message_id"])}">{title}</a>')
-    lines += ["", "Сохраните, чтобы не потерять 💛"]
-    return "\n".join(lines)
+    return digest_chunks("📌 <b>Дайджест недели</b>",
+                         [(post_link(chat_id, r["username"], r["message_id"]), r["title"], r["excerpt"] or "")
+                          for r in rows])
 
 
 def digest_channels() -> list[int]:
@@ -559,11 +601,12 @@ def digest_channels() -> list[int]:
 
 async def send_weekly_digest(context: ContextTypes.DEFAULT_TYPE) -> None:
     for chat_id in digest_channels():
-        text = build_digest(chat_id)
-        if not text:
+        chunks = build_digest(chat_id)
+        if not chunks:
             continue
         try:
-            await context.bot.send_message(chat_id, text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+            for text in chunks:
+                await context.bot.send_message(chat_id, text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
             log.info("Дайджест опубликован в канале %s", chat_id)
         except TelegramError as e:
             log.error("Не удалось опубликовать дайджест в канале %s: %s", chat_id, e)
@@ -577,8 +620,13 @@ async def cmd_digest(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
                                         "Проверьте, что он добавлен в канал администратором.")
         return
     for chat_id in channels:
-        await update.message.reply_text(build_digest(chat_id), parse_mode=ParseMode.HTML,
-                                        disable_web_page_preview=True)
+        chunks = build_digest(chat_id)
+        if not chunks:
+            await update.message.reply_text("За неделю в канале не было постов с текстом.")
+            continue
+        for text in chunks:
+            await update.message.reply_text(text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+        await update.message.reply_text("Это черновик, в канал ничего не ушло. В воскресенье в 19:00 он выйдет сам.")
 
 
 class ChannelPageParser(HTMLParser):
@@ -635,20 +683,6 @@ async def fetch_channel_posts(username: str, pages: int) -> list[dict]:
     return sorted(posts.values(), key=lambda p: p["id"])
 
 
-def digest_text(header: str, rows: list[tuple[str, str]]) -> list[str]:
-    """Собирает дайджест и режет на сообщения не длиннее лимита Telegram."""
-    chunks, cur = [], [header, ""]
-    for link, title in rows:
-        line = f'• <a href="{link}">{html.escape(title)}</a>'
-        if len("\n".join(cur + [line])) > 3800:
-            chunks.append("\n".join(cur))
-            cur = []
-        cur.append(line)
-    cur += ["", "Сохраните, чтобы не потерять 💛"]
-    chunks.append("\n".join(cur))
-    return chunks
-
-
 async def cmd_import(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """/import doc_perepelitsa [страниц] — забрать старые посты открытого канала и показать дайджест."""
     if not context.args:
@@ -665,15 +699,19 @@ async def cmd_import(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         return
     with db() as conn:
         for p in posts:
-            conn.execute("INSERT OR IGNORE INTO channel_posts VALUES (?, ?, ?, ?, ?, ?)",
-                         (chat.id, p["id"], username, post_title(p["text"]), None, p["ts"] or time.time()))
-    rows = [(post_link(chat.id, username, p["id"]), post_title(p["text"]) or "Пост с фото или видео")
-            for p in reversed(posts)]
+            conn.execute(
+                "INSERT INTO channel_posts (chat_id, message_id, username, title, media_group, ts, excerpt)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(chat_id, message_id) DO UPDATE SET "
+                "title = excluded.title, excerpt = excluded.excerpt",
+                (chat.id, p["id"], username, post_title(p["text"]), None, p["ts"] or time.time(),
+                 post_excerpt(p["text"])))
+    rows = [(post_link(chat.id, username, p["id"]), post_title(p["text"]), post_excerpt(p["text"]))
+            for p in reversed(posts) if post_title(p["text"])]
     if not rows:
         await update.message.reply_text("На странице канала постов не нашлось. Канал точно открытый?")
         return
     context.bot_data["full_digest"] = (chat.id, rows)
-    for chunk in digest_text(f"📚 <b>Все публикации канала</b> ({len(rows)})", rows):
+    for chunk in digest_chunks(f"📚 <b>Все публикации канала</b> ({len(rows)})", rows, FULL_INTRO):
         await update.message.reply_text(chunk, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
     await update.message.reply_text("Это черновик, в канал ничего не ушло. Чтобы опубликовать — /postall")
 
@@ -685,7 +723,7 @@ async def cmd_postall(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         return
     chat_id, rows = data
     try:
-        for chunk in digest_text(f"📚 <b>Все публикации канала</b>", rows):
+        for chunk in digest_chunks("📚 <b>Все публикации канала</b>", rows, FULL_INTRO):
             await context.bot.send_message(chat_id, chunk, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
     except TelegramError as e:
         await update.message.reply_text(f"Не удалось опубликовать: {e}")
