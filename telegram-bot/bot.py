@@ -33,6 +33,7 @@ from telegram.ext import (
     CommandHandler,
     ContextTypes,
     MessageHandler,
+    MessageReactionHandler,
     TypeHandler,
     filters,
 )
@@ -92,10 +93,11 @@ def _connect() -> sqlite3.Connection:
             PRIMARY KEY (chat_id, message_id));
         """
     )
-    try:
-        conn.execute("ALTER TABLE channel_posts ADD COLUMN excerpt TEXT")
-    except sqlite3.OperationalError:
-        pass  # колонка уже есть
+    for column in ("excerpt TEXT", "reactions INTEGER DEFAULT 0", "views INTEGER DEFAULT 0"):
+        try:
+            conn.execute(f"ALTER TABLE channel_posts ADD COLUMN {column}")
+        except sqlite3.OperationalError:
+            pass  # колонка уже есть
     return conn
 
 
@@ -512,7 +514,8 @@ def post_title(text: str | None) -> str:
 
 
 DIGEST_EXCERPT_LIMIT = 220
-DIGEST_INTRO = "Привет! 👋 Собрала для вас всё самое полезное за неделю — если что-то пропустили, самое время прочитать 👇"
+DIGEST_INTRO = ("Привет! 👋 Собрала посты, которые откликнулись вам больше всего за последние две недели. "
+                "Если что-то пропустили — самое время прочитать 👇")
 
 
 FULL_INTRO = "Собрала в одном месте все полезные публикации канала — сохраняйте и возвращайтесь 👇"
@@ -578,29 +581,63 @@ async def on_channel_post(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     log.info("Пост в канале %s сохранён для дайджеста", post.chat.id)
 
 
+DIGEST_DAYS = 15   # дайджест выходит 1-го и 15-го: берём посты примерно за две недели
+DIGEST_TOP = 5     # сколько самых популярных постов показывать
+
+
+async def on_reaction_count(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Telegram присылает боту-админу канала обновлённое число реакций под постом."""
+    r = update.message_reaction_count
+    total = sum(x.total_count for x in r.reactions)
+    with db() as conn:
+        conn.execute("UPDATE channel_posts SET reactions = ? WHERE chat_id = ? AND message_id = ?",
+                     (total, r.chat.id, r.message_id))
+
+
+async def refresh_views(chat_id: int) -> None:
+    """Просмотры берём с открытой страницы канала (через Bot API их не узнать)."""
+    with db() as conn:
+        row = conn.execute("SELECT username FROM channel_posts WHERE chat_id = ? AND username IS NOT NULL LIMIT 1",
+                           (chat_id,)).fetchone()
+    if not row:
+        return
+    try:
+        posts = await fetch_channel_posts(row["username"], 3)
+    except Exception as e:  # noqa: BLE001
+        log.warning("Не удалось обновить просмотры: %s", e)
+        return
+    with db() as conn:
+        conn.executemany("UPDATE channel_posts SET views = ? WHERE chat_id = ? AND message_id = ?",
+                         [(p["views"], chat_id, p["id"]) for p in posts if p.get("views")])
+
+
 def build_digest(chat_id: int) -> list[str] | None:
-    """Дайджест за 7 дней. Посты без текста (только фото или видео) не попадают."""
+    """Самые популярные посты за две недели: больше реакций, при равенстве — больше просмотров.
+    Посты без текста (только фото или видео) не попадают."""
     with db() as conn:
         rows = conn.execute(
             "SELECT message_id, username, title, excerpt FROM channel_posts "
-            "WHERE chat_id = ? AND ts > ? AND title != '' ORDER BY ts",
-            (chat_id, time.time() - 7 * DAY),
+            "WHERE chat_id = ? AND ts > ? AND title != '' "
+            "ORDER BY COALESCE(reactions, 0) DESC, COALESCE(views, 0) DESC LIMIT ?",
+            (chat_id, time.time() - DIGEST_DAYS * DAY, DIGEST_TOP),
         ).fetchall()
     if not rows:
         return None
-    return digest_chunks("📌 <b>Дайджест недели</b>",
+    return digest_chunks("📌 <b>Самое популярное за две недели</b>",
                          [(post_link(chat_id, r["username"], r["message_id"]), r["title"], r["excerpt"] or "")
                           for r in rows])
 
 
 def digest_channels() -> list[int]:
     with db() as conn:
-        rows = conn.execute("SELECT DISTINCT chat_id FROM channel_posts WHERE ts > ?", (time.time() - 7 * DAY,))
+        rows = conn.execute("SELECT DISTINCT chat_id FROM channel_posts WHERE ts > ?",
+                            (time.time() - DIGEST_DAYS * DAY,))
         return [r["chat_id"] for r in rows]
 
 
 async def send_weekly_digest(context: ContextTypes.DEFAULT_TYPE) -> None:
     for chat_id in digest_channels():
+        await refresh_views(chat_id)
         chunks = build_digest(chat_id)
         if not chunks:
             continue
@@ -620,13 +657,14 @@ async def cmd_digest(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
                                         "Проверьте, что он добавлен в канал администратором.")
         return
     for chat_id in channels:
+        await refresh_views(chat_id)
         chunks = build_digest(chat_id)
         if not chunks:
-            await update.message.reply_text("За неделю в канале не было постов с текстом.")
+            await update.message.reply_text("За две недели в канале не было постов с текстом.")
             continue
         for text in chunks:
             await update.message.reply_text(text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
-        await update.message.reply_text("Это черновик, в канал ничего не ушло. В воскресенье в 19:00 он выйдет сам.")
+        await update.message.reply_text("Это черновик, в канал ничего не ушло. Дайджест выходит сам 1-го и 15-го числа в 19:00 по Москве.")
 
 
 class ChannelPageParser(HTMLParser):
@@ -638,12 +676,13 @@ class ChannelPageParser(HTMLParser):
         self._cur: dict | None = None
         self._text_depth = 0
         self._buf: list[str] = []
+        self._in_views = False
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
         cls = a.get("class") or ""
         if tag == "div" and "tgme_widget_message " in cls + " " and a.get("data-post"):
-            self._cur = {"id": int(a["data-post"].rsplit("/", 1)[1]), "text": "", "ts": 0.0}
+            self._cur = {"id": int(a["data-post"].rsplit("/", 1)[1]), "text": "", "ts": 0.0, "views": 0}
             self.posts.append(self._cur)
         elif self._cur is not None and tag == "div" and "tgme_widget_message_text" in cls and not self._cur["text"]:
             self._text_depth, self._buf = 1, []
@@ -652,10 +691,14 @@ class ChannelPageParser(HTMLParser):
                 self._text_depth += 1
             if tag == "br":
                 self._buf.append("\n")
+        if self._cur is not None and tag == "span" and "tgme_widget_message_views" in cls:
+            self._in_views = True
         if self._cur is not None and tag == "time" and a.get("datetime") and not self._cur["ts"]:
             self._cur["ts"] = datetime.fromisoformat(a["datetime"]).timestamp()
 
     def handle_endtag(self, tag):
+        if self._in_views and tag == "span":
+            self._in_views = False
         if self._text_depth and tag == "div":
             self._text_depth -= 1
             if not self._text_depth and self._cur is not None:
@@ -664,6 +707,18 @@ class ChannelPageParser(HTMLParser):
     def handle_data(self, data):
         if self._text_depth:
             self._buf.append(data)
+        if self._in_views and self._cur is not None and data.strip():
+            self._cur["views"] = parse_count(data.strip())
+
+
+def parse_count(text: str) -> int:
+    """«1.2K» → 1200, «3M» → 3000000, «845» → 845."""
+    text = text.replace(",", ".").upper()
+    mult = 1000 if text.endswith("K") else 1_000_000 if text.endswith("M") else 1
+    try:
+        return int(float(text.rstrip("KM")) * mult)
+    except ValueError:
+        return 0
 
 
 async def fetch_channel_posts(username: str, pages: int) -> list[dict]:
@@ -700,11 +755,11 @@ async def cmd_import(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     with db() as conn:
         for p in posts:
             conn.execute(
-                "INSERT INTO channel_posts (chat_id, message_id, username, title, media_group, ts, excerpt)"
-                " VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(chat_id, message_id) DO UPDATE SET "
-                "title = excluded.title, excerpt = excluded.excerpt",
+                "INSERT INTO channel_posts (chat_id, message_id, username, title, media_group, ts, excerpt, views)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(chat_id, message_id) DO UPDATE SET "
+                "title = excluded.title, excerpt = excluded.excerpt, views = excluded.views",
                 (chat.id, p["id"], username, post_title(p["text"]), None, p["ts"] or time.time(),
-                 post_excerpt(p["text"])))
+                 post_excerpt(p["text"]), p.get("views", 0)))
     rows = [(post_link(chat.id, username, p["id"]), post_title(p["text"]), post_excerpt(p["text"]))
             for p in reversed(posts) if post_title(p["text"])]
     if not rows:
@@ -850,6 +905,8 @@ def main() -> None:
     app.add_handler(CommandHandler("import", cmd_import, filters=assistant))
     app.add_handler(CommandHandler("postall", cmd_postall, filters=assistant))
     app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POST, on_channel_post))
+    app.add_handler(MessageReactionHandler(on_reaction_count,
+                                           message_reaction_types=MessageReactionHandler.MESSAGE_REACTION_COUNT_UPDATED))
     app.add_handler(MessageHandler(
         filters.UpdateType.MESSAGE & filters.ChatType.GROUPS & ~assistant & ~filters.COMMAND, on_group_comment))
     app.add_handler(MessageHandler(filters.UpdateType.MESSAGE & assistant & filters.REPLY & ~filters.COMMAND,
@@ -868,8 +925,10 @@ def main() -> None:
 
     app.job_queue.run_repeating(send_followups, interval=600, first=30)
     app.job_queue.run_repeating(check_server_balance, interval=DAY, first=60)
-    # Воскресенье, 19:00 по Москве (в python-telegram-bot 0 = воскресенье).
-    app.job_queue.run_daily(send_weekly_digest, time=dtime(19, 0, tzinfo=ZoneInfo("Europe/Moscow")), days=(0,))
+    # Дайджест 1-го и 15-го числа в 19:00 по Москве.
+    for day in (1, 15):
+        app.job_queue.run_monthly(send_weekly_digest, when=dtime(19, 0, tzinfo=ZoneInfo("Europe/Moscow")), day=day,
+                                  name=f"digest_{day}")
     log.info("Бот запущен")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
