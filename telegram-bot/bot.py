@@ -50,8 +50,8 @@ DB_PATH = Path(__file__).parent / "bot.db"
 MEDIA_DIR = Path(__file__).parent / "media"
 DAY = 24 * 3600
 
-LEAD_TYPES = {"LEAD": "program", "LEAD_CHILD": "child", "LEAD_OWN": "existing_test"}
-LEAD_TYPE_NAMES = {"program": "программа", "child": "ребёнок", "existing_test": "уже есть тест"}
+LEAD_TYPES = {"LEAD": "program", "LEAD_TALK": "talk", "LEAD_CHILD": "child", "LEAD_OWN": "existing_test"}
+LEAD_TYPE_NAMES = {"program": "программа", "talk": "сначала коротко поговорить", "child": "ребёнок", "existing_test": "уже есть тест"}
 TOPIC_NAMES = {
     "energy": "энергия, туман в голове",
     "weight": "вес и питание",
@@ -61,6 +61,10 @@ TOPIC_NAMES = {
     "child": "ребёнок",
     "other": "другая тема",
     "edema": "отёки",
+    "m_belly": "мужчина: живот",
+    "m_energy": "мужчина: нет сил",
+    "m_pressure": "мужчина: давление и сахар",
+    "m_sport": "мужчина: тренировки",
     "sport": "тренировки",
     "existing_test": "уже есть тест",
 }
