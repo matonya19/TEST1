@@ -1347,7 +1347,8 @@ const NAT_DEFAULT=()=>[
   {type:'text',kick:'моя позиция',h:'Заголовок-вопрос? **Да.**',t:'Короткий абзац: 1–3 строки.\n• пункт • пункт • пункт • пункт\nИ только потом — **главный вывод.**\n> **НАПОМНЮ:** врезка в рамке для важной мысли.'},
   {type:'tabs',tabs:'Тема 1, Тема 2, Тема 3, Пример',h:'Пример',sub:'короткое пояснение',t:'Абзац о теме. **Ключевая мысль** золотом.\n> **НО:** оговорка или предостережение.',closer:'Финальная фраза.'},
   {type:'bgphoto',h:'Я за новые возможности. **Я за пептиды.**',t:'Но ещё больше — за **индивидуальный подход.** То, что подходит одному, совсем не обязательно нужно другому.',btn:'Запись на консультацию',btnsub:'ссылка в шапке профиля',small:'Не является рекомендацией к применению. Есть противопоказания, нужна консультация специалиста.'}];
-const photoCtl=(s,i,label)=>assets?`<label class="btn sm" for="cs-ph-${i}">${s.photo?'Сменить '+(label||'фото'):'+ '+(label?label[0].toUpperCase()+label.slice(1):'Фото')}</label><input type="file" accept="image/jpeg,image/png,image/webp" id="cs-ph-${i}" data-csph="${i}" hidden>${s.photo?`<button class="btn sm ghost" type="button" data-cs="nophoto" data-i="${i}">Убрать</button>`:''}`:'';
+const photoCtl=(s,i,label,key='photo')=>{if(!assets)return '';const id=`cs-${key==='photo'?'ph':key}-${i}`,has=s[key],L=label||'фото';
+  return `<label class="btn sm" for="${id}">${has?'Сменить '+L:'+ '+L[0].toUpperCase()+L.slice(1)}</label><input type="file" accept="image/jpeg,image/png,image/webp" id="${id}" data-csph="${i}" data-key="${key}" hidden>${has?`<button class="btn sm ghost" type="button" data-cs="nophoto" data-i="${i}" data-key="${key}">Убрать</button>`:''}`};
 function natFields(s,i){
   const type=natType(s,i),fy=s.fy==null||s.fy===''?.35:+s.fy;
   const opt=(arr,v)=>arr.map(([k,l])=>`<option value="${k}" ${String(v)===String(k)?'selected':''}>${l}</option>`).join('');
@@ -1365,6 +1366,123 @@ function natFields(s,i){
     ${body?ta('t','Текст: абзацы с новой строки. «> текст» — врезка, «>> текст» — тёмная врезка, «• а • б» — чипы',5)+inp('closer','Финальная фраза золотом (необязательно)'):''}
     ${body?`<details class="st-more" ${s.btn||s.small?'open':''}><summary>Кнопка и дисклеймер</summary>${inp('btn','Кнопка: «Запись на консультацию»')}${inp('btnsub','Подпись в кнопке: «ссылка в шапке профиля»')}${ta('small','Дисклеймер мелким шрифтом',2)}</details>`:''}`;
 }
+/* ----- Room & Bloom listing carousels: 1080x1440, beige / cream / graphite, sand accent ----- */
+const RB={W:1080,H:1440,beige:'#E8DFD3',cream:'#F4EFE8',dark:'#222222',sand:'#D6C3A8',ink:'#222222',muted:'#7A6F66',light:'#CFCFCF',ph:'#D9D0C4'};
+const rfont=(ctx,w,s,it)=>{ctx.font=`${it?'italic ':''}${w} ${s}px Montserrat, system-ui, sans-serif`};
+const rbType=(s,i)=>s.type||(i===0?'cover':'dark');
+function rbKick(ctx,t,x,y,color,align='left'){if(!t)return 0;rfont(ctx,700,24);ctx.fillStyle=color;drawSpaced(ctx,String(t).toUpperCase(),x,y,5,align);return 34}
+/* title: plain = bold, _x_ = light italic, *x* = accent (sand text on dark, sand band behind on light) */
+function rbTitle(ctx,text,x,y,maxW,sizes,maxL,{dark=false,align='left',color}={}){
+  const f=sz=>(c,m)=>m==='o'?rfont(c,300,sz,true):rfont(c,700,sz);
+  let sz=sizes[sizes.length-1],L;for(const s of sizes){L=richLayout(ctx,text,maxW,f(s));if(L.length<=maxL){sz=s;break}}
+  const lh=Math.round(sz*1.12),base=color||(dark?'#FFFFFF':RB.ink);
+  L.forEach((line,li)=>{
+    const yy=y+li*lh;let cx=align==='center'?x-lineW(line)/2:x;
+    if(!dark){let seg=null;const segs=[];let px=cx;for(const tk of line){if(tk.m==='a'&&!tk.sp){if(!seg)seg={a:px};seg.b=px+tk.w}else if(!(tk.sp&&seg&&tk.m==='a')){if(seg){segs.push(seg);seg=null}}px+=tk.w}if(seg)segs.push(seg);
+      ctx.fillStyle=RB.sand;for(const g of segs)ctx.fillRect(g.a-6,yy+sz*.58,g.b-g.a+12,sz*.5)}
+    for(const tk of line){if(!tk.sp){f(sz)(ctx,tk.m);ctx.fillStyle=tk.m==='a'&&dark?RB.sand:base;ctx.fillText(tk.t,cx,yy)}cx+=tk.w}
+  });
+  return {h:L.length*lh,over:L.length>maxL};
+}
+function rbPara(ctx,text,x,y,maxW,size,lh,color,align='left',max=99){
+  const f=(c,m)=>rfont(c,m?600:300,size);const L=richLayout(ctx,text,maxW,f).slice(0,max);
+  richDraw(ctx,L,x,y,lh,size,f,()=>color,()=>null,align);return L.length*lh;
+}
+function rbPhoto(ctx,img,x,y,w,h,pos,clip){
+  ctx.save();if(clip)clip();else{ctx.beginPath();ctx.rect(x,y,w,h)}ctx.clip();
+  if(img)photoIn(ctx,img,x,y,w,h,{pos});else{ctx.fillStyle=RB.ph;ctx.fillRect(x,y,w,h);rfont(ctx,500,26);ctx.fillStyle='rgba(34,34,34,.35)';drawSpaced(ctx,'фото',x+w/2,y+h/2-14,2,'center')}
+  ctx.restore();
+}
+function rbLogo(ctx,cx,y,color){
+  ctx.save();ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=10;
+  icon(ctx,'roombloom',cx-50,y,100,color,1.3);
+  rfont(ctx,400,30);ctx.fillStyle=color;drawSpaced(ctx,'ROOM & BLOOM',cx,y+112,4,'center');
+  rfont(ctx,500,13);drawSpaced(ctx,'RENT&SALE',cx,y+152,4,'center');ctx.restore();
+}
+function rbSlide(ctx,s,i){
+  const {W,H}=RB,type=rbType(s,i),fy=s.fy==null||s.fy===''?.45:+s.fy,pos=`50% ${Math.round(fy*100)}%`;
+  const img=IMG[s.photo]||null,img2=IMG[s.photo2]||null;let over=false;
+  ctx.textBaseline='top';
+  if(type==='cover'){
+    const ph=820;rbPhoto(ctx,img,0,0,W,ph,pos);
+    if(s.tag){rfont(ctx,700,24);const t=String(s.tag).toUpperCase(),tw=spacedW(ctx,t,4);ctx.fillStyle=RB.cream;ctx.fillRect(64,64,tw+48,60);ctx.fillStyle=RB.ink;drawSpaced(ctx,t,88,81,4)}
+    if(s.logo!==false)rbLogo(ctx,W-180,56,'#FFFFFF');
+    ctx.fillStyle=RB.beige;ctx.fillRect(0,ph,W,H-ph);
+    let y=ph+62;y+=rbKick(ctx,s.kick,72,y,RB.muted)+26;
+    const stats=String(s.stats||'').split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a[0]).slice(0,4);
+    const limit=stats.length?1200:H-80,r=rbTitle(ctx,s.h,72,y,936,[84,78,72,66,60],3);over=r.over||y+r.h>limit;
+    if(stats.length){ctx.fillStyle=RB.ink;ctx.fillRect(72,1225,936,2);
+      stats.forEach(([v,l],k)=>{const x=72+k*234;rfont(ctx,700,58);ctx.fillStyle=RB.ink;ctx.fillText(v,x,1256);rfont(ctx,300,24);ctx.fillStyle=RB.muted;ctx.fillText(l||'',x,1330)})}
+  }else if(type==='arch'){
+    ctx.fillStyle=RB.cream;ctx.fillRect(0,0,W,H);
+    const ax=190,ay=130,aw=700,ah=900,r=aw/2;
+    rbPhoto(ctx,img,ax,ay,aw,ah,pos,()=>{ctx.beginPath();ctx.moveTo(ax,ay+r);ctx.arc(ax+r,ay+r,r,Math.PI,0);ctx.lineTo(ax+aw,ay+ah);ctx.lineTo(ax,ay+ah);ctx.closePath()});
+    const t=rbTitle(ctx,s.h,W/2,1088,940,[76,70,64,58],2,{align:'center'});over=t.over;
+    if(s.t)rbPara(ctx,s.t,W/2,1088+t.h+26,920,32,44,'#6E655D','center',3);
+  }else if(type==='dark'){
+    ctx.fillStyle=RB.dark;ctx.fillRect(0,0,W,H);
+    let y=92;y+=rbKick(ctx,s.kick,72,y,RB.sand)+26;
+    const t=rbTitle(ctx,s.h,72,y,936,[78,72,66,60],2,{dark:true});over=t.over;
+    const top=Math.max(430,y+t.h+60);
+    if(img2){const bh=1368-16-362-top;rbPhoto(ctx,img,72,top,936,Math.max(360,bh),pos);const sy=top+Math.max(360,bh)+16;rbPhoto(ctx,img2,72,sy,560,1368-sy,`50% ${Math.round((s.fy2??.5)*100)}%`);
+      if(s.t)rbPara(ctx,s.t,666,sy+28,342,34,48,RB.light,'left',7);}
+    else{const bh=s.t?700:938;rbPhoto(ctx,img,72,top,936,bh,pos);if(s.t)rbPara(ctx,s.t,72,top+bh+36,936,34,48,RB.light,'left',4)}
+  }else if(type==='inset'){
+    rbPhoto(ctx,img,0,0,W,H,pos);
+    const g=ctx.createLinearGradient(0,H*.5,0,H);g.addColorStop(0,'rgba(20,18,16,0)');g.addColorStop(1,'rgba(20,18,16,.82)');ctx.fillStyle=g;ctx.fillRect(0,H*.5,W,H*.5);
+    if(s.ckick||s.ctext||s.photo2){
+      const cx=604,cy=72,cw=420;let ch=img2||s.photo2?440:40;rfont(ctx,300,30);const tl=s.ctext?wrap(ctx,s.ctext,cw-36).slice(0,4):[];
+      ch+=(s.ckick?44:0)+tl.length*42+30;
+      ctx.save();ctx.shadowColor='rgba(0,0,0,.25)';ctx.shadowBlur=30;ctx.fillStyle=RB.cream;ctx.fillRect(cx,cy,cw,ch);ctx.restore();
+      let yy=cy+18;if(img2||s.photo2){rbPhoto(ctx,img2,cx+18,cy+18,cw-36,420,`50% ${Math.round((s.fy2??.5)*100)}%`);yy=cy+460}else yy=cy+36;
+      if(s.ckick){rfont(ctx,700,22);ctx.fillStyle=RB.muted;drawSpaced(ctx,String(s.ckick).toUpperCase(),cx+26,yy,5);yy+=44}
+      rfont(ctx,300,30);ctx.fillStyle=RB.ink;tl.forEach((l,k)=>ctx.fillText(l,cx+26,yy+k*42));
+    }
+    const f=sz=>(c,m)=>m==='o'?rfont(c,300,sz,true):rfont(c,700,sz);let sz=76,L;for(;sz>=56;sz-=4){L=richLayout(ctx,s.h,900,f(sz));if(L.length<=4)break}
+    const lh=Math.round(sz*1.15),top=H-110-L.length*lh;
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=12;L.forEach((line,li)=>{let cx=72;for(const tk of line){if(!tk.sp){f(sz)(ctx,tk.m);ctx.fillStyle=tk.m==='a'?RB.sand:'#FFFFFF';ctx.fillText(tk.t,cx,top+li*lh)}cx+=tk.w}});ctx.restore();
+  }else if(type==='grid'){
+    ctx.fillStyle=RB.beige;ctx.fillRect(0,0,W,H);
+    let y=98;y+=rbKick(ctx,s.kick,72,y,RB.muted)+26;
+    const t=rbTitle(ctx,s.h,72,y,936,[84,78,72,66],2);over=t.over;
+    const items=String(s.t||'').split('\n').map(l=>l.trim()).filter(Boolean).slice(0,4);
+    const rows=Math.ceil(items.length/2),cw=460,chh=400,g=16,top=Math.max(470,y+t.h+70);
+    items.forEach((it,k)=>{
+      const dark=it.startsWith('!'),[a,b]=it.replace(/^!\s*/,'').split('|').map(x=>x.trim());
+      const x=72+(k%2)*(cw+g),yy=top+Math.floor(k/2)*(chh+g);
+      ctx.fillStyle=dark?RB.dark:RB.cream;ctx.fillRect(x,yy,cw,chh);
+      rfont(ctx,700,96);ctx.fillStyle=RB.sand;ctx.fillText(pad2(k+1),x+40,yy+40);
+      rfont(ctx,700,34);ctx.fillStyle=dark?'#FFFFFF':RB.ink;ctx.fillText(a||'',x+40,yy+chh-142);
+      rfont(ctx,300,32);ctx.fillStyle=dark?RB.light:RB.ink;ctx.fillText(b||'',x+40,yy+chh-90);
+    });
+    if(top+rows*(chh+g)>H)over=true;
+  }
+  return {overflow:over};
+}
+const RB_DEFAULT=()=>[
+  {type:'cover',tag:'Аренда',kick:'Район · квартира',h:'Уютная квартира\n_главная особенность_',stats:'41,7 | м²\n1 | спальня\n3 | этаж из 12\n+ | бассейн'},
+  {type:'arch',h:'Главная *фишка*',t:'Одна строка о том, почему это важно'},
+  {type:'dark',kick:'Кухня',h:'Яркая кухня\n*с обеденной зоной*',t:'Что есть из техники и мебели. Выход на балкон.'},
+  {type:'inset',h:'Спальня\n_со шкафом и кондиционером_',ckick:'Санузел',ctext:'Плитка под мрамор и мозаика'},
+  {type:'grid',kick:'Важно знать',h:'Коротко\n_о квартире_',t:'Бассейн | в корпусе\nКухня | с техникой\n3 этаж | из 12\n! Без | животных'}];
+function rbFields(s,i){
+  const type=rbType(s,i),fy=s.fy==null||s.fy===''?.45:+s.fy;
+  const opt=(arr,v)=>arr.map(([k,l])=>`<option value="${k}" ${String(v)===String(k)?'selected':''}>${l}</option>`).join('');
+  const ta=(k,ph,rows)=>`<textarea class="field" id="cs-${k}-${i}" rows="${rows}" placeholder="${ph}">${esc(s[k]||'')}</textarea>`;
+  const inp=(k,ph)=>`<input class="field" id="cs-${k}-${i}" placeholder="${ph}" value="${esc(s[k]||'')}" autocomplete="off">`;
+  const two=type==='dark'||type==='inset';
+  return `<div class="st-row"><select class="field" id="cs-type-${i}" aria-label="Тип слайда">${opt([['cover','Обложка объекта'],['arch','Фото в арке'],['dark','Тёмный: фото + текст'],['inset','Фото + карточка'],['grid','Коротко: 4 факта']],type)}</select></div>
+    ${type!=='grid'?`<div class="st-row">${photoCtl(s,i,'')}<select class="field" id="cs-fy-${i}" aria-label="Кадрирование">${opt([[.2,'Кадр: верх'],[.45,'Кадр: центр'],[.7,'Кадр: низ']],fy)}</select></div>`:''}
+    ${two?`<div class="st-row">${photoCtl(s,i,type==='inset'?'фото в карточку':'второе фото','photo2')}</div>`:''}
+    ${type==='cover'?inp('tag','Плашка: Аренда / Продажа'):''}
+    ${type!=='arch'&&type!=='inset'?inp('kick','Надзаголовок: Ортачала · квартира'):''}
+    ${ta('h','Заголовок. Вторая строка с новой строки: _курсивом_, *акцент*',2)}
+    ${type==='cover'?ta('stats','Цифры, до 4 строк: 41,7 | м²',4):''}
+    ${type==='arch'?inp('t','Подпись под заголовком'):''}
+    ${type==='dark'?ta('t','Текст рядом с фото',3):''}
+    ${type==='inset'?inp('ckick','Карточка: надзаголовок (Санузел)')+inp('ctext','Карточка: текст'):''}
+    ${type==='grid'?ta('t','До 4 фактов: Бассейн | в корпусе. Строка с ! — тёмная карточка',4):''}`;
+}
 const CASE_DEFAULT=()=>[
   {bg:'photo',tag:'Кейс ученицы',h:'«Цитата героини о том, как было»',t:'А теперь *главный результат*',note:'Имя Фамилия\nКак смена формата вернула интерес к учёбе'},
   {bg:'light',tag:'Знакомо?',h:'Когда учёба идёт *без интереса*',t:'- утром не хочется вставать\n- уроки кажутся скучными\n- хочется просто пережить день',note:'Так было и у героини: каждое утро — мысль *остаться дома*'},
@@ -1378,17 +1496,21 @@ const STYLES={
     label:(s,i)=>({cover:'обложка',photo:'с фото',text:'текст',bgphoto:'фото фоном',tabs:'вкладки',reel:'рилс 9:16'})[natType(s,i)],
     blank:()=>({type:'text',h:'Заголовок с **акцентом**',t:''}),
     hint:'<b>**слово**</b> — золотом (2–3 на слайд). В тексте: абзацы с новой строки; <b>&gt; текст</b> — врезка в рамке, <b>&gt;&gt; текст</b> — тёмная врезка, <b>• а • б • в</b> — чипы с точкой, <b>**1.**</b> пункт — нумерация. Ярлык врезки пишите жирным: <b>**НАПОМНЮ:**</b>. Номер «1/14» в шапке ставится сам. У вкладок активная — та, что совпадает с названием. Без фото окно остаётся прозрачным. На обложке рилса <b>_слово_</b> — курсивом.'},
+  rb:{name:'Объект недвижимости',clients:['roombloom'],render:rbSlide,defaults:RB_DEFAULT,fieldsHTML:rbFields,height:()=>RB.H,
+    label:(s,i)=>({cover:'обложка',arch:'арка',dark:'тёмный',inset:'фото + карточка',grid:'4 факта'})[rbType(s,i)],
+    blank:()=>({type:'dark',kick:'Комната',h:'Название\n*акцент*',t:''}),
+    hint:'Формат 1080×1440. В заголовке вторая строка с новой строки: <b>_текст_</b> — тонким курсивом, <b>*текст*</b> — акцент (на светлом — песочная подложка, на тёмном — песочный цвет). Цифры на обложке: «41,7 | м²» по строке. В «4 фактах»: «Бассейн | в корпусе», строка с <b>!</b> — тёмная карточка.'},
   case:{name:'Кейс / статья',clients:['school'],render:caseSlide,defaults:CASE_DEFAULT,hint:'<b>*слово*</b> — выделить синим (на синем и фото — оранжевое подчёркивание), <b>_слово_</b> — оранжевым, <b>**слово**</b> — жирным. В тексте строка с «- » — пункт с точкой, с «1. » — нумерованный. На обложке «Вывод» — карточка: первая строка имя, дальше описание.',
     blank:()=>({bg:'light',tag:'Новый слайд',h:'Заголовок с *акцентом*',t:'- пункт\n- пункт',note:''}),
     fields:[['tag','Плашка','input'],['h','Заголовок','area2'],['t','Текст','area4'],['note','Вывод / карточка','area2'],['btn','Кнопка (для последнего слайда)','input']]}
 };
-const DEFAULT_STYLE={natalia:'nat'};
+const DEFAULT_STYLE={natalia:'nat',roombloom:'rb'};
 const slideH=(it,s,i)=>STYLES[it.style]?.height?.(s||{},i)||CH;
 const slideLabel=(it,s,i,n)=>STYLES[it.style]?.label?.(s||{},i)||ROLE_LABEL[roleOf(i,n)];
 const stylesFor=cid=>Object.entries(STYLES).filter(([,v])=>!v.clients||v.clients.includes(cid));
 async function slideAssets(cid,slides){
   await ensureFonts();
-  await Promise.all((slides||[]).map(s=>s&&s.photo?loadImg(s.photo).then(im=>{IMG[s.photo]=im}):null));
+  await Promise.all((slides||[]).flatMap(s=>s?[s.photo,s.photo2].filter(Boolean).map(u=>loadImg(u).then(im=>{IMG[u]=im})):[]));
   await Promise.all((slides||[]).map(s=>{if(!s||!s.svg)return null;const u=svgUrl(s.svg);return loadImg(u).then(im=>{IMG[u]=im})}));
   const p=S.profiles[cid]||{};
   return {photo:await loadImg(p.photo),zoom:p.zoom||1,pos:p.pos||'50% 30%'};
@@ -1484,12 +1606,14 @@ async function studioAI(fromSrc){
   if(fromSrc&&!srcText&&!src.images.length){toast('Вставьте текст исходника или приложите скриншоты');document.getElementById('cs-src')?.focus();return}
   const it=studio.it,title=(it.title||'').trim()||String(it.slides[0]?.h||'').replace(/[*_]/g,'')||(fromSrc?'по исходнику':'');
   if(!title){toast('Сначала напишите тему карусели');document.getElementById('cs-title')?.focus();return}
-  const isCase=it.style==='case',isNat=it.style==='nat';
-  const n=isCase?6:isNat?Math.max(6,Math.min(14,it.slides.length)):Math.max(5,Math.min(10,it.slides.length>=5?it.slides.length:7));
+  const isCase=it.style==='case',isNat=it.style==='nat',isRb=it.style==='rb';
+  const n=isCase?6:isRb?Math.max(5,Math.min(10,it.slides.length)):isNat?Math.max(6,Math.min(14,it.slides.length)):Math.max(5,Math.min(10,it.slides.length>=5?it.slides.length:7));
   studio.busy=true;drawStudio();
   try{
     const draft=it.slides.map((x,i)=>`${i+1}. `+JSON.stringify(x)).join('\n');
-    const prompt=isNat
+    const prompt=isRb
+      ?`Ты SMM-копирайтер агентства Room & Bloom (аренда и продажа жилья). Сделай карусель-презентацию объекта для Instagram.\n\n${context(it.client)}\n\nТема: ${title}\nТекущий черновик (можно переписать полностью, сохраняя факты):\n${draft}\n\nСделай ${n} слайдов. Порядок: 1 — {"type":"cover","tag":"Аренда" или "Продажа","kick":"Район · тип объекта","h":"Главное в 2–3 словах\\n_особенность курсивом_","stats":"4 строки «значение | подпись»: площадь «41,7 | м²», спальни, этаж «3 | этаж из 12», главная особенность «+ | бассейн»"}; 2 — {"type":"arch","h":"1–2 слова с *акцентом* — главная фишка объекта или дома","t":"одна строка-пояснение"}; дальше по комнатам: {"type":"dark","kick":"КОМНАТА","h":"Комната\\n*чем хороша*","t":"1–2 предложения: техника, мебель, выходы"} и {"type":"inset","h":"Комната\\n_детали курсивом_","ckick":"вторая комната (например Санузел)","ctext":"короткая деталь"}; предпоследний или последний — {"type":"grid","kick":"Важно знать","h":"Коротко\\n_о квартире_","t":"4 строки «Главное | пояснение»; ограничение (животные, дети, курение, депозит) начинай с «!»"}. Пиши коротко, только факты из исходника, без эмодзи, хэштегов и восклицаний. Ответь только JSON-массивом объектов с полями type, tag, kick, h, t, stats, ckick, ctext.`
+      :isNat
       ?`Ты пишешь карусель для Instagram в блог доктора Натальи Перепелицы (врач превентивной медицины, косметолог, генетик).\n\n${context(it.client)}\n\nТема: ${title}\nТекущий черновик (можно переписать полностью, сохраняя смысл и факты):\n${draft}\n\nГолос: от первого лица, коротко, честно, с юмором. Сделай ${n} слайдов. Первый — {"type":"cover","h":"самая цепляющая фраза, 2–4 строки, последние слова в **…**"}. Дальше выбирай тип под смысл: "text" (основной: можно "kick" — надзаголовок 2–3 слова строчными, например «моя позиция»), "photo" (если к мысли нужна фотография, не больше двух), "tabs" (обзор нескольких препаратов или тем: поле "tabs" — список через запятую одинаковый на всех таких слайдах, "h" — название активной вкладки, "sub" — пояснение 2–4 слова), "bgphoto" (сильная мысль на фото фоном). Последний слайд — призыв: "btn":"Запись на консультацию", "btnsub":"ссылка в шапке профиля", для медицинских тем "small" — дисклеймер «Не является рекомендацией к применению. Есть противопоказания, нужна консультация специалиста.». Поле "t" — строки через \n: абзац 1–3 строки; "> **НАПОМНЮ:** текст" — врезка для важной оговорки; "• а • б • в" — короткие чипы (2–3 слова каждый); "**1.** пункт" — нумерация. "closer" — необязательная короткая финальная фраза-вывод. На слайде не больше 60 слов. Ключевые слова выделяй **…**, не больше 2–3 на слайд. Без эмодзи, хэштегов и подписи. Если слайд типа text или tabs посвящён конкретному препарату, БАДу, косметике или анализу — добавь картинку: "art" — одно из vial (пептид во флаконе), jar (капсулы, витамины, БАД), dropper (сыворотка, масло, капли), tube (крем, SPF, гель), testtube (анализ крови), ampoule (инъекции), и "artLabel" — короткое название латиницей, как на упаковке (Semax, Epitalon, Magnesium, Vitamin D3, Ferritin). Если предмет важен, но его нет в этом списке (шприц-ручка, баночка крема, блистер таблеток, капельница и т.п.) — "art":"custom" и "artIdea" — что нарисовать, 2–5 слов. Если предмета нет — "art":"none". Ответь только JSON-массивом объектов с полями type, kick, h, sub, tabs, t, closer, btn, btnsub, small, art, artLabel, artIdea (пустые поля не пиши).`
       :isCase
       ?`Ты SMM-копирайтер онлайн-школы SHKOLA. Напиши карусель-кейс/статью для Instagram.\n\n${context(it.client)}\n\nТема: ${title}\nТекущий черновик (можно переписать полностью, сохраняя смысл и факты из него):\n${draft}\n\nСтруктура из ${n} слайдов как в образце: 1 — обложка (bg "photo", tag "Кейс ученицы" или подходящий, h — цитата или крючок до 50 символов, t — подзаголовок до 45 символов с выделением *…*, note — "Имя Фамилия\\nописание до 45 символов"); 2 — боль "Знакомо?" (bg "light", 3 пункта); 3 — решение (bg "blue", 3 пункта, note — короткий вывод); 4 — изменения (bg "light", нумерованный список 3–4 пункта, note — вывод); 5 — главный результат-цитата (bg "blue", note — имя); 6 — призыв (bg "light", btn "Напишите нам в Direct", note — короткая подпись под кнопкой).\nПоля слайда: tag (2–3 слова), h (до 60 символов), t (строки через \\n; пункт начинается с "- ", нумерованный с "1. "), note, bg ("light"|"blue"|"photo"), btn (только для последнего). Разметка: *слово* — акцент, _слово_ — оранжевое выделение, **слово** — жирный; в каждом заголовке выдели 1–3 ключевых слова. Без эмодзи и хэштегов. Ответь только JSON-массивом объектов.`
@@ -1502,8 +1626,8 @@ async function studioAI(fromSrc){
       it.source=srcText;
     }
     const arr=await s.json(pr,opts);
-    const keep=['h','t','tag','note','btn','bg','type','closer','kick','tabs','sub','btnsub','small','art','artLabel','artIdea'];
-    const slides=(Array.isArray(arr)?arr:[]).filter(x=>x&&(x.h||x.t)).slice(0,14).map((x,i)=>{const o={};for(const k of keep)if(x[k]!=null)o[k]=String(x[k]);if(o.bg&&!['light','blue','photo'].includes(o.bg))delete o.bg;if(o.type&&!['cover','photo','text','bgphoto','tabs','reel'].includes(o.type))delete o.type;const old=it.slides[i]||{};for(const k of ['photo','fy','ph'])if(old[k]!=null)o[k]=old[k];return o});
+    const keep=['h','t','tag','note','btn','bg','type','closer','kick','tabs','sub','btnsub','small','art','artLabel','artIdea','stats','ckick','ctext'];
+    const slides=(Array.isArray(arr)?arr:[]).filter(x=>x&&(x.h||x.t)).slice(0,14).map((x,i)=>{const o={};for(const k of keep)if(x[k]!=null)o[k]=String(x[k]);if(o.bg&&!['light','blue','photo'].includes(o.bg))delete o.bg;if(o.type&&!['cover','photo','text','bgphoto','tabs','reel','arch','dark','inset','grid'].includes(o.type))delete o.type;const old=it.slides[i]||{};for(const k of ['photo','photo2','fy','fy2','ph'])if(old[k]!=null)o[k]=old[k];return o});
     if(slides.length){it.slides=slides;if(!it.title||it.title==='по исходнику')it.title=String(slides[0].h||title).replace(/[*_]/g,'').slice(0,80);studio.dirty=true;if(fromSrc)studio.srcOpen=false}
   }catch(e){if(e?.code!=='cancelled')toast(sampleErr(e))}
   finally{if(studio){studio.busy=false;drawStudio()}}
@@ -1536,7 +1660,7 @@ document.addEventListener('input',e=>{
   if(id==='cs-title'){studio.it.title=e.target.value;studio.dirty=true;return}
   if(id==='cs-src'){studio.src.text=e.target.value;return}
   if(id==='cs-style'){const v=e.target.value;if(v!==studio.it.style){studio.it.style=v;studio.it.slides=defaultSlides(studio.it.title,v);studio.dirty=true;drawStudio()}return}
-  const m=id.match(/^cs-(h|t|tag|note|btn|bg|type|phh|fy|closer|kick|tabs|sub|btnsub|small|art|artLabel|artSub|artIdea)-(\d+)$/);if(!m)return;
+  const m=id.match(/^cs-(h|t|tag|note|btn|bg|type|phh|fy|closer|kick|tabs|sub|btnsub|small|art|artLabel|artSub|artIdea|stats|ckick|ctext)-(\d+)$/);if(!m)return;
   const i=+m[2],k={phh:'ph'}[m[1]]||m[1];studio.it.slides[i][k]=['ph','fy'].includes(k)?+e.target.value:e.target.value;studio.dirty=true;
   if(k==='type'||(k==='art'&&(e.target.value==='custom'||studio.it.slides[i].svg))){drawStudio();return}
   clearTimeout(drawT);drawT=setTimeout(()=>redrawStudio(i),120);
@@ -1553,7 +1677,7 @@ document.addEventListener('change',async e=>{
   if(!studio||t.dataset.csph==null||!t.files||!t.files[0])return;
   const i=+t.dataset.csph;if(!assets){toast('Фото можно загрузить, когда страница открыта в Claude');return}
   toast('Загружаю фото…');
-  try{const r=await assets.upload(t.files[0]);if(!studio)return;studio.it.slides[i].photo=r.url;studio.dirty=true;drawStudio();toast('Фото добавлено')}
+  try{const r=await assets.upload(t.files[0]);if(!studio)return;studio.it.slides[i][t.dataset.key||'photo']=r.url;studio.dirty=true;drawStudio();toast('Фото добавлено')}
   catch(err){toast('Не получилось загрузить фото, попробуйте файл поменьше')}
 });
 document.addEventListener('click',async e=>{
@@ -1576,7 +1700,7 @@ document.addEventListener('click',async e=>{
   else if(a==='add'){const bl=STYLES[studio.it.style]?.blank;sl.splice(Math.max(1,sl.length-1),0,bl?bl():{h:'Новая мысль',t:''});studio.dirty=true;drawStudio()}
   else if(a==='rm'){sl.splice(i,1);studio.dirty=true;drawStudio()}
   else if(a==='dup'){sl.splice(i+1,0,JSON.parse(JSON.stringify(sl[i])));studio.dirty=true;drawStudio()}
-  else if(a==='nophoto'){delete sl[i].photo;studio.dirty=true;drawStudio()}
+  else if(a==='nophoto'){delete sl[i][b.dataset.key||'photo'];studio.dirty=true;drawStudio()}
   else if(a==='up'&&i>0){[sl[i-1],sl[i]]=[sl[i],sl[i-1]];studio.dirty=true;drawStudio()}
   else if(a==='down'&&i<sl.length-1){[sl[i+1],sl[i]]=[sl[i],sl[i+1]];studio.dirty=true;drawStudio()}
   else if(a==='del'){if(!studio.confirmDel){studio.confirmDel=true;drawStudio()}else{const id=studio.it.id;studio=null;document.getElementById('overlay').hidden=true;await remove('items',id);toast('Карусель удалена')}}
