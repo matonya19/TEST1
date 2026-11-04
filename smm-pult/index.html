@@ -149,6 +149,7 @@ a.btn{text-decoration:none;color:var(--ink)}
 .st-slide textarea{resize:vertical}
 .st-warn{color:var(--bad);font-weight:700}
 .st-prev{align-items:start}
+.st-more summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);padding:4px 0}.st-more[open]{display:flex;flex-direction:column;gap:6px}
 .st-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.st-row select{flex:1 1 160px;padding:7px 10px}
 @media (max-width:860px){
   .overlay:has(.studio){padding:0;align-items:stretch}
@@ -1120,21 +1121,54 @@ function caseSlide(ctx,s,i,n){
     }
   }
 }
-/* ----- Natalia "dark premium": browser-window card, gold accent, Montserrat (spec: DESIGN_SYSTEM.md) ----- */
-const NT={ground:'#141416',card:'#111113',border:'#5A4C36',gold:'#EBC385',ink:'#FFFFFF',body:'#D6D6D8',shade:'10,10,12'};
+/* ----- Natalia "dark premium": browser-window card, gold accent, Montserrat (spec: DESIGN_SYSTEM.md + real carousels) ----- */
+const NT={ground:'#141416',card:'#111113',border:'#5A4C36',gold:'#EBC385',ink:'#FFFFFF',body:'#D6D6D8',shade:'10,10,12',muted:'#8E8E93',panel:'#1B1B1E',panelLine:'#3A3530',calloutWarm:'#231D17',calloutDark:'#19191C',chip:'#17171A',small:'#6F6F74'};
 const nfont=(ctx,w,s,it)=>{ctx.font=`${it?'italic ':''}${w} ${s}px Montserrat, system-ui, sans-serif`};
 const natType=(s,i)=>s.type||(i===0?'cover':'text');
-/* title + paragraphs + gold closer, measured before drawing */
+/* text blocks, measured before drawing.
+   t lines: "> текст" warm callout, ">> текст" dark callout, "• a • b" chips, other lines paragraphs */
 function natFlow(ctx,s,MW,o){
-  const tf=c=>nfont(c,600,o.ts),bf=(c,m)=>nfont(c,m?600:300,o.bs),cf=c=>nfont(c,600,o.cs);
-  const parts=[];let h=0,gap=0;
-  const add=(L,lh,sz,f,col,after)=>{h+=gap;parts.push({L,lh,sz,f,col,dy:h});h+=L.length*lh;gap=after};
-  if(s.h)add(richLayout(ctx,s.h,MW,tf),o.tl,o.ts,tf,m=>m?NT.gold:NT.ink,o.gap);
-  for(const p of String(s.t||'').split('\n').map(x=>x.trim()).filter(Boolean))add(richLayout(ctx,p,MW,bf),o.bl,o.bs,bf,m=>m?NT.gold:NT.body,o.pgap);
-  if(s.closer)add(richLayout(ctx,s.closer,MW,cf),o.cl,o.cs,cf,()=>NT.gold,0);
-  return {h,draw:(x,y)=>parts.forEach(p=>richDraw(ctx,p.L,x,y+p.dy,p.lh,p.sz,p.f,p.col,()=>null))};
+  const items=[];let h=0,gap=0;
+  const push=(height,draw,after)=>{h+=gap;const dy=h;items.push((x,y)=>draw(x,y+dy));h+=height;gap=after};
+  const bf=(c,m)=>nfont(c,m?600:300,o.bs);
+  if(s.kick){const f=c=>nfont(c,300,Math.round(o.bs*.82));const L=richLayout(ctx,s.kick,MW,f);const lh=Math.round(o.bs*1.05);push(L.length*lh,(x,y)=>richDraw(ctx,L,x,y,lh,0,f,()=>NT.muted,()=>null),12)}
+  if(s.h){const tf=c=>nfont(c,600,o.ts);const L=richLayout(ctx,s.h,MW,tf);push(L.length*o.tl,(x,y)=>richDraw(ctx,L,x,y,o.tl,o.ts,tf,m=>m?NT.gold:NT.ink,()=>null),o.gap)}
+  if(s.sub){const f=c=>nfont(c,300,o.bs);const L=richLayout(ctx,s.sub,MW,f);push(L.length*o.bl,(x,y)=>richDraw(ctx,L,x,y,o.bl,o.bs,f,()=>NT.gold,()=>null),o.gap)}
+  for(const raw of String(s.t||'').split('\n')){
+    const line=raw.trim();if(!line)continue;
+    const cw=line.match(/^(>>?)\s*(.*)$/);
+    if(cw){
+      const warm=cw[1]==='>',cs=o.bs-2,cl=Math.round(o.bl*.96),cf=(c,m)=>nfont(c,m?700:300,cs);
+      const L=richLayout(ctx,cw[2],MW-64,cf),bh=L.length*cl+56;
+      push(bh,(x,y)=>{ctx.fillStyle=warm?NT.calloutWarm:NT.calloutDark;rr(ctx,x,y,MW,bh,20);ctx.fill();ctx.strokeStyle=warm?NT.border:'#2E2E33';ctx.lineWidth=2;ctx.stroke();richDraw(ctx,L,x+32,y+28,cl,cs,cf,m=>m?NT.gold:NT.body,()=>null)},o.pgap);
+      continue;
+    }
+    if(line.startsWith('•')){
+      const chips=line.split('•').map(x=>x.trim()).filter(Boolean),cs=Math.round(o.bs*.8),chH=Math.round(cs*2.1),pad=26,dot=18,g=14;
+      nfont(ctx,600,cs);const rows=[[]];let rw=0;
+      for(const c of chips){const w=ctx.measureText(c).width+pad*2+dot;if(rw&&rw+w>MW){rows.push([]);rw=0}rows[rows.length-1].push([c,w]);rw+=w+g}
+      const bh=rows.length*chH+(rows.length-1)*g;
+      push(bh,(x,y)=>{rows.forEach((r,ri)=>{let cx=x;const cy=y+ri*(chH+g);for(const [c,w] of r){ctx.fillStyle=NT.chip;rr(ctx,cx,cy,w,chH,chH/2);ctx.fill();ctx.strokeStyle='#3A332A';ctx.lineWidth=2;ctx.stroke();
+        ctx.fillStyle=NT.gold;ctx.beginPath();ctx.arc(cx+pad+4,cy+chH/2,5.5,0,7);ctx.fill();nfont(ctx,600,cs);ctx.fillStyle=NT.ink;ctx.fillText(c,cx+pad+dot,cy+(chH-cs*1.2)/2+2);cx+=w+g}})},o.pgap);
+      continue;
+    }
+    const L=richLayout(ctx,line,MW,bf);push(L.length*o.bl,(x,y)=>richDraw(ctx,L,x,y,o.bl,o.bs,bf,m=>m?NT.gold:NT.body,()=>null),o.pgap);
+  }
+  if(s.closer){const cf=c=>nfont(c,700,o.cs);const L=richLayout(ctx,s.closer,MW,cf);push(L.length*o.cl,(x,y)=>richDraw(ctx,L,x,y,o.cl,o.cs,cf,()=>NT.gold,()=>null),o.pgap)}
+  if(s.btn){
+    const bh=s.btnsub?150:104;
+    if(gap)gap=Math.max(gap,44);
+    push(bh,(x,y)=>{ctx.fillStyle=NT.gold;rr(ctx,x,y,MW,bh,24);ctx.fill();nfont(ctx,700,40);ctx.fillStyle='#141416';drawSpaced(ctx,s.btn,x+MW/2,y+(s.btnsub?30:30),0,'center');
+      if(s.btnsub){nfont(ctx,600,28);ctx.fillStyle='#3B3020';drawSpaced(ctx,s.btnsub,x+MW/2,y+92,0,'center')}},28);
+  }
+  if(s.small){const f=c=>nfont(c,300,24);const L=richLayout(ctx,s.small,MW,f);push(L.length*32,(x,y)=>richDraw(ctx,L,x,y,32,24,f,()=>NT.small,()=>null),0)}
+  return {h,draw:(x,y)=>items.forEach(d=>d(x,y))};
 }
-function natSlide(ctx,s,i){
+const NAT_SIZES={
+  photo:[{ts:56,tl:66,bs:34,bl:47,cs:40,cl:52,gap:30,pgap:26},{ts:50,tl:60,bs:31,bl:43,cs:36,cl:48,gap:26,pgap:22},{ts:46,tl:54,bs:28,bl:39,cs:32,cl:42,gap:22,pgap:18}],
+  text:[{ts:68,tl:80,bs:38,bl:52,cs:42,cl:54,gap:36,pgap:28},{ts:60,tl:72,bs:34,bl:47,cs:38,cl:50,gap:30,pgap:24},{ts:54,tl:64,bs:31,bl:43,cs:35,cl:46,gap:26,pgap:20},{ts:48,tl:58,bs:28,bl:39,cs:32,cl:42,gap:22,pgap:16}]};
+function natFit(ctx,s,MW,list,room){let fl;for(const o of list){fl=natFlow(ctx,s,MW,o);if(fl.h<=room)return {fl,over:false}}return {fl,over:true}}
+function natSlide(ctx,s,i,n,A){
   const type=natType(s,i),img=IMG[s.photo]||null,fy=Math.min(1,Math.max(0,s.fy==null||s.fy===''?.35:+s.fy));
   const pos=`50% ${Math.round(fy*100)}%`;
   ctx.textBaseline='top';
@@ -1153,11 +1187,15 @@ function natSlide(ctx,s,i){
   ctx.fillStyle=NT.ground;ctx.fillRect(0,0,1080,1350);
   rr(ctx,cx,cy,cw,ch,32);ctx.fillStyle=NT.card;ctx.fill();
   ctx.fillStyle=NT.gold;for(let k=0;k<3;k++){ctx.beginPath();ctx.arc(cx+34+k*28,cy+32,9,0,7);ctx.fill()}
+  /* slide counter in the header, carousel slides only (reel covers are not counted) */
+  const sl=(A&&A.slides)||[],cards=sl.filter((x,k)=>natType(x||{},k)!=='reel'),idx=sl.slice(0,i+1).filter((x,k)=>natType(x||{},k)!=='reel').length;
+  if(cards.length>1&&s.counter!==false){nfont(ctx,600,26);const t=`${idx}/${cards.length}`,tw=ctx.measureText(t).width,pw=tw+36,px=cx+cw-26-pw,py=cy+12;
+    rr(ctx,px,py,pw,40,20);ctx.strokeStyle=NT.border;ctx.lineWidth=2;ctx.stroke();ctx.fillStyle=NT.ink;ctx.fillText(t,px+18,py+8)}
   ctx.fillStyle=NT.border;ctx.fillRect(cx,lineY,cw,2);
   let over=false;
+  const bodyClip=()=>{const x0=cx+1,y0=lineY+2,w0=cw-2,h0=bottom-1-y0,r=30;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+w0,y0);ctx.lineTo(x0+w0,y0+h0-r);ctx.arcTo(x0+w0,y0+h0,x0+w0-r,y0+h0,r);ctx.lineTo(x0+r,y0+h0);ctx.arcTo(x0,y0+h0,x0,y0+h0-r,r);ctx.closePath();return [x0,y0,w0,h0]};
   if(type==='cover'){
-    const x0=cx+1,y0=lineY+2,w0=cw-2,h0=bottom-1-y0,r=30;
-    ctx.save();ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+w0,y0);ctx.lineTo(x0+w0,y0+h0-r);ctx.arcTo(x0+w0,y0+h0,x0+w0-r,y0+h0,r);ctx.lineTo(x0+r,y0+h0);ctx.arcTo(x0,y0+h0,x0,y0+h0-r,r);ctx.closePath();ctx.clip();
+    ctx.save();const [x0,y0,w0,h0]=bodyClip();ctx.clip();
     if(img)photoIn(ctx,img,x0,y0,w0,h0,{pos});else ctx.clearRect(x0,y0,w0,h0);
     const gy=y0+h0*.45,g=ctx.createLinearGradient(0,gy,0,y0+h0);g.addColorStop(0,`rgba(${NT.shade},0)`);g.addColorStop(1,`rgba(${NT.shade},.92)`);ctx.fillStyle=g;ctx.fillRect(x0,gy,w0,y0+h0-gy);
     ctx.restore();
@@ -1168,33 +1206,65 @@ function natSlide(ctx,s,i){
   }else if(type==='photo'){
     const ph=Math.min(640,Math.max(400,+s.ph||560)),x0=cx+14,y0=lineY+2+14,w0=cw-28;
     ctx.save();rr(ctx,x0,y0,w0,ph,24);ctx.clip();if(img)photoIn(ctx,img,x0,y0,w0,ph,{pos});else ctx.clearRect(x0,y0,w0,ph);ctx.restore();
-    const X=cx+60,MW=cw-120,y=y0+ph+44,room=bottom-56-y;
-    const sizes=[{ts:56,tl:66,bs:34,bl:47,cs:40,cl:52,gap:30,pgap:26},{ts:50,tl:60,bs:31,bl:43,cs:36,cl:48,gap:26,pgap:22},{ts:46,tl:54,bs:28,bl:39,cs:32,cl:42,gap:22,pgap:18}];
-    let fl;for(const o of sizes){fl=natFlow(ctx,s,MW,o);if(fl.h<=room)break}
-    over=fl.h>room;fl.draw(X,y);
+    const y=y0+ph+44,r=natFit(ctx,s,cw-120,NAT_SIZES.photo,bottom-56-y);over=r.over;r.fl.draw(cx+60,y);
+  }else if(type==='tabs'){
+    /* folder tabs + inner panel: big name, gold subtitle, product picture on the right */
+    const tabs=String(s.tabs||'').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
+    const plain=String(s.h||'').replace(/[*_]/g,'').trim().toLowerCase();
+    let act=tabs.findIndex(t=>t.replace(/^\*/,'').toLowerCase()===plain);if(act<0)act=tabs.findIndex(t=>t.startsWith('*'));
+    const px=cx+30,pw=cw-60,ty=lineY+30,th=56,py=ty+th+8,pb=bottom-30;
+    let fs=30,pad=14,gap=8,ws;for(;fs>=18;fs-=1){nfont(ctx,600,fs);ws=tabs.map(t=>ctx.measureText(t.replace(/^\*/,'')).width+pad*2);if(ws.reduce((a,b)=>a+b,0)+gap*(tabs.length-1)<=pw)break}
+    let tx=px;
+    const drawPanel=()=>{rr(ctx,px,py,pw,pb-py,26);ctx.fillStyle=NT.panel;ctx.fill();ctx.strokeStyle=NT.panelLine;ctx.lineWidth=2;ctx.stroke()};
+    tabs.forEach((t,k)=>{if(k===act){tx+=ws[k]+gap;return}rr(ctx,tx,ty,ws[k],th,20);ctx.fillStyle=NT.chip;ctx.fill();ctx.strokeStyle=NT.panelLine;ctx.lineWidth=2;ctx.stroke();nfont(ctx,600,fs);ctx.fillStyle='#9A9A9E';ctx.fillText(t.replace(/^\*/,''),tx+pad,ty+(th-fs*1.2)/2+2);tx+=ws[k]+gap});
+    drawPanel();
+    if(act>=0){let ax=px;for(let k=0;k<act;k++)ax+=ws[k]+gap;const aw=ws[act];
+      ctx.beginPath();ctx.moveTo(ax,py+12);ctx.lineTo(ax,ty+20);ctx.arcTo(ax,ty,ax+20,ty,20);ctx.lineTo(ax+aw-20,ty);ctx.arcTo(ax+aw,ty,ax+aw,ty+20,20);ctx.lineTo(ax+aw,py+12);ctx.closePath();
+      ctx.fillStyle=NT.panel;ctx.fill();ctx.strokeStyle=NT.border;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(ax,py+16);ctx.lineTo(ax,ty+20);ctx.arcTo(ax,ty,ax+20,ty,20);ctx.lineTo(ax+aw-20,ty);ctx.arcTo(ax+aw,ty,ax+aw,ty+20,20);ctx.lineTo(ax+aw,py+16);ctx.stroke();
+      ctx.fillStyle=NT.panel;ctx.fillRect(ax+1,py-2,aw-2,8);
+      nfont(ctx,600,fs);ctx.fillStyle=NT.gold;ctx.fillText(tabs[act].replace(/^\*/,''),ax+pad,ty+(th-fs*1.2)/2+8)}
+    const X=px+30,MW=pw-60;let y=py+70;
+    if(img){const bw=170,bh=260,ix=px+pw-30-bw,iy=py+44,k=Math.min(bw/img.width,bh/img.height),dw=img.width*k,dh=img.height*k;ctx.drawImage(img,ix+(bw-dw)/2,iy+(bh-dh)/2,dw,dh)}
+    const nameW=img?MW-200:MW,f=sz=>c=>nfont(c,500,sz);let sz=100,L;for(;sz>=60;sz-=6){L=richLayout(ctx,s.h,nameW,f(sz));if(L.length<=2)break}
+    richDraw(ctx,L,X,y,sz*1.08,sz,f(sz),m=>m?NT.gold:NT.ink,()=>null);y+=L.length*sz*1.08+8;
+    if(s.sub){const sf=c=>nfont(c,300,36);const SL=richLayout(ctx,s.sub,nameW,sf);richDraw(ctx,SL,X,y,46,36,sf,()=>NT.gold,()=>null);y+=SL.length*46}
+    y=Math.max(y+70,py+330);
+    const r=natFit(ctx,{t:s.t,closer:s.closer,btn:s.btn,btnsub:s.btnsub,small:s.small},MW,NAT_SIZES.text,pb-40-y);over=r.over;r.fl.draw(X,y);
   }else{
-    const X=cx+70,MW=cw-140,top=lineY+2+56,room=bottom-56-top;
-    const sizes=[{ts:68,tl:80,bs:38,bl:54,cs:44,cl:56,gap:40,pgap:28},{ts:60,tl:72,bs:34,bl:48,cs:40,cl:52,gap:34,pgap:24},{ts:52,tl:62,bs:31,bl:44,cs:36,cl:48,gap:28,pgap:20}];
-    let fl;for(const o of sizes){fl=natFlow(ctx,s,MW,o);if(fl.h<=room)break}
-    over=fl.h>room;fl.draw(X,top+Math.max(0,(room-fl.h)/2));
+    /* text and photo-background slides: content block centered in the card body */
+    if(type==='bgphoto'){
+      ctx.save();const [x0,y0,w0,h0]=bodyClip();ctx.clip();
+      if(img){photoIn(ctx,img,x0,y0,w0,h0,{pos:`${s.fx!=null?Math.round(s.fx*100):60}% ${Math.round(fy*100)}%`});
+        ctx.fillStyle='rgba(14,14,16,.5)';ctx.fillRect(x0,y0,w0,h0);const g=ctx.createLinearGradient(x0,0,x0+w0*.75,0);g.addColorStop(0,'rgba(14,14,16,.6)');g.addColorStop(1,'rgba(14,14,16,0)');ctx.fillStyle=g;ctx.fillRect(x0,y0,w0,h0)}
+      ctx.restore();
+    }
+    const X=cx+60,MW=cw-120,top=lineY+2+60,room=bottom-60-top;
+    const r=natFit(ctx,s,MW,NAT_SIZES.text,room);over=r.over;r.fl.draw(X,top+Math.max(0,(room-r.fl.h)/2));
   }
   rr(ctx,cx,cy,cw,ch,32);ctx.strokeStyle=NT.border;ctx.lineWidth=2;ctx.stroke();
   return {overflow:over};
 }
 const NAT_DEFAULT=()=>[
   {type:'cover',h:'Каждый видит **своё.**',fy:.35},
-  {type:'photo',h:'Впервые получила **негативный отзыв.**',t:'Неприятно? Да. Но это честный повод посмотреть на свою работу со стороны.\nРазобрала, что пошло не так, и что поменяю.',closer:'А как хотим?',ph:560,fy:.35},
-  {type:'text',h:'Что я делаю **каждое утро**',t:'**1.** Стакан воды до кофе\n**2.** 10 минут на улице без телефона\n**3.** Белок на завтрак'},
-  {type:'text',h:'Почему это работает',t:'Простые привычки снижают стресс и выравнивают уровень сахара в течение дня.',closer:'Это омолаживает.'}];
-const photoCtl=(s,i)=>assets?`<label class="btn sm" for="cs-ph-${i}">${s.photo?'Сменить фото':'+ Фото'}</label><input type="file" accept="image/jpeg,image/png,image/webp" id="cs-ph-${i}" data-csph="${i}" hidden>${s.photo?`<button class="btn sm ghost" type="button" data-cs="nophoto" data-i="${i}">Убрать фото</button>`:''}`:'';
+  {type:'text',kick:'моя позиция',h:'Заголовок-вопрос? **Да.**',t:'Короткий абзац: 1–3 строки.\n• пункт • пункт • пункт • пункт\nИ только потом — **главный вывод.**\n> **НАПОМНЮ:** врезка в рамке для важной мысли.'},
+  {type:'tabs',tabs:'Тема 1, Тема 2, Тема 3, Пример',h:'Пример',sub:'короткое пояснение',t:'Абзац о теме. **Ключевая мысль** золотом.\n> **НО:** оговорка или предостережение.',closer:'Финальная фраза.'},
+  {type:'bgphoto',h:'Я за новые возможности. **Я за пептиды.**',t:'Но ещё больше — за **индивидуальный подход.** То, что подходит одному, совсем не обязательно нужно другому.',btn:'Запись на консультацию',btnsub:'ссылка в шапке профиля',small:'Не является рекомендацией к применению. Есть противопоказания, нужна консультация специалиста.'}];
+const photoCtl=(s,i,label)=>assets?`<label class="btn sm" for="cs-ph-${i}">${s.photo?'Сменить '+(label||'фото'):'+ '+(label?label[0].toUpperCase()+label.slice(1):'Фото')}</label><input type="file" accept="image/jpeg,image/png,image/webp" id="cs-ph-${i}" data-csph="${i}" hidden>${s.photo?`<button class="btn sm ghost" type="button" data-cs="nophoto" data-i="${i}">Убрать</button>`:''}`:'';
 function natFields(s,i){
   const type=natType(s,i),fy=s.fy==null||s.fy===''?.35:+s.fy;
   const opt=(arr,v)=>arr.map(([k,l])=>`<option value="${k}" ${String(v)===String(k)?'selected':''}>${l}</option>`).join('');
   const ta=(k,ph,rows)=>`<textarea class="field" id="cs-${k}-${i}" rows="${rows}" placeholder="${ph}">${esc(s[k]||'')}</textarea>`;
-  return `<div class="st-row"><select class="field" id="cs-type-${i}" aria-label="Тип слайда">${opt([['cover','Обложка карусели'],['photo','Слайд с фото'],['text','Текстовый слайд'],['reel','Обложка рилса 9:16']],type)}</select>${type!=='text'?photoCtl(s,i):''}</div>
-    ${type!=='text'?`<div class="st-row">${type==='photo'?`<select class="field" id="cs-phh-${i}" aria-label="Высота фото">${opt([[400,'Фото низкое (400)'],[560,'Фото среднее (560)'],[640,'Фото высокое (640)']],s.ph||560)}</select>`:''}<select class="field" id="cs-fy-${i}" aria-label="Где лицо на фото">${opt([[.15,'Лицо: вверху'],[.35,'Лицо: стандарт'],[.5,'Лицо: по центру'],[.7,'Лицо: внизу']],fy)}</select></div>`:''}
-    ${ta('h',type==='reel'?'Текст обложки, _курсив_ для акцента':'Заголовок, **золотые слова**',2)}
-    ${type==='photo'||type==='text'?ta('t','Текст: каждый абзац с новой строки; список — **1.** пункт',4)+ta('closer','Финальная фраза золотом (необязательно)',1):''}`;
+  const inp=(k,ph)=>`<input class="field" id="cs-${k}-${i}" placeholder="${ph}" value="${esc(s[k]||'')}" autocomplete="off">`;
+  const hasPhoto=['cover','photo','bgphoto','reel','tabs'].includes(type);
+  const body=['text','photo','bgphoto','tabs'].includes(type);
+  return `<div class="st-row"><select class="field" id="cs-type-${i}" aria-label="Тип слайда">${opt([['cover','Обложка карусели'],['photo','Слайд с фото'],['text','Текстовый слайд'],['bgphoto','Фото фоном'],['tabs','Вкладки (препарат / тема)'],['reel','Обложка рилса 9:16']],type)}</select>${hasPhoto?photoCtl(s,i,type==='tabs'?'картинку':''):''}</div>
+    ${hasPhoto&&type!=='tabs'?`<div class="st-row">${type==='photo'?`<select class="field" id="cs-phh-${i}" aria-label="Высота фото">${opt([[400,'Фото низкое (400)'],[560,'Фото среднее (560)'],[640,'Фото высокое (640)']],s.ph||560)}</select>`:''}<select class="field" id="cs-fy-${i}" aria-label="Где лицо на фото">${opt([[.15,'Лицо: вверху'],[.35,'Лицо: стандарт'],[.5,'Лицо: по центру'],[.7,'Лицо: внизу']],fy)}</select></div>`:''}
+    ${type==='tabs'?inp('tabs','Вкладки через запятую: BPC-157, TB-500, Эпиталон'):''}
+    ${body&&type!=='tabs'?inp('kick','Надзаголовок мелким (необязательно)'):''}
+    ${ta('h',type==='reel'?'Текст обложки, _курсив_ для акцента':type==='tabs'?'Название (совпадает с активной вкладкой)':'Заголовок, **золотые слова**',2)}
+    ${type==='tabs'?inp('sub','Подзаголовок золотом: «мозг и память»'):''}
+    ${body?ta('t','Текст: абзацы с новой строки. «> текст» — врезка, «>> текст» — тёмная врезка, «• а • б» — чипы',5)+inp('closer','Финальная фраза золотом (необязательно)'):''}
+    ${body?`<details class="st-more" ${s.btn||s.small?'open':''}><summary>Кнопка и дисклеймер</summary>${inp('btn','Кнопка: «Запись на консультацию»')}${inp('btnsub','Подпись в кнопке: «ссылка в шапке профиля»')}${ta('small','Дисклеймер мелким шрифтом',2)}</details>`:''}`;
 }
 const CASE_DEFAULT=()=>[
   {bg:'photo',tag:'Кейс ученицы',h:'«Цитата героини о том, как было»',t:'А теперь *главный результат*',note:'Имя Фамилия\nКак смена формата вернула интерес к учёбе'},
@@ -1206,9 +1276,9 @@ const CASE_DEFAULT=()=>[
 const STYLES={
   brand:{name:'Фирменный',clients:null,hint:'Первый слайд — обложка, последний — призыв. Перенос строки ставьте через Enter.'},
   nat:{name:'Тёмная премиум',clients:['natalia'],render:natSlide,defaults:NAT_DEFAULT,fieldsHTML:natFields,height:(s,i)=>natType(s,i)==='reel'?1920:CH,
-    label:(s,i)=>({cover:'обложка',photo:'с фото',text:'текст',reel:'рилс 9:16'})[natType(s,i)],
+    label:(s,i)=>({cover:'обложка',photo:'с фото',text:'текст',bgphoto:'фото фоном',tabs:'вкладки',reel:'рилс 9:16'})[natType(s,i)],
     blank:()=>({type:'text',h:'Заголовок с **акцентом**',t:''}),
-    hint:'<b>**слово**</b> — золотом (не больше 2–3 на слайд). Каждый абзац с новой строки, список — «**1.** пункт». На обложке рилса <b>_слово_</b> — курсивом. Без фото окно остаётся прозрачным: в PNG под него можно положить видео. До ~60 слов на слайд.'},
+    hint:'<b>**слово**</b> — золотом (2–3 на слайд). В тексте: абзацы с новой строки; <b>&gt; текст</b> — врезка в рамке, <b>&gt;&gt; текст</b> — тёмная врезка, <b>• а • б • в</b> — чипы с точкой, <b>**1.**</b> пункт — нумерация. Ярлык врезки пишите жирным: <b>**НАПОМНЮ:**</b>. Номер «1/14» в шапке ставится сам. У вкладок активная — та, что совпадает с названием. Без фото окно остаётся прозрачным. На обложке рилса <b>_слово_</b> — курсивом.'},
   case:{name:'Кейс / статья',clients:['school'],render:caseSlide,defaults:CASE_DEFAULT,hint:'<b>*слово*</b> — выделить синим (на синем и фото — оранжевое подчёркивание), <b>_слово_</b> — оранжевым, <b>**слово**</b> — жирным. В тексте строка с «- » — пункт с точкой, с «1. » — нумерованный. На обложке «Вывод» — карточка: первая строка имя, дальше описание.',
     blank:()=>({bg:'light',tag:'Новый слайд',h:'Заголовок с *акцентом*',t:'- пункт\n- пункт',note:''}),
     fields:[['tag','Плашка','input'],['h','Заголовок','area2'],['t','Текст','area4'],['note','Вывод / карточка','area2'],['btn','Кнопка (для последнего слайда)','input']]}
@@ -1225,7 +1295,7 @@ async function slideAssets(cid,slides){
 }
 function paintSlide(canvas,cid,slides,i,A,scale=1,style){
   const ctx=canvas.getContext('2d');ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,canvas.width/scale,canvas.height/scale);ctx.save();
-  const st=STYLES[style];let r;
+  const st=STYLES[style];let r;if(A)A.slides=slides;
   if(st&&st.render)r=st.render(ctx,slides[i]||{},i,slides.length,A);
   else (DS[cid]||DS.keystone)(ctx,slides[i]||{h:'',t:''},i,slides.length,roleOf(i,slides.length),A);
   ctx.restore();return r;
@@ -1280,9 +1350,9 @@ function drawStudio(){
       <div class="st-edit">
         <div class="hint" style="color:var(--muted);font-size:13px;line-height:1.5">${(st||STYLES.brand).hint}</div>
         ${it.slides.map((s,i)=>`<div class="st-slide"><div class="st-sh"><b>Слайд ${i+1}</b><span>${slideLabel(it,s,i,n)}</span><span class="sp"></span>
-          <button class="btn sm ghost" type="button" data-cs="up" data-i="${i}" ${i?'':'disabled'} aria-label="Выше">↑</button><button class="btn sm ghost" type="button" data-cs="down" data-i="${i}" ${i<n-1?'':'disabled'} aria-label="Ниже">↓</button><button class="btn sm ghost" type="button" data-cs="rm" data-i="${i}" ${n>1?'':'disabled'} aria-label="Удалить слайд">✕</button></div>
+          <button class="btn sm ghost" type="button" data-cs="up" data-i="${i}" ${i?'':'disabled'} aria-label="Выше">↑</button><button class="btn sm ghost" type="button" data-cs="down" data-i="${i}" ${i<n-1?'':'disabled'} aria-label="Ниже">↓</button>${n<14?`<button class="btn sm ghost" type="button" data-cs="dup" data-i="${i}" aria-label="Дублировать слайд" title="Дублировать">⧉</button>`:''}<button class="btn sm ghost" type="button" data-cs="rm" data-i="${i}" ${n>1?'':'disabled'} aria-label="Удалить слайд">✕</button></div>
           ${slideFields(it,s,i,n)}</div>`).join('')}
-        <div style="display:flex;gap:8px;flex-wrap:wrap">${n<10?`<button class="btn" type="button" data-cs="add">+ слайд</button>`:''}<span class="sp" style="flex:1"></span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">${n<14?`<button class="btn" type="button" data-cs="add">+ слайд</button>`:''}<span class="sp" style="flex:1"></span>
           ${isSaved?`<button class="btn ${studio.confirmDel?'danger':'ghost'}" type="button" data-cs="del">${studio.confirmDel?'Точно удалить карусель?':'Удалить карусель'}</button>`:''}</div>
       </div></div></div>`;
   o.hidden=false;
@@ -1307,18 +1377,18 @@ async function studioAI(){
   const it=studio.it,title=(it.title||'').trim()||String(it.slides[0]?.h||'').replace(/[*_]/g,'');
   if(!title){toast('Сначала напишите тему карусели');document.getElementById('cs-title')?.focus();return}
   const isCase=it.style==='case',isNat=it.style==='nat';
-  const n=isCase?6:isNat?Math.max(5,Math.min(8,it.slides.length)):Math.max(5,Math.min(10,it.slides.length>=5?it.slides.length:7));
+  const n=isCase?6:isNat?Math.max(6,Math.min(14,it.slides.length)):Math.max(5,Math.min(10,it.slides.length>=5?it.slides.length:7));
   studio.busy=true;drawStudio();
   try{
     const draft=it.slides.map((x,i)=>`${i+1}. `+JSON.stringify(x)).join('\n');
     const prompt=isNat
-      ?`Ты пишешь карусель для Instagram в блог доктора Натальи Перепелицы (врач превентивной медицины, косметолог, генетик).\n\n${context(it.client)}\n\nТема: ${title}\nТекущий черновик (можно переписать полностью, сохраняя смысл и факты):\n${draft}\n\nГолос: от первого лица, коротко, честно, с юмором. Сделай ${n} слайдов. Первый — {"type":"cover","h":"самая цепляющая фраза, 2–4 строки, последние слова в **…**"}. Дальше слайды {"type":"text"} или {"type":"photo"} (photo — если к мысли нужна фотография; не больше двух photo): "h" — заголовок-факт или вопрос, 2–3 строки, точка в конце допустима; "t" — 1–3 абзаца по 1–3 строки, абзацы через \n, списки в виде "**1.** пункт"; "closer" — необязательная короткая финальная фраза-вывод (например «Это омолаживает.», «Интересно, почему?»). На слайде не больше 60 слов (на photo — не больше 40). Ключевые слова выделяй **…**, не больше 2–3 на слайд. Без эмодзи, хэштегов и подписи. Ответь только JSON-массивом объектов с полями type, h, t, closer.`
+      ?`Ты пишешь карусель для Instagram в блог доктора Натальи Перепелицы (врач превентивной медицины, косметолог, генетик).\n\n${context(it.client)}\n\nТема: ${title}\nТекущий черновик (можно переписать полностью, сохраняя смысл и факты):\n${draft}\n\nГолос: от первого лица, коротко, честно, с юмором. Сделай ${n} слайдов. Первый — {"type":"cover","h":"самая цепляющая фраза, 2–4 строки, последние слова в **…**"}. Дальше выбирай тип под смысл: "text" (основной: можно "kick" — надзаголовок 2–3 слова строчными, например «моя позиция»), "photo" (если к мысли нужна фотография, не больше двух), "tabs" (обзор нескольких препаратов или тем: поле "tabs" — список через запятую одинаковый на всех таких слайдах, "h" — название активной вкладки, "sub" — пояснение 2–4 слова), "bgphoto" (сильная мысль на фото фоном). Последний слайд — призыв: "btn":"Запись на консультацию", "btnsub":"ссылка в шапке профиля", для медицинских тем "small" — дисклеймер «Не является рекомендацией к применению. Есть противопоказания, нужна консультация специалиста.». Поле "t" — строки через \n: абзац 1–3 строки; "> **НАПОМНЮ:** текст" — врезка для важной оговорки; "• а • б • в" — короткие чипы (2–3 слова каждый); "**1.** пункт" — нумерация. "closer" — необязательная короткая финальная фраза-вывод. На слайде не больше 60 слов. Ключевые слова выделяй **…**, не больше 2–3 на слайд. Без эмодзи, хэштегов и подписи. Ответь только JSON-массивом объектов с полями type, kick, h, sub, tabs, t, closer, btn, btnsub, small (пустые поля не пиши).`
       :isCase
       ?`Ты SMM-копирайтер онлайн-школы SHKOLA. Напиши карусель-кейс/статью для Instagram.\n\n${context(it.client)}\n\nТема: ${title}\nТекущий черновик (можно переписать полностью, сохраняя смысл и факты из него):\n${draft}\n\nСтруктура из ${n} слайдов как в образце: 1 — обложка (bg "photo", tag "Кейс ученицы" или подходящий, h — цитата или крючок до 50 символов, t — подзаголовок до 45 символов с выделением *…*, note — "Имя Фамилия\\nописание до 45 символов"); 2 — боль "Знакомо?" (bg "light", 3 пункта); 3 — решение (bg "blue", 3 пункта, note — короткий вывод); 4 — изменения (bg "light", нумерованный список 3–4 пункта, note — вывод); 5 — главный результат-цитата (bg "blue", note — имя); 6 — призыв (bg "light", btn "Напишите нам в Direct", note — короткая подпись под кнопкой).\nПоля слайда: tag (2–3 слова), h (до 60 символов), t (строки через \\n; пункт начинается с "- ", нумерованный с "1. "), note, bg ("light"|"blue"|"photo"), btn (только для последнего). Разметка: *слово* — акцент, _слово_ — оранжевое выделение, **слово** — жирный; в каждом заголовке выдели 1–3 ключевых слова. Без эмодзи и хэштегов. Ответь только JSON-массивом объектов.`
       :`Ты SMM-копирайтер. Напиши карусель для Instagram (формат 4:5) для клиента.\n\n${context(it.client)}\n\nТема карусели: ${title}\nТекущий черновик слайдов (можно переписать полностью):\n${draft}\n\nСделай ${n} слайдов. Слайд 1 — обложка: "h" — цепляющий заголовок до 60 символов, "t" — подзаголовок до 90 символов. Слайды 2–${n-1}: "h" — одна мысль до 50 символов, "t" — пояснение 1–3 предложения, до 220 символов. Последний слайд — призыв: "h" до 50 символов, "t" до 140 символов (сохранить, написать в директ или оставить комментарий). Пиши в тоне клиента, по-русски, без хэштегов и эмодзи. Ответь только JSON-массивом объектов {"h": "...", "t": "..."}.`;
     const arr=await s.json(prompt,{cache:false});
-    const keep=['h','t','tag','note','btn','bg','type','closer'];
-    const slides=(Array.isArray(arr)?arr:[]).filter(x=>x&&(x.h||x.t)).slice(0,10).map((x,i)=>{const o={};for(const k of keep)if(x[k]!=null)o[k]=String(x[k]);if(o.bg&&!['light','blue','photo'].includes(o.bg))delete o.bg;if(o.type&&!['cover','photo','text','reel'].includes(o.type))delete o.type;const old=it.slides[i]||{};for(const k of ['photo','fy','ph'])if(old[k]!=null)o[k]=old[k];return o});
+    const keep=['h','t','tag','note','btn','bg','type','closer','kick','tabs','sub','btnsub','small'];
+    const slides=(Array.isArray(arr)?arr:[]).filter(x=>x&&(x.h||x.t)).slice(0,14).map((x,i)=>{const o={};for(const k of keep)if(x[k]!=null)o[k]=String(x[k]);if(o.bg&&!['light','blue','photo'].includes(o.bg))delete o.bg;if(o.type&&!['cover','photo','text','bgphoto','tabs','reel'].includes(o.type))delete o.type;const old=it.slides[i]||{};for(const k of ['photo','fy','ph'])if(old[k]!=null)o[k]=old[k];return o});
     if(slides.length){it.slides=slides;if(!it.title)it.title=title;studio.dirty=true}
   }catch(e){if(e?.code!=='cancelled')toast(sampleErr(e))}
   finally{if(studio){studio.busy=false;drawStudio()}}
@@ -1331,7 +1401,7 @@ document.addEventListener('input',e=>{
   if(!studio)return;const id=e.target.id||'';
   if(id==='cs-title'){studio.it.title=e.target.value;studio.dirty=true;return}
   if(id==='cs-style'){const v=e.target.value;if(v!==studio.it.style){studio.it.style=v;studio.it.slides=defaultSlides(studio.it.title,v);studio.dirty=true;drawStudio()}return}
-  const m=id.match(/^cs-(h|t|tag|note|btn|bg|type|phh|fy|closer)-(\d+)$/);if(!m)return;
+  const m=id.match(/^cs-(h|t|tag|note|btn|bg|type|phh|fy|closer|kick|tabs|sub|btnsub|small)-(\d+)$/);if(!m)return;
   const i=+m[2],k={phh:'ph'}[m[1]]||m[1];studio.it.slides[i][k]=['ph','fy'].includes(k)?+e.target.value:e.target.value;studio.dirty=true;
   if(k==='type'){drawStudio();return}
   clearTimeout(drawT);drawT=setTimeout(()=>redrawStudio(i),120);
@@ -1359,6 +1429,7 @@ document.addEventListener('click',async e=>{
   else if(a==='ai')studioAI();
   else if(a==='add'){const bl=STYLES[studio.it.style]?.blank;sl.splice(Math.max(1,sl.length-1),0,bl?bl():{h:'Новая мысль',t:''});studio.dirty=true;drawStudio()}
   else if(a==='rm'){sl.splice(i,1);studio.dirty=true;drawStudio()}
+  else if(a==='dup'){sl.splice(i+1,0,JSON.parse(JSON.stringify(sl[i])));studio.dirty=true;drawStudio()}
   else if(a==='nophoto'){delete sl[i].photo;studio.dirty=true;drawStudio()}
   else if(a==='up'&&i>0){[sl[i-1],sl[i]]=[sl[i],sl[i-1]];studio.dirty=true;drawStudio()}
   else if(a==='down'&&i<sl.length-1){[sl[i+1],sl[i]]=[sl[i],sl[i+1]];studio.dirty=true;drawStudio()}
