@@ -1131,8 +1131,9 @@ function natFlow(ctx,s,MW,o){
   const items=[];let h=0,gap=0;
   const push=(height,draw,after)=>{h+=gap;const dy=h;items.push((x,y)=>draw(x,y+dy));h+=height;gap=after};
   const bf=(c,m)=>nfont(c,m?600:300,o.bs);
-  if(s.kick){const f=c=>nfont(c,300,Math.round(o.bs*.82));const L=richLayout(ctx,s.kick,MW,f);const lh=Math.round(o.bs*1.05);push(L.length*lh,(x,y)=>richDraw(ctx,L,x,y,lh,0,f,()=>NT.muted,()=>null),12)}
-  if(s.h){const tf=c=>nfont(c,600,o.ts);const L=richLayout(ctx,s.h,MW,tf);push(L.length*o.tl,(x,y)=>richDraw(ctx,L,x,y,o.tl,o.ts,tf,m=>m?NT.gold:NT.ink,()=>null),o.gap)}
+  if(s.kick){const f=c=>nfont(c,300,Math.round(o.bs*.82));const L=richLayout(ctx,s.kick,o.titleW||MW,f);const lh=Math.round(o.bs*1.05);push(L.length*lh,(x,y)=>richDraw(ctx,L,x,y,lh,0,f,()=>NT.muted,()=>null),12)}
+  if(s.h){const tf=c=>nfont(c,600,o.ts);const L=richLayout(ctx,s.h,o.titleW||MW,tf);push(L.length*o.tl,(x,y)=>richDraw(ctx,L,x,y,o.tl,o.ts,tf,m=>m?NT.gold:NT.ink,()=>null),o.gap)}
+  if(o.titleMinH&&h<o.titleMinH)h=o.titleMinH;
   if(s.sub){const f=c=>nfont(c,300,o.bs);const L=richLayout(ctx,s.sub,MW,f);push(L.length*o.bl,(x,y)=>richDraw(ctx,L,x,y,o.bl,o.bs,f,()=>NT.gold,()=>null),o.gap)}
   for(const raw of String(s.t||'').split('\n')){
     const line=raw.trim();if(!line)continue;
@@ -1163,6 +1164,93 @@ function natFlow(ctx,s,MW,o){
   }
   if(s.small){const f=c=>nfont(c,300,24);const L=richLayout(ctx,s.small,MW,f);push(L.length*32,(x,y)=>richDraw(ctx,L,x,y,32,24,f,()=>NT.small,()=>null),0)}
   return {h,draw:(x,y)=>items.forEach(d=>d(x,y))};
+}
+/* drawn product art in the vial style: grey glass, ribbed gold cap, white label with a name */
+const ART_TYPES=[['auto','Картинка: авто'],['none','Без картинки'],['vial','Флакон (пептид)'],['jar','Банка с капсулами'],['dropper','Флакон с пипеткой'],['tube','Тюбик (крем)'],['testtube','Пробирка (анализ)'],['ampoule','Ампула']];
+const ART_SUB={vial:'lyophilized peptide',jar:'dietary supplement',dropper:'serum',tube:'cream',testtube:'lab test',ampoule:'solution'};
+const ART_RULES=[
+  [/пептид|лиофил|bpc|tb-500|эпитал|семакс|mots|kpv|селанк/i,'vial'],
+  [/ампул|инъекц|укол|мезотерап/i,'ampoule'],
+  [/анализ|кров|ферритин|гемоглоб|ттг|пробирк|чекап|check-?up/i,'testtube'],
+  [/сыворот|пипетк|масл[оа]|капл/i,'dropper'],
+  [/крем|spf|санскрин|гель|бальзам|маск[аи]/i,'tube'],
+  [/капсул|витамин|бад|омег|магни|цинк|железо|коллаген|добавк/i,'jar']];
+function artFor(s,type){
+  const a=s.art||'auto';if(a==='none')return null;if(a!=='auto')return a;
+  for(const txt of [[s.h,s.sub,s.artLabel].join(' '),[s.kick,s.t].join(' ')])for(const [re,k] of ART_RULES)if(re.test(txt))return k;
+  return null;
+}
+function artLabelFor(s,kind,type){
+  if(s.artLabel)return s.artLabel;
+  if(type==='tabs')return String(s.h||'').replace(/[*_]/g,'').trim();
+  const txt=[s.h,s.sub,s.t].join(' ');const rule=ART_RULES.find(([,k])=>k===kind);const m=rule&&txt.match(rule[0]);
+  return m?m[0][0].toUpperCase()+m[0].slice(1).toLowerCase():'';
+}
+function labelText(ctx,x,y,w,name,sub,maxSize){
+  let fs=maxSize;nfont(ctx,700,fs);while(fs>11&&ctx.measureText(name).width>w-14){fs--;nfont(ctx,700,fs)}
+  ctx.fillStyle='#141416';drawSpaced(ctx,name,x+w/2,y,0,'center');
+  if(sub){nfont(ctx,500,9);ctx.fillStyle='#8A8A8E';drawSpaced(ctx,sub,x+w/2,y+fs+8,0,'center')}
+}
+function goldCap(ctx,x,y,w,h,ribs){
+  const g=ctx.createLinearGradient(x,0,x+w,0);g.addColorStop(0,'#B8874A');g.addColorStop(.35,'#F2D59E');g.addColorStop(.7,'#D9AF6A');g.addColorStop(1,'#A87A40');
+  rr(ctx,x,y,w,h,8);ctx.fillStyle=g;ctx.fill();
+  ctx.strokeStyle='rgba(90,60,25,.45)';ctx.lineWidth=2;for(let k=1;k<ribs;k++){const yy=y+k*h/ribs;ctx.beginPath();ctx.moveTo(x+4,yy);ctx.lineTo(x+w-4,yy);ctx.stroke()}
+}
+function glass(ctx,x,y,w,h,r,tone){
+  const g=ctx.createLinearGradient(x,0,x+w,0);
+  const c=tone==='amber'?['#3A2616','#7A5232','#2A1A0E','#5A3A20']:['#45454B','#7C7C83','#38383E','#5E5E64'];
+  g.addColorStop(0,c[0]);g.addColorStop(.28,c[1]);g.addColorStop(.6,c[2]);g.addColorStop(1,c[3]);
+  rr(ctx,x,y,w,h,r);ctx.fillStyle=g;ctx.fill();
+  ctx.save();rr(ctx,x,y,w,h,r);ctx.clip();ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(x+w*.12,y+8,w*.08,h-16);ctx.restore();
+}
+function drawArt(ctx,kind,x,y,name,sub){
+  const W=170,H=260;ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=24;ctx.shadowOffsetY=10;
+  if(kind==='vial'){
+    glass(ctx,x+10,y+72,150,186,22);ctx.shadowColor='transparent';
+    ctx.fillStyle='#E8E8E4';rr(ctx,x+20,y+212,130,38,14);ctx.fill();
+    ctx.fillStyle='#26262A';ctx.fillRect(x+42,y+58,86,16);
+    goldCap(ctx,x+30,y,110,60,7);
+    ctx.fillStyle='#F4F4F1';ctx.fillRect(x+10,y+118,150,80);ctx.fillStyle='#D9AF6A';ctx.fillRect(x+10,y+194,150,4);
+    labelText(ctx,x+10,y+136,150,name,sub,24);
+  }else if(kind==='jar'){
+    glass(ctx,x+8,y+64,154,194,28);ctx.shadowColor='transparent';
+    goldCap(ctx,x+16,y+8,138,58,6);
+    ctx.fillStyle='#F4F4F1';ctx.fillRect(x+8,y+120,154,92);ctx.fillStyle='#D9AF6A';ctx.fillRect(x+8,y+208,154,4);
+    labelText(ctx,x+8,y+140,154,name,sub,24);
+    for(const [cx2,cy2,a] of [[x+40,y+236,-.3],[x+86,y+240,.2],[x+128,y+234,-.1]]){ctx.save();ctx.translate(cx2,cy2);ctx.rotate(a);rr(ctx,-22,-9,44,18,9);ctx.fillStyle='#EBC385';ctx.fill();ctx.fillStyle='#F4F4F1';ctx.fillRect(0,-9,22,18);ctx.restore()}
+  }else if(kind==='dropper'){
+    glass(ctx,x+25,y+92,120,166,30,'amber');ctx.shadowColor='transparent';
+    rr(ctx,x+64,y,42,66,20);ctx.fillStyle='#1E1E21';ctx.fill();
+    goldCap(ctx,x+48,y+58,74,38,4);
+    ctx.fillStyle='#F4F4F1';ctx.fillRect(x+25,y+150,120,70);ctx.fillStyle='#D9AF6A';ctx.fillRect(x+25,y+216,120,4);
+    labelText(ctx,x+25,y+164,120,name,sub,20);
+  }else if(kind==='tube'){
+    ctx.beginPath();ctx.moveTo(x+28,y+22);ctx.lineTo(x+142,y+22);ctx.lineTo(x+122,y+212);ctx.lineTo(x+48,y+212);ctx.closePath();
+    const g=ctx.createLinearGradient(x+28,0,x+142,0);g.addColorStop(0,'#CFCFCB');g.addColorStop(.35,'#FAFAF7');g.addColorStop(1,'#BDBDB8');ctx.fillStyle=g;ctx.fill();ctx.shadowColor='transparent';
+    ctx.fillStyle='#BDBDB8';ctx.fillRect(x+26,y+6,118,18);ctx.strokeStyle='rgba(0,0,0,.12)';ctx.lineWidth=1.5;for(let k=0;k<12;k++){ctx.beginPath();ctx.moveTo(x+32+k*9,y+8);ctx.lineTo(x+32+k*9,y+22);ctx.stroke()}
+    goldCap(ctx,x+52,y+208,66,50,4);
+    ctx.fillStyle='#D9AF6A';ctx.fillRect(x+44,y+150,82,3);
+    labelText(ctx,x+40,y+92,90,name,sub,20);
+  }else if(kind==='testtube'){
+    ctx.shadowColor='transparent';
+    ctx.beginPath();ctx.moveTo(x+58,y+40);ctx.lineTo(x+58,y+222);ctx.arc(x+85,y+222,27,Math.PI,0,true);ctx.lineTo(x+112,y+40);ctx.closePath();
+    ctx.fillStyle='rgba(255,255,255,.07)';ctx.fill();ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.save();ctx.clip();const lg=ctx.createLinearGradient(x+58,0,x+112,0);lg.addColorStop(0,'#5A1418');lg.addColorStop(.4,'#9A2A2E');lg.addColorStop(1,'#4A1013');ctx.fillStyle=lg;ctx.fillRect(x+56,y+150,60,110);ctx.restore();
+    goldCap(ctx,x+52,y+6,66,40,4);
+    ctx.fillStyle='#F4F4F1';ctx.fillRect(x+58,y+70,54,62);ctx.fillStyle='#D9AF6A';ctx.fillRect(x+58,y+128,54,3);
+    labelText(ctx,x+58,y+86,54,name,'',14);
+  }else if(kind==='ampoule'){
+    ctx.shadowColor='transparent';
+    const p=new Path2D();p.moveTo(x+70,y+10);p.quadraticCurveTo(x+85,y-2,x+100,y+10);p.lineTo(x+100,y+52);p.quadraticCurveTo(x+94,y+68,x+96,y+84);p.quadraticCurveTo(x+130,y+100,x+130,y+132);p.lineTo(x+130,y+240);p.quadraticCurveTo(x+130,y+258,x+112,y+258);p.lineTo(x+58,y+258);p.quadraticCurveTo(x+40,y+258,x+40,y+240);p.lineTo(x+40,y+132);p.quadraticCurveTo(x+40,y+100,x+74,y+84);p.quadraticCurveTo(x+76,y+68,x+70,y+52);p.closePath();
+    const g=ctx.createLinearGradient(x+40,0,x+130,0);g.addColorStop(0,'rgba(220,225,232,.30)');g.addColorStop(.35,'rgba(255,255,255,.62)');g.addColorStop(1,'rgba(210,215,222,.26)');ctx.fillStyle=g;ctx.fill(p);ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=2;ctx.stroke(p);
+    ctx.save();ctx.clip(p);ctx.fillStyle='rgba(235,195,133,.75)';ctx.fillRect(x+38,y+196,94,64);ctx.restore();
+    ctx.fillStyle='#D9AF6A';ctx.fillRect(x+68,y+60,34,6);
+    ctx.fillStyle='#F4F4F1';ctx.fillRect(x+40,y+136,90,56);ctx.fillStyle='#D9AF6A';ctx.fillRect(x+40,y+188,90,3);
+    labelText(ctx,x+40,y+150,90,name,'',16);
+  }
+  ctx.restore();
+  return {w:W,h:H};
 }
 const NAT_SIZES={
   photo:[{ts:56,tl:66,bs:34,bl:47,cs:40,cl:52,gap:30,pgap:26},{ts:50,tl:60,bs:31,bl:43,cs:36,cl:48,gap:26,pgap:22},{ts:46,tl:54,bs:28,bl:39,cs:32,cl:42,gap:22,pgap:18}],
@@ -1224,8 +1312,10 @@ function natSlide(ctx,s,i,n,A){
       ctx.fillStyle=NT.panel;ctx.fillRect(ax+1,py-2,aw-2,8);
       nfont(ctx,600,fs);ctx.fillStyle=NT.gold;ctx.fillText(tabs[act].replace(/^\*/,''),ax+pad,ty+(th-fs*1.2)/2+8)}
     const X=px+30,MW=pw-60;let y=py+70;
+    const kind=img?null:artFor(s,type);
     if(img){const bw=170,bh=260,ix=px+pw-30-bw,iy=py+44,k=Math.min(bw/img.width,bh/img.height),dw=img.width*k,dh=img.height*k;ctx.drawImage(img,ix+(bw-dw)/2,iy+(bh-dh)/2,dw,dh)}
-    const nameW=img?MW-200:MW,f=sz=>c=>nfont(c,500,sz);let sz=100,L;for(;sz>=60;sz-=6){L=richLayout(ctx,s.h,nameW,f(sz));if(L.length<=2)break}
+    else if(kind)drawArt(ctx,kind,px+pw-30-170,py+44,artLabelFor(s,kind,type),s.artSub!=null&&s.artSub!==''?s.artSub:ART_SUB[kind]);
+    const nameW=img||kind?MW-200:MW,f=sz=>c=>nfont(c,500,sz);let sz=100,L;for(;sz>=60;sz-=6){L=richLayout(ctx,s.h,nameW,f(sz));if(L.length<=2)break}
     richDraw(ctx,L,X,y,sz*1.08,sz,f(sz),m=>m?NT.gold:NT.ink,()=>null);y+=L.length*sz*1.08+8;
     if(s.sub){const sf=c=>nfont(c,300,36);const SL=richLayout(ctx,s.sub,nameW,sf);richDraw(ctx,SL,X,y,46,36,sf,()=>NT.gold,()=>null);y+=SL.length*46}
     y=Math.max(y+70,py+330);
@@ -1239,7 +1329,10 @@ function natSlide(ctx,s,i,n,A){
       ctx.restore();
     }
     const X=cx+60,MW=cw-120,top=lineY+2+60,room=bottom-60-top;
-    const r=natFit(ctx,s,MW,NAT_SIZES.text,room);over=r.over;r.fl.draw(X,top+Math.max(0,(room-r.fl.h)/2));
+    const kind=type==='text'?artFor(s,type):null;
+    const list=kind?NAT_SIZES.text.map(o=>({...o,titleW:MW-200,titleMinH:290})):NAT_SIZES.text;
+    const r=natFit(ctx,s,MW,list,room);over=r.over;const ct=top+Math.max(0,(room-r.fl.h)/2);r.fl.draw(X,ct);
+    if(kind)drawArt(ctx,kind,X+MW-170,ct,artLabelFor(s,kind,type),s.artSub!=null&&s.artSub!==''?s.artSub:ART_SUB[kind]);
   }
   rr(ctx,cx,cy,cw,ch,32);ctx.strokeStyle=NT.border;ctx.lineWidth=2;ctx.stroke();
   return {overflow:over};
@@ -1260,6 +1353,7 @@ function natFields(s,i){
   return `<div class="st-row"><select class="field" id="cs-type-${i}" aria-label="Тип слайда">${opt([['cover','Обложка карусели'],['photo','Слайд с фото'],['text','Текстовый слайд'],['bgphoto','Фото фоном'],['tabs','Вкладки (препарат / тема)'],['reel','Обложка рилса 9:16']],type)}</select>${hasPhoto?photoCtl(s,i,type==='tabs'?'картинку':''):''}</div>
     ${hasPhoto&&type!=='tabs'?`<div class="st-row">${type==='photo'?`<select class="field" id="cs-phh-${i}" aria-label="Высота фото">${opt([[400,'Фото низкое (400)'],[560,'Фото среднее (560)'],[640,'Фото высокое (640)']],s.ph||560)}</select>`:''}<select class="field" id="cs-fy-${i}" aria-label="Где лицо на фото">${opt([[.15,'Лицо: вверху'],[.35,'Лицо: стандарт'],[.5,'Лицо: по центру'],[.7,'Лицо: внизу']],fy)}</select></div>`:''}
     ${type==='tabs'?inp('tabs','Вкладки через запятую: BPC-157, TB-500, Эпиталон'):''}
+    ${type==='tabs'||type==='text'?`<div class="st-row"><select class="field" id="cs-art-${i}" aria-label="Картинка">${opt(ART_TYPES,s.art||'auto')}</select>${inp('artLabel','Надпись на этикетке, напр. Semax')}</div>`:''}
     ${body&&type!=='tabs'?inp('kick','Надзаголовок мелким (необязательно)'):''}
     ${ta('h',type==='reel'?'Текст обложки, _курсив_ для акцента':type==='tabs'?'Название (совпадает с активной вкладкой)':'Заголовок, **золотые слова**',2)}
     ${type==='tabs'?inp('sub','Подзаголовок золотом: «мозг и память»'):''}
@@ -1382,12 +1476,12 @@ async function studioAI(){
   try{
     const draft=it.slides.map((x,i)=>`${i+1}. `+JSON.stringify(x)).join('\n');
     const prompt=isNat
-      ?`Ты пишешь карусель для Instagram в блог доктора Натальи Перепелицы (врач превентивной медицины, косметолог, генетик).\n\n${context(it.client)}\n\nТема: ${title}\nТекущий черновик (можно переписать полностью, сохраняя смысл и факты):\n${draft}\n\nГолос: от первого лица, коротко, честно, с юмором. Сделай ${n} слайдов. Первый — {"type":"cover","h":"самая цепляющая фраза, 2–4 строки, последние слова в **…**"}. Дальше выбирай тип под смысл: "text" (основной: можно "kick" — надзаголовок 2–3 слова строчными, например «моя позиция»), "photo" (если к мысли нужна фотография, не больше двух), "tabs" (обзор нескольких препаратов или тем: поле "tabs" — список через запятую одинаковый на всех таких слайдах, "h" — название активной вкладки, "sub" — пояснение 2–4 слова), "bgphoto" (сильная мысль на фото фоном). Последний слайд — призыв: "btn":"Запись на консультацию", "btnsub":"ссылка в шапке профиля", для медицинских тем "small" — дисклеймер «Не является рекомендацией к применению. Есть противопоказания, нужна консультация специалиста.». Поле "t" — строки через \n: абзац 1–3 строки; "> **НАПОМНЮ:** текст" — врезка для важной оговорки; "• а • б • в" — короткие чипы (2–3 слова каждый); "**1.** пункт" — нумерация. "closer" — необязательная короткая финальная фраза-вывод. На слайде не больше 60 слов. Ключевые слова выделяй **…**, не больше 2–3 на слайд. Без эмодзи, хэштегов и подписи. Ответь только JSON-массивом объектов с полями type, kick, h, sub, tabs, t, closer, btn, btnsub, small (пустые поля не пиши).`
+      ?`Ты пишешь карусель для Instagram в блог доктора Натальи Перепелицы (врач превентивной медицины, косметолог, генетик).\n\n${context(it.client)}\n\nТема: ${title}\nТекущий черновик (можно переписать полностью, сохраняя смысл и факты):\n${draft}\n\nГолос: от первого лица, коротко, честно, с юмором. Сделай ${n} слайдов. Первый — {"type":"cover","h":"самая цепляющая фраза, 2–4 строки, последние слова в **…**"}. Дальше выбирай тип под смысл: "text" (основной: можно "kick" — надзаголовок 2–3 слова строчными, например «моя позиция»), "photo" (если к мысли нужна фотография, не больше двух), "tabs" (обзор нескольких препаратов или тем: поле "tabs" — список через запятую одинаковый на всех таких слайдах, "h" — название активной вкладки, "sub" — пояснение 2–4 слова), "bgphoto" (сильная мысль на фото фоном). Последний слайд — призыв: "btn":"Запись на консультацию", "btnsub":"ссылка в шапке профиля", для медицинских тем "small" — дисклеймер «Не является рекомендацией к применению. Есть противопоказания, нужна консультация специалиста.». Поле "t" — строки через \n: абзац 1–3 строки; "> **НАПОМНЮ:** текст" — врезка для важной оговорки; "• а • б • в" — короткие чипы (2–3 слова каждый); "**1.** пункт" — нумерация. "closer" — необязательная короткая финальная фраза-вывод. На слайде не больше 60 слов. Ключевые слова выделяй **…**, не больше 2–3 на слайд. Без эмодзи, хэштегов и подписи. Если слайд типа text или tabs посвящён конкретному препарату, БАДу, косметике или анализу — добавь картинку: "art" — одно из vial (пептид во флаконе), jar (капсулы, витамины, БАД), dropper (сыворотка, масло, капли), tube (крем, SPF, гель), testtube (анализ крови), ampoule (инъекции), и "artLabel" — короткое название латиницей, как на упаковке (Semax, Epitalon, Magnesium, Vitamin D3, Ferritin). Если предмета нет — "art":"none". Ответь только JSON-массивом объектов с полями type, kick, h, sub, tabs, t, closer, btn, btnsub, small, art, artLabel (пустые поля не пиши).`
       :isCase
       ?`Ты SMM-копирайтер онлайн-школы SHKOLA. Напиши карусель-кейс/статью для Instagram.\n\n${context(it.client)}\n\nТема: ${title}\nТекущий черновик (можно переписать полностью, сохраняя смысл и факты из него):\n${draft}\n\nСтруктура из ${n} слайдов как в образце: 1 — обложка (bg "photo", tag "Кейс ученицы" или подходящий, h — цитата или крючок до 50 символов, t — подзаголовок до 45 символов с выделением *…*, note — "Имя Фамилия\\nописание до 45 символов"); 2 — боль "Знакомо?" (bg "light", 3 пункта); 3 — решение (bg "blue", 3 пункта, note — короткий вывод); 4 — изменения (bg "light", нумерованный список 3–4 пункта, note — вывод); 5 — главный результат-цитата (bg "blue", note — имя); 6 — призыв (bg "light", btn "Напишите нам в Direct", note — короткая подпись под кнопкой).\nПоля слайда: tag (2–3 слова), h (до 60 символов), t (строки через \\n; пункт начинается с "- ", нумерованный с "1. "), note, bg ("light"|"blue"|"photo"), btn (только для последнего). Разметка: *слово* — акцент, _слово_ — оранжевое выделение, **слово** — жирный; в каждом заголовке выдели 1–3 ключевых слова. Без эмодзи и хэштегов. Ответь только JSON-массивом объектов.`
       :`Ты SMM-копирайтер. Напиши карусель для Instagram (формат 4:5) для клиента.\n\n${context(it.client)}\n\nТема карусели: ${title}\nТекущий черновик слайдов (можно переписать полностью):\n${draft}\n\nСделай ${n} слайдов. Слайд 1 — обложка: "h" — цепляющий заголовок до 60 символов, "t" — подзаголовок до 90 символов. Слайды 2–${n-1}: "h" — одна мысль до 50 символов, "t" — пояснение 1–3 предложения, до 220 символов. Последний слайд — призыв: "h" до 50 символов, "t" до 140 символов (сохранить, написать в директ или оставить комментарий). Пиши в тоне клиента, по-русски, без хэштегов и эмодзи. Ответь только JSON-массивом объектов {"h": "...", "t": "..."}.`;
     const arr=await s.json(prompt,{cache:false});
-    const keep=['h','t','tag','note','btn','bg','type','closer','kick','tabs','sub','btnsub','small'];
+    const keep=['h','t','tag','note','btn','bg','type','closer','kick','tabs','sub','btnsub','small','art','artLabel'];
     const slides=(Array.isArray(arr)?arr:[]).filter(x=>x&&(x.h||x.t)).slice(0,14).map((x,i)=>{const o={};for(const k of keep)if(x[k]!=null)o[k]=String(x[k]);if(o.bg&&!['light','blue','photo'].includes(o.bg))delete o.bg;if(o.type&&!['cover','photo','text','bgphoto','tabs','reel'].includes(o.type))delete o.type;const old=it.slides[i]||{};for(const k of ['photo','fy','ph'])if(old[k]!=null)o[k]=old[k];return o});
     if(slides.length){it.slides=slides;if(!it.title)it.title=title;studio.dirty=true}
   }catch(e){if(e?.code!=='cancelled')toast(sampleErr(e))}
@@ -1401,7 +1495,7 @@ document.addEventListener('input',e=>{
   if(!studio)return;const id=e.target.id||'';
   if(id==='cs-title'){studio.it.title=e.target.value;studio.dirty=true;return}
   if(id==='cs-style'){const v=e.target.value;if(v!==studio.it.style){studio.it.style=v;studio.it.slides=defaultSlides(studio.it.title,v);studio.dirty=true;drawStudio()}return}
-  const m=id.match(/^cs-(h|t|tag|note|btn|bg|type|phh|fy|closer|kick|tabs|sub|btnsub|small)-(\d+)$/);if(!m)return;
+  const m=id.match(/^cs-(h|t|tag|note|btn|bg|type|phh|fy|closer|kick|tabs|sub|btnsub|small|art|artLabel|artSub)-(\d+)$/);if(!m)return;
   const i=+m[2],k={phh:'ph'}[m[1]]||m[1];studio.it.slides[i][k]=['ph','fy'].includes(k)?+e.target.value:e.target.value;studio.dirty=true;
   if(k==='type'){drawStudio();return}
   clearTimeout(drawT);drawT=setTimeout(()=>redrawStudio(i),120);
