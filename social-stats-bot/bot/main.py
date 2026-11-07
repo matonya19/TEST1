@@ -29,8 +29,8 @@ def collect() -> list[AccountStats]:
         jobs.append(("youtube", lambda: youtube.fetch(env("YOUTUBE_API_KEY"), env("YOUTUBE_CHANNEL"))))
     if env("INSTAGRAM_ACCESS_TOKEN"):
         jobs.append(("instagram", lambda: instagram.fetch(
-            env("INSTAGRAM_ACCESS_TOKEN"), env("INSTAGRAM_USER_ID", "me"),
-            env("INSTAGRAM_API_HOST", "graph.instagram.com"), env("INSTAGRAM_API_VERSION", "v23.0"))))
+            env("INSTAGRAM_ACCESS_TOKEN"), env("INSTAGRAM_USER_ID"),
+            env("INSTAGRAM_API_HOST"), env("INSTAGRAM_API_VERSION", "v23.0"))))
     if env("TIKTOK_CLIENT_KEY") and env("TIKTOK_REFRESH_TOKEN"):
         jobs.append(("tiktok", lambda: tiktok.fetch(
             env("TIKTOK_CLIENT_KEY"), env("TIKTOK_CLIENT_SECRET", ""), env("TIKTOK_REFRESH_TOKEN"))))
