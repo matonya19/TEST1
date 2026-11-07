@@ -14,6 +14,7 @@ export const SOURCE_WORKSPACES = [
   { id: 'shkola', label: 'Школа', color: '#6D8FBD' },
   { id: 'ulyana', label: 'Ульяна', color: '#C77A93' },
   { id: 'natalia', label: 'Наталья', color: '#8A7CB0' },
+  { id: 'interview', label: 'Курс интервью', color: '#B0715B' },
 ];
 
 export function isCombinedWorkspace() {
