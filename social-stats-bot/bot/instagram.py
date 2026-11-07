@@ -58,15 +58,35 @@ def detect_host(token: str) -> str:
     return "graph.instagram.com" if token.startswith("IG") else "graph.facebook.com"
 
 
+def _ids_from_token_scopes(c: Client) -> list[tuple[str, str]]:
+    """У токена системного пользователя в granular_scopes лежат ID выданных объектов."""
+    try:
+        data = c.get("debug_token", input_token=c.token).get("data", {})
+    except RuntimeError as e:
+        log.info("Instagram: debug_token недоступно (%s)", str(e)[:120])
+        return []
+    ids: list[str] = []
+    for scope in data.get("granular_scopes", []):
+        if scope.get("scope", "").startswith("instagram_"):
+            ids += [i for i in scope.get("target_ids", []) if i not in ids]
+    found = []
+    for ig_id in ids:
+        try:
+            found.append((ig_id, c.get(ig_id, fields="username").get("username", "")))
+        except RuntimeError as e:
+            log.info("Instagram: объект %s не похож на аккаунт (%s)", ig_id, str(e)[:120])
+    return found
+
+
 def discover_user_id(c: Client) -> str:
     """Ищет ID Instagram-аккаунта, доступного токену Facebook/системного пользователя."""
-    found: list[tuple[str, str]] = []
+    found: list[tuple[str, str]] = _ids_from_token_scopes(c)
     attempts = [
         ("me/accounts", {"fields": "name,instagram_business_account{id,username}"}),
         ("me/businesses", {"fields": "name,owned_instagram_accounts{id,username},"
                                     "instagram_business_accounts{id,username}"}),
     ]
-    for path, params in attempts:
+    for path, params in ([] if found else attempts):
         try:
             data = c.get(path, **params).get("data", [])
         except RuntimeError as e:
