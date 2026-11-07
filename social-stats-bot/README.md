@@ -1,0 +1,99 @@
+# Бот статистики соцсетей
+
+Каждый понедельник в 09:00 по Москве бот:
+
+1. собирает статистику аккаунтов **YouTube**, **Instagram** и **TikTok**: подписчиков, просмотры, лайки, комментарии, репосты, сохранения;
+2. считает прирост за неделю (сравнивает с прошлым снимком в `data/history.json`);
+3. находит ролики, которые **залетели**: набрали в `VIRAL_MULTIPLIER` раз (по умолчанию в 2) больше медианы аккаунта;
+4. отдаёт данные в **Claude**, чтобы тот объяснил, **почему** ролики залетели, и дал 3 рекомендации на неделю;
+5. присылает отчёт в **Telegram**.
+
+```
+📊 Отчёт по соцсетям · 9 ноября 2026
+
+🎵 TikTok · @my_account
+👥 Подписчики: 33 тыс (+321 за неделю)
+👁 Просмотры роликов за неделю: ≈ +27,5 тыс
+🆕 Новых роликов за неделю: 3
+📏 Медиана: 9 910 просм., ER 7.5%
+🔥 Залетело:
+• Как я делегировал отдел за месяц — 55,3 тыс просм., ×5.6 к медиане, ER 7.3%, 1 546 репостов
+
+🧠 Почему залетело
+…
+```
+
+## Быстрый старт
+
+```bash
+cd social-stats-bot
+pip install -r requirements.txt
+python -m bot.main --demo          # отчёт на фейковых данных, ключи не нужны
+cp .env.example .env               # заполнить ключи
+python -m bot.main --dry-run       # реальные данные, печать в консоль без отправки
+python -m bot.main                 # отправить в Telegram и сохранить снимок
+```
+
+Если какая-то платформа не настроена, бот её просто пропускает. Если платформа вернула ошибку, остальные всё равно попадут в отчёт, а для упавшей будет предупреждение.
+
+## Какие ключи нужны
+
+### Telegram
+1. Создайте бота у [@BotFather](https://t.me/BotFather), получите `TELEGRAM_BOT_TOKEN`.
+2. Напишите своему боту любое сообщение и откройте `https://api.telegram.org/bot<TOKEN>/getUpdates`, оттуда возьмите `chat.id`. Для группы добавьте бота в группу; id группы начинается с `-100`.
+
+### Claude (анализ причин)
+Ключ `ANTHROPIC_API_KEY` создаётся в [console.anthropic.com](https://console.anthropic.com). Модель по умолчанию `claude-opus-5-5`, её можно сменить через `CLAUDE_MODEL`. Без ключа отчёт придёт, но без раздела «Почему залетело».
+
+### YouTube
+1. В [Google Cloud Console](https://console.cloud.google.com/) включите **YouTube Data API v3** и создайте **API key**.
+2. В `YOUTUBE_CHANNEL` укажите хэндл (`@mychannel`) или ID канала (`UC…`).
+
+Бот берёт публичные данные: подписчиков, просмотры, лайки и комментарии. Удержание и источники трафика доступны только через YouTube Analytics API с OAuth; если понадобятся, это можно добавить.
+
+### Instagram
+Нужен **профессиональный аккаунт** (Business или Creator).
+
+Самый простой вариант: **Instagram API with Instagram Login**.
+1. На [developers.facebook.com](https://developers.facebook.com/) создайте приложение и добавьте продукт **Instagram**.
+2. Выдайте разрешения `instagram_business_basic` и `instagram_business_manage_insights` и сгенерируйте токен для своего аккаунта.
+3. Обменяйте его на long-lived токен (живёт 60 дней):
+   `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=APP_SECRET&access_token=SHORT_TOKEN`
+4. В `.env`: `INSTAGRAM_ACCESS_TOKEN=…`, `INSTAGRAM_USER_ID=me`, `INSTAGRAM_API_HOST=graph.instagram.com`.
+
+Long-lived токен нужно продлевать раз в 60 дней:
+`https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=TOKEN`.
+Если аккаунт привязан к странице Facebook, можно получить бессрочный токен System User через Business Manager. Тогда укажите `INSTAGRAM_API_HOST=graph.facebook.com` и числовой `INSTAGRAM_USER_ID`.
+
+Для каждого поста бот запрашивает просмотры, охват, сохранения, репосты, а для Reels ещё и среднее время просмотра.
+
+### TikTok
+1. На [developers.tiktok.com](https://developers.tiktok.com/) создайте приложение и подключите **Login Kit** со scopes `user.info.basic`, `user.info.profile`, `user.info.stats`, `video.list`. Укажите Redirect URI.
+2. Впишите в `.env` `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`, `TIKTOK_REDIRECT_URI`.
+3. Получите refresh token:
+   ```bash
+   python get_tiktok_token.py          # откройте ссылку, разрешите доступ
+   python get_tiktok_token.py <code>   # code возьмите из адресной строки после редиректа
+   ```
+4. Сохраните полученный `TIKTOK_REFRESH_TOKEN`. Он живёт 365 дней, access token бот обновляет сам при каждом запуске.
+
+Пока приложение на ревью, TikTok работает в sandbox-режиме: добавьте свой аккаунт в **Target users** приложения.
+
+## Запуск по расписанию (GitHub Actions)
+
+Workflow лежит в `.github/workflows/weekly-social-report.yml` и запускается каждый понедельник в 06:07 UTC (09:07 МСК).
+
+1. Смёржите ветку в основную: GitHub запускает расписания только с ветки по умолчанию.
+2. В **Settings → Secrets and variables → Actions** добавьте:
+   - **Secrets:** `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `ANTHROPIC_API_KEY`, `YOUTUBE_API_KEY`, `INSTAGRAM_ACCESS_TOKEN`, `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`, `TIKTOK_REFRESH_TOKEN`
+   - **Variables:** `YOUTUBE_CHANNEL`, `INSTAGRAM_USER_ID`, `INSTAGRAM_API_HOST`; по желанию `VIRAL_MULTIPLIER`, `VIRAL_MIN_VIEWS`
+3. Для проверки запустите вручную: **Actions → Weekly social media report → Run workflow**.
+
+После каждого запуска бот коммитит снимок в `data/history.json`, по нему считается прирост на следующей неделе. Поэтому первый отчёт придёт без «+N за неделю»: сравнивать пока не с чем.
+
+## Как бот решает, что ролик «залетел»
+
+- База — **медиана просмотров** по последним ~30 роликам аккаунта. Ролики младше 3 дней в базу не входят.
+- Ролик считается залетевшим, если он опубликован за последние `LOOKBACK_DAYS` дней (30), набрал не меньше `VIRAL_MIN_VIEWS` просмотров (1000) и не меньше `VIRAL_MULTIPLIER × медиана` (×2).
+- Отдельно отмечается **лидер недели** — ролик с наибольшим приростом просмотров за 7 дней.
+- Claude получает метрики залетевших и обычных роликов: подпись, длительность, день и время публикации, ER, репосты, сохранения, время просмотра. По ним он формулирует гипотезы, чем удачные ролики отличаются от остальных. Сами видео Claude не смотрит, поэтому выводы — это гипотезы, сделанные по цифрам и подписям.

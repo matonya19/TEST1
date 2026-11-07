@@ -1,0 +1,56 @@
+name: Weekly social media report
+
+on:
+  schedule:
+    # Каждый понедельник в 06:07 UTC = 09:07 по Москве
+    - cron: "7 6 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write  # чтобы сохранить историю снимков в репозиторий
+
+concurrency:
+  group: weekly-social-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: social-stats-bot
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: social-stats-bot/requirements.txt
+
+      - run: pip install -r requirements.txt
+
+      - name: Build and send report
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_CHANNEL: ${{ vars.YOUTUBE_CHANNEL }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ vars.INSTAGRAM_USER_ID }}
+          INSTAGRAM_API_HOST: ${{ vars.INSTAGRAM_API_HOST }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          VIRAL_MULTIPLIER: ${{ vars.VIRAL_MULTIPLIER }}
+          VIRAL_MIN_VIEWS: ${{ vars.VIRAL_MIN_VIEWS }}
+        run: python -m bot.main
+
+      - name: Save history
+        run: |
+          git config user.name "social-stats-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/history.json
+          git diff --cached --quiet || git commit -m "Social stats snapshot $(date -u +%F)"
+          git push
