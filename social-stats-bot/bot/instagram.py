@@ -1,16 +1,21 @@
 """Instagram Graph API (профессиональный аккаунт: Business или Creator).
 
-Работает с обоими вариантами:
-  * Instagram API with Instagram Login  -> host graph.instagram.com, user_id = me
-  * Instagram API with Facebook Login   -> host graph.facebook.com, user_id = числовой IG ID
+Работает с обоими типами токенов:
+  * IGAA…  (Instagram Login)                -> graph.instagram.com, user_id = me
+  * EAA…   (Facebook Login / системный пользователь, «Unified login»)
+                                             -> graph.facebook.com, числовой IG ID
+Хост и ID определяются автоматически, если не заданы явно.
 """
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 
 import requests
 
 from .models import AccountStats, Video
+
+log = logging.getLogger(__name__)
 
 # Пробуем наборы метрик по очереди: если API отклонит метрику (они меняются
 # от версии к версии и зависят от типа публикации), откатываемся к более простому.
@@ -49,9 +54,48 @@ def _insights(c: Client, media_id: str, product: str) -> dict:
     return {}
 
 
-def fetch(token: str, user_id: str = "me", host: str = "graph.instagram.com",
+def detect_host(token: str) -> str:
+    return "graph.instagram.com" if token.startswith("IG") else "graph.facebook.com"
+
+
+def discover_user_id(c: Client) -> str:
+    """Ищет ID Instagram-аккаунта, доступного токену Facebook/системного пользователя."""
+    found: list[tuple[str, str]] = []
+    attempts = [
+        ("me/accounts", {"fields": "name,instagram_business_account{id,username}"}),
+        ("me/businesses", {"fields": "name,owned_instagram_accounts{id,username},"
+                                    "instagram_business_accounts{id,username}"}),
+    ]
+    for path, params in attempts:
+        try:
+            data = c.get(path, **params).get("data", [])
+        except RuntimeError as e:
+            log.info("Instagram: %s недоступно (%s)", path, str(e)[:120])
+            continue
+        for item in data:
+            ig = item.get("instagram_business_account")
+            if ig:
+                found.append((ig["id"], ig.get("username", "")))
+            for edge in ("owned_instagram_accounts", "instagram_business_accounts"):
+                for ig in (item.get(edge) or {}).get("data", []):
+                    found.append((ig["id"], ig.get("username", "")))
+        if found:
+            break
+    if not found:
+        raise RuntimeError("не удалось найти Instagram-аккаунт для этого токена — "
+                           "задайте INSTAGRAM_USER_ID вручную")
+    uniq = list(dict.fromkeys(found))
+    log.info("Instagram: найдены аккаунты %s, используем первый",
+             ", ".join(f"@{u} ({i})" for i, u in uniq))
+    return uniq[0][0]
+
+
+def fetch(token: str, user_id: str | None = None, host: str | None = None,
           version: str = "v23.0", max_media: int = 30) -> AccountStats:
+    host = host or detect_host(token)
     c = Client(token, host, version)
+    if not user_id or (user_id == "me" and host == "graph.facebook.com"):
+        user_id = "me" if host == "graph.instagram.com" else discover_user_id(c)
     me = c.get(user_id, fields="username,followers_count,media_count")
     media = c.get(
         f"{user_id}/media", limit=max_media,

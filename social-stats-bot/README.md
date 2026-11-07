@@ -52,20 +52,17 @@ python -m bot.main                 # отправить в Telegram и сохр�
 Бот берёт публичные данные: подписчиков, просмотры, лайки и комментарии. Удержание и источники трафика доступны только через YouTube Analytics API с OAuth; если понадобятся, это можно добавить.
 
 ### Instagram
-Нужен **профессиональный аккаунт** (Business или Creator).
+Нужен **профессиональный аккаунт** (Автор или Бизнес).
 
-Самый простой вариант: **Instagram API with Instagram Login**.
-1. На [developers.facebook.com](https://developers.facebook.com/) создайте приложение и добавьте продукт **Instagram**.
-2. Выдайте разрешения `instagram_business_basic` и `instagram_business_manage_insights` и сгенерируйте токен для своего аккаунта.
-3. Обменяйте его на long-lived токен (живёт 60 дней):
-   `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=APP_SECRET&access_token=SHORT_TOKEN`
-4. В `.env`: `INSTAGRAM_ACCESS_TOKEN=…`, `INSTAGRAM_USER_ID=me`, `INSTAGRAM_API_HOST=graph.instagram.com`.
+1. На [developers.facebook.com](https://developers.facebook.com/) создайте приложение со сценарием **«Управление сообщениями и контентом в Instagram»** и подключите к нему бизнес-портфолио.
+2. В разделе **API setup with Unified login** создайте конфигурацию: маркер системного пользователя, срок действия **«Никогда»**, объект — ваш Instagram-аккаунт, разрешения `instagram_basic` и `instagram_manage_insights` (остальные не нужны).
+3. Сгенерируйте маркер доступа (`EAA…`) и сохраните его как `INSTAGRAM_ACCESS_TOKEN`.
 
-Long-lived токен нужно продлевать раз в 60 дней:
-`https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=TOKEN`.
-Если аккаунт привязан к странице Facebook, можно получить бессрочный токен System User через Business Manager. Тогда укажите `INSTAGRAM_API_HOST=graph.facebook.com` и числовой `INSTAGRAM_USER_ID`.
+Хост API и ID аккаунта бот определит сам по токену и напишет их в журнал запуска. Если найдётся не тот аккаунт, задайте `INSTAGRAM_USER_ID` вручную.
 
-Для каждого поста бот запрашивает просмотры, охват, сохранения, репосты, а для Reels ещё и среднее время просмотра.
+Токены вида `IGAA…` (Instagram Login) тоже поддерживаются, но живут 60 дней и требуют продления.
+
+Для каждой публикации бот запрашивает просмотры, охват, сохранения, репосты, а для Reels ещё и среднее время просмотра.
 
 ### TikTok
 1. На [developers.tiktok.com](https://developers.tiktok.com/) создайте приложение и подключите **Login Kit** со scopes `user.info.basic`, `user.info.profile`, `user.info.stats`, `video.list`. Укажите Redirect URI.
