@@ -83,6 +83,48 @@
      }
     }
    }
+  },
+  {
+   "date": "2026-11-07T13:52:47+00:00",
+   "platforms": {
+    "youtube": {
+     "followers": 63,
+     "total_views": 86471,
+     "total_likes": null,
+     "videos": {
+      "UXT4ziADYA4": 1203,
+      "p6PulZw5-LI": 39,
+      "e__SRt_otA4": 476,
+      "ORiojFJaDlA": 33,
+      "IK-zyQ_aLtM": 970,
+      "EZNSJj3aGyk": 200,
+      "B3RgNQfQ9J8": 264,
+      "ir4aULuig_Y": 420,
+      "aUgGqu9PyjE": 1068,
+      "dxnMobwp-Ns": 978,
+      "z2XIhdO3ouA": 169,
+      "5TYP-QJGff0": 724,
+      "TqXFwW3ktPU": 250,
+      "Tlq1c2WzPY4": 13,
+      "zyQjzZL8hSI": 245,
+      "q2RBIvU_3HY": 214,
+      "0Cx-aFjrs8I": 134,
+      "aVNZ8B61yds": 1490,
+      "pMZ_GW6yjkE": 90,
+      "n54VsPHxwVY": 51,
+      "zyCBdo0kr64": 597,
+      "QiPYQpPLi14": 542,
+      "4IK1phaXe1E": 351,
+      "UIebRw5KRNo": 135,
+      "_fy2zX8XUo8": 75,
+      "TJwHgACagMw": 1182,
+      "7dPEADHBtCw": 316,
+      "E31Y8lpP7YA": 187,
+      "XzhFhxo7uG4": 534,
+      "dNgfXyZTXyc": 1157
+     }
+    }
+   }
   }
  ]
 }
