@@ -1,0 +1,8 @@
+«Домашка» — Crayon Picture Book version
+
+Voice-over and music: the user's original video soundtrack (used as provided by the user).
+Foley: synthesised procedurally (Lemo-Opuscar core/audio/sfx.py and mix.py).
+Fonts: Neucha (Jovanny Lemonad), SIL Open Font License 1.1 — fonts/OFL-Neucha.txt
+       Caveat (Impallari Type), SIL Open Font License 1.1 — fonts/OFL-Caveat.txt (downloaded, not used in the film)
+Crayon/paper engine: adapted from the Lemo-Opuscar library (crayon-book style), see its LICENSE.
+Style grammar inspired by hand-drawn picture-book animation.
