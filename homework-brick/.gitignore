@@ -1,0 +1,4 @@
+audio/*.wav
+out/
+stills/
+*.mp4
