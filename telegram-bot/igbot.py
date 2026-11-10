@@ -30,8 +30,10 @@ IG_USERNAME = os.environ.get("IG_USERNAME", "doc.perepelitsa").lstrip("@").lower
 KEYWORD = os.environ.get("IG_KEYWORD", "генетика")
 TG_BOT_USERNAME = os.environ.get("TG_BOT_USERNAME", "dnk_system_perepelitca_bot").lstrip("@")
 POLL_SECONDS = int(os.environ.get("IG_POLL_SECONDS", "240"))
-MEDIA_DAYS = int(os.environ.get("IG_MEDIA_DAYS", "365"))  # старые Reels тоже комментируют — смотрим публикации за год
-MEDIA_LIMIT = int(os.environ.get("IG_MEDIA_LIMIT", "100"))  # сколько последних публикаций проверять
+MEDIA_DAYS = int(os.environ.get("IG_MEDIA_DAYS", "730"))  # старые Reels тоже комментируют — смотрим за 2 года
+RECENT_LIMIT = 25        # свежие публикации проверяем при каждой проверке
+FULL_SCAN_PAGES = 10     # раз в FULL_SCAN_SECONDS проверяем до 10×100 публикаций
+FULL_SCAN_SECONDS = int(os.environ.get("IG_FULL_SCAN_SECONDS", "1800"))
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 ASSISTANT_CHAT_ID = os.environ.get("ASSISTANT_CHAT_ID", "")
 
@@ -232,11 +234,32 @@ def handle_comment(api: Composio, comment: dict) -> None:
     )
 
 
+_last_full_scan = 0.0
+
+
+def list_media(api: Composio) -> list[dict]:
+    """Свежие публикации — каждый раз; все за последние годы — раз в полчаса (старые Reels тоже комментируют)."""
+    global _last_full_scan
+    full = time.time() - _last_full_scan > FULL_SCAN_SECONDS
+    media, after = [], None
+    for _ in range(FULL_SCAN_PAGES if full else 1):
+        args = {"ig_user_id": "me", "limit": 100 if full else RECENT_LIMIT, "fields": "id,timestamp,comments_count"}
+        if after:
+            args["after"] = after
+        data = api.execute("INSTAGRAM_GET_IG_USER_MEDIA", args)
+        page = items(data)
+        media += page
+        inner = data.get("data", data) if isinstance(data.get("data"), dict) else data
+        after = ((inner.get("paging") or {}).get("cursors") or {}).get("after")
+        if not page or not after or (page and time.time() - ts(page[-1]["timestamp"]) > MEDIA_DAYS * DAY):
+            break
+    if full:
+        _last_full_scan = time.time()
+    return media
+
+
 def check_comments(api: Composio, own_id: str, since: float) -> None:
-    media = items(api.execute("INSTAGRAM_GET_IG_USER_MEDIA", {
-        "ig_user_id": "me", "limit": MEDIA_LIMIT, "fields": "id,timestamp,comments_count",
-    }))
-    for m in media:
+    for m in list_media(api):
         if time.time() - ts(m["timestamp"]) > MEDIA_DAYS * DAY:
             continue
         count = int(m.get("comments_count") or 0)
@@ -245,6 +268,8 @@ def check_comments(api: Composio, own_id: str, since: float) -> None:
             conn.execute("INSERT OR REPLACE INTO media_counts VALUES (?, ?)", (m["id"], count))
         if row is not None and row[0] == count:
             continue  # новых комментариев нет — не тратим запрос
+        if row is None and count == 0:
+            continue
         comments = items(api.execute("INSTAGRAM_GET_IG_MEDIA_COMMENTS", {
             "ig_media_id": m["id"], "limit": 50, "fields": "id,text,timestamp,from,username",
         }))
