@@ -30,7 +30,8 @@ IG_USERNAME = os.environ.get("IG_USERNAME", "doc.perepelitsa").lstrip("@").lower
 KEYWORD = os.environ.get("IG_KEYWORD", "генетика")
 TG_BOT_USERNAME = os.environ.get("TG_BOT_USERNAME", "dnk_system_perepelitca_bot").lstrip("@")
 POLL_SECONDS = int(os.environ.get("IG_POLL_SECONDS", "240"))
-MEDIA_DAYS = int(os.environ.get("IG_MEDIA_DAYS", "14"))  # комментарии смотрим только под публикациями за N дней
+MEDIA_DAYS = int(os.environ.get("IG_MEDIA_DAYS", "365"))  # старые Reels тоже комментируют — смотрим публикации за год
+MEDIA_LIMIT = int(os.environ.get("IG_MEDIA_LIMIT", "100"))  # сколько последних публикаций проверять
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 ASSISTANT_CHAT_ID = os.environ.get("ASSISTANT_CHAT_ID", "")
 
@@ -233,7 +234,7 @@ def handle_comment(api: Composio, comment: dict) -> None:
 
 def check_comments(api: Composio, own_id: str, since: float) -> None:
     media = items(api.execute("INSTAGRAM_GET_IG_USER_MEDIA", {
-        "ig_user_id": "me", "limit": 15, "fields": "id,timestamp,comments_count",
+        "ig_user_id": "me", "limit": MEDIA_LIMIT, "fields": "id,timestamp,comments_count",
     }))
     for m in media:
         if time.time() - ts(m["timestamp"]) > MEDIA_DAYS * DAY:
