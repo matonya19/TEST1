@@ -1,0 +1,159 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="node_modules/@fontsource/manrope/800.css">
+<link rel="stylesheet" href="node_modules/@fontsource/manrope/600.css">
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<img id="logo" LOGO_SRC style="display:none">
+<script>
+const P = new URLSearchParams(location.search);
+const DATE = P.get('date') || '20';
+const W = 1080, H = 1920;
+const c = document.getElementById('c'), x = c.getContext('2d');
+const LIME = '#a8f52c', DG = '#06301a', TAU = Math.PI * 2;
+const F = (w, s) => `${w} ${s}px Manrope`;
+let seed = 5; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+function rr(px, py, w, h, r) {
+  x.beginPath(); x.moveTo(px + r, py); x.arcTo(px + w, py, px + w, py + h, r);
+  x.arcTo(px + w, py + h, px, py + h, r); x.arcTo(px, py + h, px, py, r); x.arcTo(px, py, px + w, py, r); x.closePath();
+}
+function glow(cx, cy, r, col, a) {
+  const g = x.createRadialGradient(cx, cy, 0, cx, cy, r);
+  g.addColorStop(0, col.replace('A', a)); g.addColorStop(1, col.replace('A', 0));
+  x.fillStyle = g; x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+}
+function limeShade(cx, cy, r) {
+  const g = x.createRadialGradient(cx - r * .35, cy - r * .4, r * .05, cx, cy, r * 1.15);
+  g.addColorStop(0, '#f2ffc8'); g.addColorStop(.3, '#b8ff3a'); g.addColorStop(.75, '#5fc515'); g.addColorStop(1, '#1f6a08'); return g;
+}
+function limeBall(cx, cy, r) {
+  x.save(); x.shadowColor = 'rgba(120,255,60,.5)'; x.shadowBlur = r * .6;
+  x.fillStyle = limeShade(cx, cy, r); x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.fill(); x.restore();
+  x.fillStyle = 'rgba(255,255,255,.8)'; x.beginPath(); x.ellipse(cx - r * .4, cy - r * .45, r * .2, r * .11, -.6, 0, TAU); x.fill();
+}
+function limePlus(cx, cy, s, rot) {
+  x.save(); x.translate(cx, cy); x.rotate(rot);
+  const a = s * .36, b = s;
+  x.shadowColor = 'rgba(0,0,0,.45)'; x.shadowBlur = 40; x.shadowOffsetY = 20;
+  x.fillStyle = '#2f8a0c'; rr(-a, -b, 2 * a, 2 * b, a * .9); x.fill(); rr(-b, -a, 2 * b, 2 * a, a * .9); x.fill();
+  x.shadowColor = 'transparent'; x.translate(-s * .05, -s * .07);
+  x.fillStyle = limeShade(-s * .1, -s * .1, s * 1.1); rr(-a, -b, 2 * a, 2 * b, a * .9); x.fill(); rr(-b, -a, 2 * b, 2 * a, a * .9); x.fill();
+  x.fillStyle = 'rgba(255,255,255,.55)'; x.beginPath(); x.ellipse(-a * .3, -b * .62, a * .35, a * .16, 0, 0, TAU); x.fill();
+  x.beginPath(); x.ellipse(-b * .62, -a * .3, a * .3, a * .14, 0, 0, TAU); x.fill();
+  x.restore();
+}
+
+function background() {
+  x.fillStyle = '#03140c'; x.fillRect(0, 0, W, H);
+  glow(60, 1250, 700, 'rgba(0,200,90,A)', .5);
+  glow(1040, 260, 560, 'rgba(0,230,200,A)', .42);
+  glow(1000, 1700, 640, 'rgba(30,220,80,A)', .45);
+  glow(540, 900, 700, 'rgba(0,120,60,A)', .4);
+  for (let i = 0; i < 60; i++) { x.fillStyle = `rgba(200,255,220,${.15 + rnd() * .45})`; x.beginPath(); x.arc(rnd() * W, rnd() * H, .8 + rnd() * 1.8, 0, TAU); x.fill(); }
+  const v = x.createRadialGradient(540, 960, 500, 540, 960, 1150);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,10,5,.55)'); x.fillStyle = v; x.fillRect(0, 0, W, H);
+}
+
+// --- icons (drawn on lime circle, dark-green strokes) ---
+function icon(kind, cx, cy) {
+  x.save(); x.shadowColor = 'rgba(168,245,44,.45)'; x.shadowBlur = 24;
+  x.fillStyle = limeShade(cx, cy, 58); x.beginPath(); x.arc(cx, cy, 58, 0, TAU); x.fill(); x.restore();
+  x.save(); x.translate(cx, cy); x.strokeStyle = DG; x.fillStyle = DG; x.lineWidth = 7; x.lineCap = 'round'; x.lineJoin = 'round';
+  if (kind === 'smile') {
+    x.beginPath(); x.arc(0, 0, 30, 0, TAU); x.stroke();
+    x.beginPath(); x.arc(-11, -8, 4.5, 0, TAU); x.arc(11, -8, 4.5, 0, TAU); x.fill();
+    x.beginPath(); x.arc(0, 2, 16, .25 * Math.PI, .75 * Math.PI); x.stroke();
+  } else if (kind === 'group') {
+    for (const [dx, r] of [[-20, 9], [20, 9], [0, 11]]) { x.beginPath(); x.arc(dx, -12 + (r === 11 ? -2 : 4), r, 0, TAU); x.fill(); }
+    x.beginPath(); x.arc(0, 30, 20, Math.PI, TAU); x.fill();
+    x.beginPath(); x.arc(-24, 30, 14, Math.PI, TAU); x.fill(); x.beginPath(); x.arc(24, 30, 14, Math.PI, TAU); x.fill();
+  } else if (kind === 'bulb') {
+    x.beginPath(); x.arc(0, -8, 22, Math.PI * .8, Math.PI * 2.2); x.lineTo(9, 20); x.lineTo(-9, 20); x.closePath(); x.stroke();
+    x.beginPath(); x.moveTo(-8, 30); x.lineTo(8, 30); x.stroke();
+  } else if (kind === 'chart') {
+    x.beginPath(); x.moveTo(-28, 24); x.lineTo(-8, 2); x.lineTo(6, 14); x.lineTo(28, -16); x.stroke();
+    x.beginPath(); x.moveTo(12, -18); x.lineTo(28, -18); x.lineTo(28, -2); x.stroke();
+  }
+  x.restore();
+}
+
+function wrapText(str, px, py, maxW, lh) {
+  const words = str.split(' '); let line = '', y = py;
+  for (const w of words) { const test = line ? line + ' ' + w : w;
+    if (x.measureText(test).width > maxW && line) { x.fillText(line, px, y); line = w; y += lh; } else line = test; }
+  x.fillText(line, px, y); return y;
+}
+
+function benefit(y, kind, title, desc) {
+  const bx = 70, bw = 940, bh = 190;
+  x.save(); x.shadowColor = 'rgba(0,0,0,.4)'; x.shadowBlur = 30; x.shadowOffsetY = 12;
+  rr(bx, y, bw, bh, 34); const g = x.createLinearGradient(0, y, 0, y + bh); g.addColorStop(0, 'rgba(18,80,47,.92)'); g.addColorStop(1, 'rgba(6,42,23,.92)');
+  x.fillStyle = g; x.fill(); x.restore();
+  x.lineWidth = 2; x.strokeStyle = 'rgba(168,245,44,.45)'; rr(bx, y, bw, bh, 34); x.stroke();
+  icon(kind, bx + 100, y + bh / 2);
+  x.textAlign = 'left'; x.textBaseline = 'alphabetic';
+  x.font = F(800, 42); x.fillStyle = '#fff'; x.fillText(title, bx + 195, y + 78);
+  x.font = F(600, 29); x.fillStyle = '#cfeedd'; wrapText(desc, bx + 195, y + 124, 700, 38);
+}
+
+function offer(cx, cy, lime, label, big, l1) {
+  const w = 455, h = 280;
+  x.save(); x.translate(cx, cy); x.rotate(lime ? -.025 : .025);
+  x.shadowColor = lime ? 'rgba(168,245,44,.45)' : 'rgba(0,0,0,.5)'; x.shadowBlur = 44; x.shadowOffsetY = 14;
+  rr(-w / 2, -h / 2, w, h, 32);
+  const g = x.createLinearGradient(0, -h / 2, 0, h / 2);
+  if (lime) { g.addColorStop(0, '#d6ff86'); g.addColorStop(.5, LIME); g.addColorStop(1, '#7ad410'); } else { g.addColorStop(0, '#11502f'); g.addColorStop(1, '#062a17'); }
+  x.fillStyle = g; x.fill(); x.shadowColor = 'transparent'; x.shadowOffsetY = 0;
+  x.lineWidth = 3; x.strokeStyle = lime ? 'rgba(255,255,255,.6)' : 'rgba(168,245,44,.85)'; x.stroke();
+  x.font = F(800, 22); if ('letterSpacing' in x) x.letterSpacing = '2px';
+  const lw = x.measureText(label).width + 40;
+  rr(-lw / 2, -h / 2 + 24, lw, 44, 22); x.fillStyle = lime ? DG : LIME; x.fill();
+  x.fillStyle = lime ? LIME : DG; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(label, 0, -h / 2 + 47);
+  if ('letterSpacing' in x) x.letterSpacing = '0px';
+  x.font = F(800, 104); x.fillStyle = lime ? DG : LIME; if (!lime) { x.shadowColor = 'rgba(168,245,44,.5)'; x.shadowBlur = 20; }
+  x.fillText(big, 0, 10); x.shadowBlur = 0;
+  x.font = F(800, 30); x.fillStyle = lime ? DG : '#fff'; x.fillText(l1, 0, 98);
+  x.restore();
+}
+
+function draw() {
+  background();
+  limePlus(995, 445, 52, .3); limePlus(1040, 1405, 50, -.35);
+  limeBall(95, 520, 26); limeBall(990, 1300, 20); limeBall(960, 180, 14);
+  // logo
+  const logo = document.getElementById('logo'), lw = 260, lh = lw * logo.naturalHeight / logo.naturalWidth;
+  x.drawImage(logo, 540 - lw / 2, 150, lw, lh);
+  // title
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.font = F(800, 74); x.fillStyle = '#fff'; x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 24; x.shadowOffsetY = 6;
+  x.fillText('Почему в SHKOLA', 540, 340); x.shadowOffsetY = 0;
+  x.fillStyle = LIME; x.shadowColor = 'rgba(168,245,44,.45)'; x.shadowBlur = 22;
+  x.fillText('учиться легко', 540, 430); x.shadowBlur = 0;
+  // benefits
+  const B = [
+    ['smile', 'Без оценок и стресса', 'Учёба не давит, а вдохновляет'],
+    ['group', 'Мини-классы до 8 человек', 'Учитель видит каждого ученика'],
+    ['bulb', 'До 100% понимания', 'Объясняем тему, пока всё не станет ясно'],
+    ['chart', 'Кураторы и прогресс', 'Помогают не терять мотивацию, а родители видят реальный результат'],
+  ];
+  B.forEach((b, i) => benefit(520 + i * 212, ...b));
+  // offers
+  x.textAlign = 'center'; x.font = F(800, 44); x.fillStyle = '#fff';
+  x.fillText('Скидки Чёрной пятницы', 540, 1415);
+  offer(300, 1600, true, 'ОБУЧЕНИЕ В ШКОЛЕ', '−50%', 'на первый месяц');
+  offer(780, 1600, false, 'РЕПЕТИТОРСТВО', '−20%', 'на пакеты занятий*');
+  // CTA
+  const cy = 1800, w = 860, h = 92;
+  x.save(); x.shadowColor = 'rgba(168,245,44,.6)'; x.shadowBlur = 36; rr(540 - w / 2, cy - h / 2, w, h, h / 2);
+  const g = x.createLinearGradient(0, cy - h / 2, 0, cy + h / 2); g.addColorStop(0, '#d2ff7a'); g.addColorStop(.5, LIME); g.addColorStop(1, '#79d10f');
+  x.fillStyle = g; x.fill(); x.restore();
+  rr(540 - w / 2 + 16, cy - h / 2 + 6, w - 32, h * .36, h * .18); x.fillStyle = 'rgba(255,255,255,.35)'; x.fill();
+  x.font = F(800, 34); x.fillStyle = DG; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillText(`Запишитесь на пробный урок до ${DATE} ноября`, 540, cy + 2);
+  x.font = F(600, 22); x.fillStyle = 'rgba(216,255,230,.7)';
+  x.fillText('*скидка не распространяется на пакет «Макси»', 540, 1880);
+}
+window.ready = Promise.all([document.fonts.load(F(800, 40), 'Почему SHKOLA 0123456789%−'), document.fonts.load(F(600, 40), 'Учёба 0123456789'),
+  document.getElementById('logo').decode()]).then(() => { draw(); return true; });
+</script></body></html>
