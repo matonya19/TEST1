@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Карусель — Ульяна</title>
+<style>
+  :root{
+    --cream:#F5EDE1;   /* сливочный фон */
+    --sand:#DCC7AA;    /* песочный */
+    --caramel:#B07A4F; /* карамель */
+    --choc:#4A2E22;    /* шоколад */
+    --terra:#9C5236;   /* терракота */
+    --milk:#F6E6C6;    /* акцентный светлый текст */
+    --dark:#3B2418;    /* акцентный тёмный текст */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#222;font-family:"Inter Display","Inter",sans-serif;display:flex;flex-direction:column;align-items:center;gap:40px;padding:40px 0}
+  .slide{width:1500px;height:2000px;position:relative;overflow:hidden;flex:none}
+  .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .abs{position:absolute}
+  .h{font-weight:700;letter-spacing:-0.055em;line-height:.98;text-transform:lowercase}
+  .t{font-weight:300;letter-spacing:-0.045em;line-height:1.08}
+  .b{font-weight:700}
+  .shade-top{position:absolute;inset:0;background:linear-gradient(180deg,rgba(59,36,24,.55) 0%,rgba(59,36,24,0) 32%)}
+  .shade-bot{position:absolute;inset:0;background:linear-gradient(0deg,rgba(59,36,24,.85) 0%,rgba(59,36,24,.55) 22%,rgba(59,36,24,0) 42%)}
+  p+p{margin-top:.55em}
+</style>
+</head>
+<body>
+
+<!-- 1. Обложка -->
+<section class="slide" id="s1">
+  <img class="bg" src="photos/p01.jpg" style="object-position:50% 30%">
+  <div class="shade-top"></div><div class="shade-bot"></div>
+  <div class="abs h" style="left:110px;top:150px;font-size:150px;color:var(--milk)">привет,</div>
+  <div class="abs h" style="right:110px;top:150px;font-size:150px;color:var(--milk);text-transform:none">я Ульяна</div>
+  <div class="abs t" style="left:110px;bottom:300px;font-size:64px;color:var(--milk);width:900px">три школы, жизнь в Батуми<br>и много историй по дороге</div>
+  <div class="abs t" style="left:0;right:0;bottom:150px;text-align:center;font-size:66px;color:var(--milk)">[ давайте знакомиться ]</div>
+</section>
+
+<!-- 2. Батуми: цвет сверху, фото снизу -->
+<section class="slide" id="s2" style="background:var(--cream)">
+  <img class="abs" src="photos/p07.jpg" style="left:0;top:1000px;width:1500px;height:1000px;object-fit:cover;object-position:50% 45%">
+  <div class="abs h" style="left:110px;top:120px;font-size:124px;color:var(--choc);text-transform:none">сейчас мой<br>дом — Батуми</div>
+  <div class="abs t" style="right:110px;top:440px;width:820px;text-align:right;font-size:50px;color:var(--choc)">
+    <p>когда-то мы с мужем прилетели в Сочи из холодной Уфы</p>
+    <p>сидели у моря, пили кофе, а я думала: «почему мы вообще живём там, где мне всё время холодно?»</p>
+  </div>
+  <div class="abs h" style="left:110px;top:820px;font-size:70px;color:var(--caramel)">[ теперь море — часть моей обычной жизни ]</div>
+</section>
+
+<!-- 3. До трёх школ: фото в рамке на цветном фоне -->
+<section class="slide" id="s3" style="background:var(--caramel)">
+  <img class="abs" src="photos/p02.jpg" style="left:110px;top:430px;width:800px;height:1150px;object-fit:cover;object-position:60% 50%">
+  <div class="abs h" style="left:110px;top:120px;font-size:124px;color:var(--milk)">до трёх школ<br>было много всего</div>
+  <div class="abs t" style="left:960px;top:620px;font-size:60px;line-height:1.12;color:var(--dark)">
+    ночные клубы<br><br>летнее кафе<br><br>магазины<br>косметики<br>и продуктов<br><br>кадровое<br>агентство
+  </div>
+  <div class="abs t" style="left:110px;top:1650px;width:1280px;font-size:52px;color:var(--milk)">
+    так что историй у меня хватит. и удачных, и тех, после которых думаешь:
+  </div>
+  <div class="abs h" style="left:110px;top:1800px;font-size:72px;color:var(--dark)">[ «ну, зато теперь знаю» ]</div>
+</section>
+
+<!-- 4. Три школы: фото на весь слайд, текст раскидан -->
+<section class="slide" id="s4">
+  <img class="bg" src="photos/p12.jpg" style="object-position:50% 40%">
+  <div class="abs" style="inset:0;background:rgba(40,24,16,.28)"></div>
+  <div class="shade-bot"></div>
+  <div class="abs h" style="left:0;right:0;top:120px;text-align:center;font-size:96px;color:var(--milk)">[ сегодня я совладелец<br>и управляющая трёх школ ]</div>
+  <div class="abs t" style="left:90px;top:700px;font-size:56px;color:var(--milk)">российская<br>онлайн-школа</div>
+  <div class="abs t" style="right:80px;top:560px;text-align:right;font-size:56px;color:var(--milk)">международная<br>онлайн-школа</div>
+  <div class="abs t" style="right:80px;top:1060px;text-align:right;font-size:56px;color:var(--milk)">офлайн-школа<br>в Батуми</div>
+  <div class="abs" style="left:90px;top:1080px;color:var(--sand)">
+    <div class="h" style="font-size:190px">300+</div>
+    <div class="t" style="font-size:50px;margin-top:6px">человек<br>в нашей команде</div>
+  </div>
+  <div class="abs t" style="left:90px;right:90px;bottom:120px;font-size:48px;color:var(--milk)">
+    <p>и да, меня спрашивают: <span class="b">«если у тебя есть директора, ты-то чем занимаешься?»</span></p>
+    <p>здесь рассказываю и об этом</p>
+  </div>
+</section>
+
+<!-- 5. Страх нового: фото по центру -->
+<section class="slide" id="s5" style="background:var(--choc)">
+  <div class="abs h" style="left:110px;top:120px;font-size:112px;color:var(--sand)">я тоже боюсь,<br>когда начинаю новое</div>
+  <div class="abs t" style="left:110px;top:380px;width:900px;font-size:48px;color:var(--sand)">в этом году мы взяли для школы помещение в три раза больше прежнего</div>
+  <img class="abs" src="photos/p03.jpg" style="left:330px;top:590px;width:660px;height:880px;object-fit:cover">
+  <div class="abs t" style="left:1030px;top:900px;width:370px;font-size:46px;color:#fff">в день подписания я смотрела на пустые метры и считала: «а если учеников не станет больше? чем платить аренду?»</div>
+  <div class="abs h" style="left:0;right:0;top:1600px;text-align:center;font-size:96px;color:var(--caramel)">[ расчёты были.<br>стопроцентной<br>уверенности — нет ]</div>
+</section>
+
+<!-- 6. Бизнес-клуб: фото сверху, цвет снизу -->
+<section class="slide" id="s6" style="background:var(--sand)">
+  <img class="abs" src="photos/p14.jpg" style="left:0;top:0;width:1500px;height:1080px;object-fit:cover;object-position:50% 50%">
+  <div class="abs" style="left:0;top:0;width:1500px;height:1080px;background:linear-gradient(180deg,rgba(59,36,24,.55),rgba(59,36,24,0) 40%)"></div>
+  <div class="abs h" style="left:110px;top:110px;font-size:104px;color:var(--milk)">мне важно, с кем<br>можно всё это обсудить</div>
+  <div class="abs t" style="left:110px;right:110px;top:1150px;text-align:center;font-size:50px;color:var(--dark)">
+    <p>в Уфе я основала бизнес-клуб.<br>после переезда мы с Василиной открыли клуб в Батуми</p>
+    <p>здесь можно сказать: <span class="b">«я не знаю, как это решить»</span></p>
+  </div>
+  <div class="abs h" style="left:110px;right:110px;top:1560px;text-align:center;font-size:64px;line-height:1.05;color:var(--terra)">[ и обсудить с людьми, которые тоже платят зарплаты, ищут клиентов и отвечают за свой бизнес ]</div>
+</section>
+
+<!-- 7. Жизнь у моря: фото на весь слайд, фразы раскиданы -->
+<section class="slide" id="s7">
+  <img class="bg" src="photos/p05.jpg" style="object-position:50% 69%">
+  <div class="abs" style="inset:0;background:linear-gradient(180deg,rgba(245,237,225,.7) 0%,rgba(245,237,225,0) 36%,rgba(245,237,225,0) 72%,rgba(245,237,225,.8) 100%)"></div>
+  <div class="abs h" style="left:0;right:0;top:90px;text-align:center;font-size:100px;color:var(--choc)">[ а ещё я просто<br>люблю жить у моря ]</div>
+  <div class="abs t" style="left:110px;top:1160px;font-size:58px;color:var(--choc)">завтракать<br>на берегу</div>
+  <div class="abs t" style="right:110px;top:350px;text-align:right;font-size:54px;color:var(--choc)">купаться, когда на календаре<br>уже конец октября</div>
+  <div class="abs t" style="right:110px;top:1420px;text-align:right;font-size:58px;color:var(--choc)">проводить<br>время с мужем</div>
+  <div class="abs t" style="left:110px;right:110px;bottom:150px;text-align:center;font-size:56px;color:var(--choc)">и иногда рассказывать историю, которая вообще никак не связана с работой</div>
+</section>
+
+<!-- 8. Финал -->
+<section class="slide" id="s8">
+  <img class="bg" src="photos/p10.jpg" style="object-position:50% 30%">
+  <div class="abs" style="inset:0;background:linear-gradient(0deg,rgba(59,36,24,.92) 0%,rgba(59,36,24,.75) 28%,rgba(59,36,24,0) 50%)"></div>
+  <div class="abs h" style="left:0;right:0;top:130px;text-align:center;font-size:120px;color:var(--choc)">здесь будем<br>знакомиться ближе</div>
+  <div class="abs t" style="left:110px;right:110px;top:1360px;text-align:center;font-size:50px;color:var(--milk)">
+    <p>я рассказываю, как мы развиваем школы, работаем с командой и пробуем новое</p>
+    <p>делюсь жизнью в Грузии, решениями и ошибками</p>
+  </div>
+  <div class="abs h" style="left:0;right:0;top:1700px;text-align:center;font-size:76px;color:var(--sand)">а вы откуда и чем занимаетесь?</div>
+  <svg class="abs" style="left:0;top:1770px" width="1500" height="230" viewBox="0 0 1500 230">
+    <path id="arc" d="M430,60 Q750,250 1070,60" fill="none"/>
+    <text font-family="Inter Display" font-weight="300" font-size="58" letter-spacing="-2.4" fill="#F6E6C6">
+      <textPath href="#arc" startOffset="50%" text-anchor="middle">[ давайте знакомиться ]</textPath>
+    </text>
+  </svg>
+</section>
+
+</body>
+</html>
