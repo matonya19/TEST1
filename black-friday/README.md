@@ -21,3 +21,9 @@ H=1350 node render.js 20 shkola_black_friday_20nov_1080x1350.mp4   # число 
 
 Видео 9:16: `H=1920 node render.js 20 out.mp4`.
 Слайд 2: собирается из `slide_src.html` (в `LOGO_SRC` подставляется логотип), `node shot.js 20 slide.png`.
+
+## Версии с озвучкой (~19,6 сек)
+
+- `shkola_black_friday_20nov_1080x1350_voice.mp4`, `shkola_black_friday_20nov_1080x1920_voice.mp4`
+- Текст озвучки: `voice/lines.txt`, фразы: `voice/seg1..6.wav` (синтез Piper, голос ru-irinia-medium).
+- Сборка: `SCENE=scene_voice.html node render_vo.js 20 out.mp4 1350 voice` — таймлайн растянут под фразы (см. WARP/VO в render_vo.js).
