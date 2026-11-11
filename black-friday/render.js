@@ -7,7 +7,7 @@ const fs = require('fs'); const path = require('path'); const { spawn } = requir
   await pg.evaluate(() => window.ready);
   const FPS = 30, DUR = await pg.evaluate(() => window.DUR);
   if (mode === 'stills') {
-    for (const t of [0.6, 1.5, 2.5, 4, 6, 8.9]) { await pg.evaluate(t => drawAt(t), t);
+    for (const t of (process.env.STILLS ? process.env.STILLS.split(',').map(Number) : [0.6, 1.5, 2.5, 4, 6, 8.9])) { await pg.evaluate(t => drawAt(t), t);
       const d = await pg.evaluate(() => document.getElementById('c').toDataURL('image/png'));
       fs.writeFileSync(`still_${t}.png`, Buffer.from(d.split(',')[1], 'base64')); }
     await b.close(); return;
