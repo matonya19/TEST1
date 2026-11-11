@@ -3,7 +3,7 @@ const fs = require('fs'); const path = require('path'); const { spawn } = requir
 (async () => {
   const [date = '', out = 'out.mp4', mode = 'video'] = process.argv.slice(2);
   const b = await chromium.launch(); const pg = await b.newPage({ viewport: { width: 1080, height: 1080 } });
-  await pg.goto('file://' + path.resolve('scene.html') + '?date=' + encodeURIComponent(date));
+  await pg.goto('file://' + path.resolve(process.env.SCENE || 'scene.html') + '?date=' + encodeURIComponent(date));
   await pg.evaluate(() => window.ready);
   const FPS = 30, DUR = await pg.evaluate(() => window.DUR);
   if (mode === 'stills') {

@@ -1,15 +1,16 @@
 # Черная пятница в SHKOLA — анимированный пост
 
+Фирменный стиль (тёмно-зелёный фон, лаймовый акцент, хромированные элементы).
 Квадрат 1080×1080, 9 сек, 30 fps, без звука.
 
-- `shkola_black_friday.mp4` — версия без даты («СТАРТОВАЛА! ВЫГОДА ДО 50%»)
-- `shkola_black_friday_20nov.mp4` — с датой («ТОЛЬКО ДО 20 НОЯБРЯ»)
+- `shkola_black_friday_20nov.mp4` — «Акция действует только до 20 ноября»
+- `old-pink/` — первая версия в розовом стиле референса (не актуальна)
 
 ## Перерендер с другой датой
 
 ```bash
 cd black-friday
 npm install
-node render.js 28 shkola_black_friday_28nov.mp4   # число ноября, имя файла
+node render.js 20 shkola_black_friday_20nov.mp4   # число ноября, имя файла
 ```
 Нужны Node, Playwright (Chromium) и ffmpeg.

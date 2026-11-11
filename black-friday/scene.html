@@ -1,18 +1,17 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
-<link rel="stylesheet" href="node_modules/@fontsource/unbounded/900.css">
-<link rel="stylesheet" href="node_modules/@fontsource/montserrat/800.css">
-<link rel="stylesheet" href="node_modules/@fontsource/caveat/700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/manrope/800.css">
+<link rel="stylesheet" href="node_modules/@fontsource/manrope/600.css">
 <style>html,body{margin:0;background:#000}canvas{display:block}</style>
 </head><body>
 <canvas id="c" width="1080" height="1080"></canvas>
 <script>
 const P = new URLSearchParams(location.search);
-const DATE = P.get('date') || '';           // e.g. "30" -> "ТОЛЬКО ДО 30 НОЯБРЯ"
+const DATE = P.get('date') || '';
 const W = 1080, H = 1080, DUR = 9;
 const c = document.getElementById('c'), x = c.getContext('2d');
+const LIME = '#a8f52c', TEAL = '#2fe3d3';
 
-// ---------- helpers ----------
 const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
 const prog = (t, s, d) => clamp((t - s) / d);
 const easeOut = p => 1 - Math.pow(1 - p, 3);
@@ -20,270 +19,296 @@ const easeInOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
 const backOut = (p, s = 1.9) => 1 + (s + 1) * Math.pow(p - 1, 3) + s * Math.pow(p - 1, 2);
 const elastic = p => p === 0 ? 0 : p === 1 ? 1 : Math.pow(2, -10 * p) * Math.sin((p * 10 - .75) * (2 * Math.PI) / 3) + 1;
 const TAU = Math.PI * 2;
-// deterministic random
-let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const F = (w, s) => `${w} ${s}px Manrope`;
+let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
-const UNB = '900 {s}px Unbounded', MON = '800 {s}px Montserrat', CAV = '700 {s}px Caveat';
-const font = (f, s) => f.replace('{s}', s);
-
-function roundRect(px, py, w, h, r) {
+function rr(px, py, w, h, r) {
   x.beginPath(); x.moveTo(px + r, py); x.arcTo(px + w, py, px + w, py + h, r);
   x.arcTo(px + w, py + h, px, py + h, r); x.arcTo(px, py + h, px, py, r); x.arcTo(px, py, px + w, py, r); x.closePath();
 }
 
-// ---------- background ----------
-const stars = Array.from({ length: 70 }, () => ({ x: rnd() * W, y: rnd() * H, r: .6 + rnd() * 2.2, ph: rnd() * TAU, sp: .5 + rnd() * 2, dark: rnd() < .45 }));
-function background(t) {
-  const g = x.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, '#050109'); g.addColorStop(.32, '#1c0626'); g.addColorStop(.62, '#7a0f5e'); g.addColorStop(.85, '#d61f86'); g.addColorStop(1, '#2a0420');
-  x.fillStyle = g; x.fillRect(0, 0, W, H);
-  // hot glow behind the sphere
-  const pulse = .85 + .15 * Math.sin(t * 2.2);
-  const rg = x.createRadialGradient(540, 640, 40, 540, 640, 620);
-  rg.addColorStop(0, `rgba(255,70,190,${.55 * pulse})`); rg.addColorStop(.5, 'rgba(160,30,160,.25)'); rg.addColorStop(1, 'rgba(0,0,0,0)');
-  x.fillStyle = rg; x.fillRect(0, 0, W, H);
-  // orbit rings
-  x.save(); x.translate(540, 620);
-  for (let i = 0; i < 4; i++) {
-    x.save(); x.rotate(-.35 + i * .5 + t * .06 * (i % 2 ? 1 : -1));
-    x.beginPath(); x.ellipse(0, 0, 330 + i * 70, 130 + i * 40, 0, 0, TAU);
-    x.strokeStyle = `rgba(255,190,240,${.16 - i * .025})`; x.lineWidth = 2; x.stroke(); x.restore();
-  }
-  x.restore();
-  for (const s of stars) {
-    const a = .35 + .65 * (.5 + .5 * Math.sin(t * s.sp * 2 + s.ph));
-    x.fillStyle = s.dark ? `rgba(20,0,25,${a * .8})` : `rgba(255,235,250,${a * .7})`;
-    x.beginPath(); x.arc(s.x + Math.sin(t * .5 + s.ph) * 6, s.y - (t * 8 * s.sp) % 40, s.r, 0, TAU); x.fill();
-  }
-}
-
-// ---------- glossy sphere ----------
-function sphere(cx, cy, r, kind) {
-  x.save();
-  // glow
-  const gl = x.createRadialGradient(cx, cy, r * .7, cx, cy, r * 1.45);
-  gl.addColorStop(0, kind === 'main' ? 'rgba(255,80,200,.45)' : 'rgba(255,60,120,.4)'); gl.addColorStop(1, 'rgba(255,60,180,0)');
-  x.fillStyle = gl; x.beginPath(); x.arc(cx, cy, r * 1.45, 0, TAU); x.fill();
-  x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.clip();
-  let g = x.createRadialGradient(cx + r * .2, cy - r * .1, r * .05, cx, cy, r);
-  if (kind === 'main') {
-    g.addColorStop(0, '#0c0118'); g.addColorStop(.55, '#250850'); g.addColorStop(.82, '#6a25d0'); g.addColorStop(1, '#ff5ad0');
-  } else if (kind === 'red') {
-    g.addColorStop(0, '#ff7fb0'); g.addColorStop(.5, '#f0306e'); g.addColorStop(.85, '#b0104a'); g.addColorStop(1, '#ff9ad0');
-  } else { // violet mini
-    g.addColorStop(0, '#3a0d6e'); g.addColorStop(.7, '#7c3cf0'); g.addColorStop(1, '#ffa0ff');
-  }
+// ---------- background: dark green with moving neon glows ----------
+const dust = Array.from({ length: 40 }, () => ({ x: rnd() * W, y: rnd() * H, r: .8 + rnd() * 1.8, ph: rnd() * TAU, sp: .4 + rnd() }));
+function glow(cx, cy, r, col, a) {
+  const g = x.createRadialGradient(cx, cy, 0, cx, cy, r);
+  g.addColorStop(0, col.replace('A', a)); g.addColorStop(1, col.replace('A', 0));
   x.fillStyle = g; x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
-  if (kind === 'red') { // stripes like a candy ball
-    x.save(); x.translate(cx, cy); x.rotate(-.6); x.globalAlpha = .22; x.fillStyle = '#fff';
-    for (let i = -5; i <= 5; i++) { x.beginPath(); x.ellipse(i * r * .32, 0, r * .07, r * 1.1, 0, 0, TAU); x.fill(); }
+}
+function background(t) {
+  x.fillStyle = '#03140c'; x.fillRect(0, 0, W, H);
+  glow(80 + Math.sin(t * .5) * 40, 700, 520, 'rgba(0,200,90,A)', .55);
+  glow(1000, 120 + Math.cos(t * .4) * 40, 420, 'rgba(0,230,200,A)', .45);
+  glow(960, 980, 520, 'rgba(30,220,80,A)', .5);
+  glow(-40, 120, 380, 'rgba(0,230,190,A)', .35);
+  glow(540, 620, 460, 'rgba(0,120,60,A)', .5 + .1 * Math.sin(t * 2));
+  // soft diagonal light streak
+  x.save(); x.translate(540, 560); x.rotate(-.35);
+  const s = x.createLinearGradient(0, -120, 0, 120);
+  s.addColorStop(0, 'rgba(60,255,150,0)'); s.addColorStop(.5, `rgba(60,255,150,${.08 + .04 * Math.sin(t * 1.3)})`); s.addColorStop(1, 'rgba(60,255,150,0)');
+  x.fillStyle = s; x.fillRect(-900, -120, 1800, 240); x.restore();
+  for (const d of dust) {
+    const a = .2 + .5 * (.5 + .5 * Math.sin(t * d.sp * 3 + d.ph));
+    x.fillStyle = `rgba(200,255,220,${a})`;
+    x.beginPath(); x.arc(d.x + Math.sin(t * .4 + d.ph) * 8, (d.y - t * 12 * d.sp + H) % H, d.r, 0, TAU); x.fill();
+  }
+  // vignette
+  const v = x.createRadialGradient(540, 540, 380, 540, 540, 800);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,10,5,.55)');
+  x.fillStyle = v; x.fillRect(0, 0, W, H);
+}
+
+// ---------- chrome tube along a sampled path, drawn up to fraction p ----------
+function samplePath(fn, n = 160) { const pts = []; for (let i = 0; i <= n; i++) pts.push(fn(i / n)); return pts; }
+function chromeTube(pts, p, width, head) {
+  const n = Math.max(2, Math.floor(pts.length * p)); const q = pts.slice(0, n);
+  const stroke = (lw, col, ox = 0, oy = 0) => {
+    x.beginPath(); q.forEach((pt, i) => i ? x.lineTo(pt[0] + ox, pt[1] + oy) : x.moveTo(pt[0] + ox, pt[1] + oy));
+    x.lineWidth = lw; x.strokeStyle = col; x.lineCap = 'round'; x.lineJoin = 'round'; x.stroke();
+  };
+  x.save();
+  x.shadowColor = 'rgba(0,0,0,.45)'; x.shadowBlur = 30; x.shadowOffsetY = 14;
+  stroke(width, '#30403a'); x.shadowColor = 'transparent';
+  stroke(width * .86, '#7f948c');
+  stroke(width * .55, 'rgba(60,255,140,.45)', width * .16, width * .18);   // green reflection
+  stroke(width * .5, '#d9e6e1', -width * .14, -width * .16);
+  stroke(width * .18, '#ffffff', -width * .2, -width * .24);
+  if (head && p > .97) { // arrow head
+    const a = q[q.length - 1], b = q[q.length - 6]; const ang = Math.atan2(a[1] - b[1], a[0] - b[0]);
+    const L = width * 2.3;
+    const tip = [a[0] + Math.cos(ang) * width * 1.4, a[1] + Math.sin(ang) * width * 1.4];
+    const l = [a[0] + Math.cos(ang + 2.5) * L, a[1] + Math.sin(ang + 2.5) * L];
+    const r = [a[0] + Math.cos(ang - 2.5) * L, a[1] + Math.sin(ang - 2.5) * L];
+    x.beginPath(); x.moveTo(...tip); x.lineTo(...l); x.lineTo(a[0] - Math.cos(ang) * width * .3, a[1] - Math.sin(ang) * width * .3); x.lineTo(...r); x.closePath();
+    const g = x.createLinearGradient(l[0], l[1], r[0], r[1]); g.addColorStop(0, '#f4fbf8'); g.addColorStop(.5, '#8fa49c'); g.addColorStop(1, '#e2ece8');
+    x.fillStyle = g; x.shadowColor = 'rgba(0,0,0,.4)'; x.shadowBlur = 20; x.fill();
+    x.lineWidth = 3; x.strokeStyle = 'rgba(80,255,150,.5)'; x.stroke();
+  }
+  x.restore();
+}
+const bez = (p0, p1, p2, p3) => u => { const v = 1 - u; return [v*v*v*p0[0] + 3*v*v*u*p1[0] + 3*v*u*u*p2[0] + u*u*u*p3[0], v*v*v*p0[1] + 3*v*v*u*p1[1] + 3*v*u*u*p2[1] + u*u*u*p3[1]]; };
+const arrowPts = samplePath(bez([-60, 340], [20, 160], [110, 110], [205, 118]));
+// "9"-like swirl on the right: a loop then a long tail down
+const swirlPts = samplePath(u => {
+  if (u < .55) { const a = -1.2 + (u / .55) * TAU * .95; return [1015 + Math.cos(a) * 95, 470 + Math.sin(a) * 120]; }
+  const k = (u - .55) / .45; return bez([1015 + Math.cos(-1.2 + TAU * .95) * 95, 470 + Math.sin(-1.2 + TAU * .95) * 120], [1120, 560], [1090, 760], [930, 905])(k);
+}, 220);
+
+// ---------- lime glossy 3D shapes ----------
+function limeShade(cx, cy, r) {
+  const g = x.createRadialGradient(cx - r * .35, cy - r * .4, r * .05, cx, cy, r * 1.15);
+  g.addColorStop(0, '#f2ffc8'); g.addColorStop(.3, '#b8ff3a'); g.addColorStop(.75, '#5fc515'); g.addColorStop(1, '#1f6a08'); return g;
+}
+function limeBall(cx, cy, r) {
+  x.save(); x.shadowColor = 'rgba(120,255,60,.5)'; x.shadowBlur = r * .6;
+  x.fillStyle = limeShade(cx, cy, r); x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.fill(); x.restore();
+  x.fillStyle = 'rgba(255,255,255,.8)'; x.beginPath(); x.ellipse(cx - r * .4, cy - r * .45, r * .2, r * .11, -.6, 0, TAU); x.fill();
+}
+function limePlus(cx, cy, s, rot) {
+  x.save(); x.translate(cx, cy); x.rotate(rot);
+  const a = s * .36, b = s;
+  const shape = () => { x.beginPath();
+    rr(-a, -b, 2 * a, 2 * b, a * .9); rr(-b, -a, 2 * b, 2 * a, a * .9); };
+  x.shadowColor = 'rgba(0,0,0,.45)'; x.shadowBlur = 40; x.shadowOffsetY = 20;
+  x.fillStyle = '#2f8a0c'; rr(-a, -b, 2 * a, 2 * b, a * .9); x.fill(); rr(-b, -a, 2 * b, 2 * a, a * .9); x.fill();
+  x.shadowColor = 'transparent';
+  x.translate(-s * .05, -s * .07);
+  x.fillStyle = limeShade(-s * .1, -s * .1, s * 1.1); rr(-a, -b, 2 * a, 2 * b, a * .9); x.fill(); rr(-b, -a, 2 * b, 2 * a, a * .9); x.fill();
+  x.fillStyle = 'rgba(255,255,255,.55)'; x.beginPath(); x.ellipse(-a * .3, -b * .62, a * .35, a * .16, 0, 0, TAU); x.fill();
+  x.beginPath(); x.ellipse(-b * .62, -a * .3, a * .3, a * .14, 0, 0, TAU); x.fill();
+  x.restore();
+}
+function notebook(cx, cy, rot) {
+  x.save(); x.translate(cx, cy); x.rotate(rot);
+  const w = 220, h = 290;
+  x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 40; x.shadowOffsetY = 20;
+  x.fillStyle = '#3aa61a'; rr(-w / 2 + 10, -h / 2 + 12, w, h, 26); x.fill(); x.shadowColor = 'transparent';
+  const g = x.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2); g.addColorStop(0, '#c6ff7a'); g.addColorStop(.5, '#7fe03a'); g.addColorStop(1, '#4cb51e');
+  x.fillStyle = g; rr(-w / 2, -h / 2, w, h, 26); x.fill();
+  x.fillStyle = 'rgba(255,255,255,.25)'; rr(-w / 2 + 12, -h / 2 + 10, w - 24, 40, 18); x.fill();
+  x.fillStyle = '#58c41f'; x.fillRect(w / 2 - 60, -h / 2, 22, h);           // elastic band
+  x.fillStyle = 'rgba(255,255,255,.3)'; x.fillRect(w / 2 - 58, -h / 2, 6, h);
+  for (let i = 0; i < 6; i++) { // spiral rings
+    const yy = -h / 2 + 40 + i * 50;
+    x.lineWidth = 10; x.strokeStyle = '#4a5a54'; x.beginPath(); x.ellipse(-w / 2, yy, 22, 13, 0, Math.PI * .5, Math.PI * 1.5); x.stroke();
+    x.lineWidth = 5; x.strokeStyle = '#eef6f2'; x.beginPath(); x.ellipse(-w / 2 - 2, yy - 2, 22, 13, 0, Math.PI * .6, Math.PI * 1.4); x.stroke();
+  }
+  x.restore();
+}
+
+// ---------- discount spheres ----------
+function bigBadge(cx, cy, r, t, tp) {
+  // lime glossy sphere
+  x.save(); x.shadowColor = 'rgba(140,255,60,.55)'; x.shadowBlur = 80;
+  x.fillStyle = limeShade(cx, cy, r); x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.fill(); x.restore();
+  x.save(); x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.clip();
+  glow(cx + r * .55, cy + r * .7, r * .9, 'rgba(0,120,40,A)', .5);
+  x.restore();
+  x.fillStyle = 'rgba(255,255,255,.75)'; x.beginPath(); x.ellipse(cx - r * .42, cy - r * .55, r * .26, r * .12, -.6, 0, TAU); x.fill();
+  if (tp <= 0) return;
+  const s = backOut(tp, 2.4);
+  x.save(); x.translate(cx, cy - r * .1); x.scale(s, s); x.rotate(-.06 + Math.sin(t * 1.5) * .02);
+  x.font = F(800, r * .56); x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillStyle = 'rgba(10,60,10,.35)'; x.fillText('−50%', 4, 7);
+  x.fillStyle = '#062a12'; x.fillText('−50%', 0, 0);
+  x.font = F(800, r * .13); x.fillText('НА ПЕРВЫЙ МЕСЯЦ', 0, r * .42);
+  x.font = F(600, r * .11); x.fillStyle = 'rgba(6,42,18,.8)'; x.fillText('обучения в школе', 0, r * .58);
+  x.restore();
+}
+function glassBadge(cx, cy, r, tp) {
+  x.save(); x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 40; x.shadowOffsetY = 16;
+  const g = x.createRadialGradient(cx - r * .3, cy - r * .35, r * .1, cx, cy, r);
+  g.addColorStop(0, '#1f6f55'); g.addColorStop(.7, '#0b3a2a'); g.addColorStop(1, '#2fe3d3');
+  x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.fill(); x.restore();
+  x.lineWidth = 4; x.strokeStyle = 'rgba(160,255,240,.6)'; x.beginPath(); x.arc(cx, cy, r - 2, 0, TAU); x.stroke();
+  x.fillStyle = 'rgba(255,255,255,.55)'; x.beginPath(); x.ellipse(cx - r * .4, cy - r * .55, r * .25, r * .1, -.6, 0, TAU); x.fill();
+  if (tp <= 0) return;
+  const s = backOut(tp, 2.4);
+  x.save(); x.translate(cx, cy - r * .08); x.scale(s, s); x.rotate(.08);
+  x.font = F(800, r * .5); x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillStyle = LIME; x.shadowColor = 'rgba(168,245,44,.6)'; x.shadowBlur = 16; x.fillText('−20%', 0, 0); x.shadowBlur = 0;
+  x.font = F(800, r * .13); x.fillStyle = '#fff'; x.fillText('НА ПАКЕТЫ', 0, r * .4);
+  x.fillText('РЕПЕТИТОРСТВА*', 0, r * .56);
+  x.restore();
+}
+
+// ---------- logo ----------
+function logo(cx, cy, s) {
+  x.save(); x.translate(cx, cy); x.scale(s, s);
+  x.font = F(800, 46); x.textBaseline = 'alphabetic'; x.fillStyle = '#fff';
+  const w1 = x.measureText('SHK').width, w2 = x.measureText('LA').width, oW = 42;
+  const total = w1 + oW + w2 + 6, ox = -total / 2;
+  x.fillText('SHK', ox, 0);
+  const ocx = ox + w1 + 3 + oW / 2, ocy = -16;
+  x.lineWidth = 10; x.strokeStyle = '#fff'; x.beginPath(); x.arc(ocx, ocy, 15, -.25, Math.PI + .25); x.stroke();
+  x.fillText('LA', ox + w1 + oW + 6, 0);
+  // cap
+  x.fillStyle = TEAL;
+  x.beginPath(); x.moveTo(ocx, ocy - 50); x.lineTo(ocx + 34, ocy - 38); x.lineTo(ocx, ocy - 26); x.lineTo(ocx - 34, ocy - 38); x.closePath(); x.fill();
+  x.beginPath(); x.moveTo(ocx - 20, ocy - 31); x.lineTo(ocx + 20, ocy - 31); x.lineTo(ocx + 18, ocy - 18); x.quadraticCurveTo(ocx, ocy - 24, ocx - 18, ocy - 18); x.closePath(); x.fill();
+  x.fillRect(ocx + 24, ocy - 38, 4, 34); x.beginPath(); x.ellipse(ocx + 26, ocy - 3, 4, 7, 0, 0, TAU); x.fill();
+  x.restore();
+}
+
+// ---------- texts ----------
+function header(t) {
+  const lp = easeOut(prog(t, 0, .6));
+  if (lp > 0) {
+    x.save(); x.globalAlpha = lp; x.translate(0, (1 - lp) * -20);
+    logo(395, 106, 1.1);
+    x.font = F(600, 27); x.fillStyle = '#e8fff0'; x.textAlign = 'left'; x.textBaseline = 'middle';
+    x.fillText('Международная онлайн-школа', 530, 88);
     x.restore();
   }
-  // pink rim bottom-left
-  const rim = x.createRadialGradient(cx - r * .55, cy + r * .65, 0, cx - r * .55, cy + r * .65, r * 1.0);
-  rim.addColorStop(0, 'rgba(255,90,210,.85)'); rim.addColorStop(1, 'rgba(255,90,210,0)');
-  x.fillStyle = rim; x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
-  // blue rim top-right
-  const rim2 = x.createRadialGradient(cx + r * .7, cy - r * .55, 0, cx + r * .7, cy - r * .55, r * .8);
-  rim2.addColorStop(0, 'rgba(120,120,255,.55)'); rim2.addColorStop(1, 'rgba(120,120,255,0)');
-  x.fillStyle = rim2; x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
-  x.restore();
-  // specular
-  x.save(); x.translate(cx - r * .38, cy - r * .45); x.rotate(-.6);
-  const sp = x.createRadialGradient(0, 0, 0, 0, 0, r * .38);
-  sp.addColorStop(0, 'rgba(255,255,255,.75)'); sp.addColorStop(1, 'rgba(255,255,255,0)');
-  x.fillStyle = sp; x.scale(1, .55); x.beginPath(); x.arc(0, 0, r * .38, 0, TAU); x.fill(); x.restore();
-  x.fillStyle = 'rgba(255,255,255,.9)'; x.beginPath(); x.arc(cx - r * .5, cy - r * .52, r * .045, 0, TAU); x.fill();
-  // thin edge
-  x.strokeStyle = 'rgba(255,200,255,.35)'; x.lineWidth = Math.max(1, r * .012); x.beginPath(); x.arc(cx, cy, r - 1, 0, TAU); x.stroke();
-}
-
-// 3D glossy text (extruded)
-function glossyText(str, px, py, size, opts = {}) {
-  x.save(); x.translate(px, py); x.rotate(opts.rot || 0); x.transform(1, 0, opts.skew ?? -.18, 1, 0, 0);
-  x.font = font(UNB, size); x.textAlign = 'center'; x.textBaseline = 'middle';
-  const depth = opts.depth ?? Math.round(size * .09);
-  for (let i = depth; i > 0; i--) { x.fillStyle = i > depth * .5 ? '#5a0a4a' : '#b0177a'; x.fillText(str, i * .6, i); }
-  const g = x.createLinearGradient(0, -size * .5, 0, size * .5);
-  (opts.colors || ['#ffffff', '#ffc2ec', '#ff5cc6']).forEach((col, i, a) => g.addColorStop(i / (a.length - 1), col));
-  x.fillStyle = g; x.shadowColor = 'rgba(255,120,220,.7)'; x.shadowBlur = size * .15; x.fillText(str, 0, 0);
-  x.shadowBlur = 0; x.globalAlpha = .35; x.fillStyle = '#fff'; x.save(); x.beginPath(); x.rect(-2000, -size * .55, 4000, size * .32); x.clip(); x.fillText(str, 0, 0); x.restore();
-  x.restore();
-}
-
-// ---------- title ----------
-function title(t) {
-  const lines = [
-    { s: 'ЧЁРНАЯ', y: 108, size: 84, skew: 0, d: 0.05 },
-    { s: 'ПЯТНИЦА', y: 200, size: 84, skew: 0, d: 0.2 },
-    { s: 'В SHKOLA', y: 308, size: 112, skew: -.28, d: 0.35 },
-  ];
-  for (const L of lines) {
-    const p = prog(t, L.d, .55); if (p <= 0) continue;
-    const sc = backOut(p, 2.4), a = clamp(p * 2);
-    x.save(); x.translate(540, L.y); x.scale(sc, sc); x.transform(1, 0, L.skew, 1, 0, 0); x.globalAlpha = a;
-    x.font = font(UNB, L.size); x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.lineJoin = 'round'; x.lineWidth = 10; x.strokeStyle = 'rgba(10,0,20,.55)'; x.strokeText(L.s, 4, 6);
-    x.fillStyle = '#fff'; x.shadowColor = 'rgba(255,90,210,.55)'; x.shadowBlur = 24; x.fillText(L.s, 0, 0);
-    x.restore();
+  const tp = prog(t, .2, .6);
+  if (tp > 0) {
+    const s = backOut(tp, 1.8);
+    x.save(); x.translate(540, 205); x.scale(s, s); x.globalAlpha = clamp(tp * 2);
+    x.font = F(800, 104); x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.shadowColor = 'rgba(0,0,0,.55)'; x.shadowBlur = 30; x.shadowOffsetY = 8;
+    x.fillStyle = '#fff'; x.fillText('Чёрная пятница', 0, 0); x.restore();
   }
-  // subtitle
-  const p = prog(t, .9, .5);
-  if (p > 0) {
-    const sub = DATE ? `ТОЛЬКО ДО ${DATE} НОЯБРЯ` : 'СТАРТОВАЛА!  ВЫГОДА ДО 50%';
-    x.save(); x.globalAlpha = p; x.translate(540, 382 + (1 - easeOut(p)) * 20);
-    x.font = font(MON, 28); x.textAlign = 'center'; x.textBaseline = 'middle';
-    if ('letterSpacing' in x) x.letterSpacing = '3px';
-    const w = x.measureText(sub).width + 50;
-    roundRect(-w / 2, -24, w, 48, 24); x.fillStyle = 'rgba(255,60,180,.22)'; x.fill();
-    x.strokeStyle = 'rgba(255,170,230,.6)'; x.lineWidth = 2; x.stroke();
-    x.fillStyle = '#ffe3f6'; x.fillText(sub, 0, 2); x.restore();
+  const sp = prog(t, .55, .6);
+  if (sp > 0) {
+    // lime line with sweeping highlight
+    x.save(); x.globalAlpha = clamp(sp * 2); x.translate(540 + (1 - easeOut(sp)) * -60, 312);
+    x.font = F(800, 80); x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.shadowColor = 'rgba(168,245,44,.45)'; x.shadowBlur = 24;
+    const str = 'Скидки до 50%', w = x.measureText(str).width;
+    const hx = -w / 2 + ((t * 0.45) % 1.6) * w * 1.3 - w * .15;
+    const g = x.createLinearGradient(hx - 120, 0, hx + 120, 0);
+    g.addColorStop(0, LIME); g.addColorStop(.5, '#f3ffd0'); g.addColorStop(1, LIME);
+    x.fillStyle = g; x.fillText(str, 0, 0); x.restore();
   }
-}
-
-// ---------- handwritten notes ----------
-function note(t, start, str, px, py, rot, arrow) {
-  const p = prog(t, start, .45); if (p <= 0) return;
-  const wob = Math.sin(t * 3 + px) * .02;
-  x.save(); x.translate(px, py); x.rotate(rot + wob); x.scale(backOut(p, 2.2), backOut(p, 2.2)); x.globalAlpha = clamp(p * 2);
-  x.font = font(CAV, 50); x.textAlign = 'center'; x.textBaseline = 'middle';
-  x.lineWidth = 8; x.strokeStyle = 'rgba(40,0,40,.55)'; x.strokeText(str, 2, 3);
-  x.fillStyle = '#ff8ae0'; x.shadowColor = 'rgba(255,80,200,.8)'; x.shadowBlur = 12; x.fillText(str, 0, 0);
-  x.restore();
-  if (arrow) { // hand-drawn arrow, drawn progressively
-    const q = easeOut(prog(t, start + .2, .5)); if (q <= 0) return;
-    const [ax, ay, bx, by, bend] = arrow;
-    const mx = (ax + bx) / 2 + bend, my = (ay + by) / 2 - Math.abs(bend) * .4;
-    x.save(); x.strokeStyle = '#ff8ae0'; x.lineWidth = 5; x.lineCap = 'round';
-    x.shadowColor = 'rgba(255,80,200,.8)'; x.shadowBlur = 8;
-    const N = 30, n = Math.floor(N * q);
-    x.beginPath();
-    let ex = ax, ey = ay, px2 = ax, py2 = ay;
-    for (let i = 0; i <= n; i++) { const u = i / N; px2 = ex; py2 = ey; ex = (1 - u) * (1 - u) * ax + 2 * u * (1 - u) * mx + u * u * bx; ey = (1 - u) * (1 - u) * ay + 2 * u * (1 - u) * my + u * u * by; i ? x.lineTo(ex, ey) : x.moveTo(ex, ey); }
-    x.stroke();
-    if (q > .95) { const ang = Math.atan2(ey - py2, ex - px2); x.beginPath();
-      x.moveTo(ex - 22 * Math.cos(ang - .5), ey - 22 * Math.sin(ang - .5)); x.lineTo(ex, ey); x.lineTo(ex - 22 * Math.cos(ang + .5), ey - 22 * Math.sin(ang + .5)); x.stroke(); }
+  const dp = prog(t, .95, .5);
+  if (dp > 0) {
+    x.save(); x.globalAlpha = dp; x.translate(540, 395 + (1 - easeOut(dp)) * 16);
+    x.textBaseline = 'middle'; x.fillStyle = '#fff';
+    const a = DATE ? 'Акция действует ' : 'Срок проведения акции — ';
+    const b = DATE ? `только до ${DATE} ноября` : 'ограничен';
+    x.font = F(600, 36); const wa = x.measureText(a).width; x.font = F(800, 36); const wb = x.measureText(b).width;
+    const sx = -(wa + wb) / 2;
+    x.font = F(600, 36); x.textAlign = 'left'; x.fillText(a, sx, 0);
+    x.font = F(800, 36); x.fillText(b, sx + wa, 0);
     x.restore();
   }
 }
 
-// ---------- CTA button with stacked echo ----------
-function pill(cx, cy, w, h, alpha, label) {
+// benefit chips, one slot, cycling
+const chips = ['Без оценок и стресса', 'Мини-классы до 8 человек', 'Объясняем до 100% понимания', 'Кураторы и видимый прогресс'];
+function chip(t) {
+  const start = 2.4, per = 1.6;
+  if (t < start) return;
+  const i = Math.min(chips.length - 1, Math.floor((t - start) / per)), lt = t - start - i * per;
+  const last = i === chips.length - 1;
+  const pin = easeOut(clamp(lt / .35)), pout = last ? 0 : easeInOut(clamp((lt - (per - .3)) / .3));
+  x.save(); x.globalAlpha = pin * (1 - pout);
+  x.translate(540 + (1 - pin) * 80 - pout * 80, 852);
+  x.font = F(800, 32); const w = x.measureText(chips[i]).width + 110, h = 66;
+  rr(-w / 2, -h / 2, w, h, h / 2); x.fillStyle = 'rgba(10,50,30,.75)'; x.fill();
+  x.lineWidth = 2; x.strokeStyle = 'rgba(168,245,44,.7)'; x.stroke();
+  // check icon
+  x.fillStyle = LIME; x.beginPath(); x.arc(-w / 2 + 38, 0, 18, 0, TAU); x.fill();
+  x.strokeStyle = '#062a12'; x.lineWidth = 5; x.lineCap = 'round'; x.lineJoin = 'round';
+  x.beginPath(); x.moveTo(-w / 2 + 29, 0); x.lineTo(-w / 2 + 36, 7); x.lineTo(-w / 2 + 47, -7); x.stroke();
+  x.fillStyle = '#fff'; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(chips[i], -w / 2 + 70, 2);
+  x.restore();
+}
+
+function pill(cx, cy, w, h, alpha) {
   x.save(); x.globalAlpha = alpha;
-  x.shadowColor = 'rgba(120,70,255,.8)'; x.shadowBlur = 30;
-  roundRect(cx - w / 2, cy - h / 2, w, h, h / 2);
-  const g = x.createLinearGradient(0, cy - h / 2, 0, cy + h / 2); g.addColorStop(0, '#9a72ff'); g.addColorStop(.5, '#6c3cff'); g.addColorStop(1, '#4a1fd8');
+  x.shadowColor = 'rgba(168,245,44,.6)'; x.shadowBlur = 36;
+  rr(cx - w / 2, cy - h / 2, w, h, h / 2);
+  const g = x.createLinearGradient(0, cy - h / 2, 0, cy + h / 2); g.addColorStop(0, '#d2ff7a'); g.addColorStop(.5, LIME); g.addColorStop(1, '#79d10f');
   x.fillStyle = g; x.fill(); x.shadowBlur = 0;
-  x.lineWidth = 3; x.strokeStyle = 'rgba(210,190,255,.85)'; x.stroke();
-  roundRect(cx - w / 2 + 14, cy - h / 2 + 6, w - 28, h * .38, h * .2); x.fillStyle = 'rgba(255,255,255,.18)'; x.fill();
-  if (label) { x.font = font(MON, 34); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#fff'; x.fillText(label, cx, cy + 2); }
+  rr(cx - w / 2 + 16, cy - h / 2 + 6, w - 32, h * .36, h * .18); x.fillStyle = 'rgba(255,255,255,.35)'; x.fill();
+  x.font = F(800, 34); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#062a12';
+  x.fillText('Записаться на пробный урок', cx, cy + 2);
   x.restore();
 }
 function cta(t) {
-  const p = prog(t, 1.6, .5); if (p <= 0) return;
-  const cx = 540, cy = 960, w = 720, h = 96;
-  // echo stacks at 2 moments
-  for (const T0 of [2.0, 6.2]) {
+  const p = prog(t, 1.7, .5); if (p <= 0) return;
+  const cx = 540, cy = 958, w = 700, h = 94;
+  for (const T0 of [2.1, 6.4]) {
     const e = prog(t, T0, .9);
-    if (e > 0 && e < 1) for (let k = 3; k >= 1; k--) {
-      const off = (1 - easeInOut(e)) * k;
-      pill(cx - off * 34, cy - off * 46, w - 20, h, .55 * (1 - e * .6), 'Записаться на пробный урок');
-    }
+    if (e > 0 && e < 1) for (let k = 3; k >= 1; k--) { const off = (1 - easeInOut(e)) * k; pill(cx + off * 30, cy - off * 40, w - 20, h, .45 * (1 - e * .6)); }
   }
-  const sc = backOut(p, 2) * (1 + .025 * Math.sin(t * 5));
-  x.save(); x.translate(cx, cy); x.scale(sc, sc); x.translate(-cx, -cy);
-  pill(cx, cy, w, h, clamp(p * 2), 'Записаться на пробный урок');
-  x.restore();
-  // footnote
-  x.save(); x.globalAlpha = .7 * clamp(p * 2); x.font = font(MON, 22); x.textAlign = 'center'; x.fillStyle = '#ffd9f1';
-  x.fillText('*скидка не распространяется на пакет «Макси»', 540, 1050); x.restore();
+  const sc = backOut(p, 2) * (1 + .02 * Math.sin(t * 5));
+  x.save(); x.translate(cx, cy); x.scale(sc, sc); x.translate(-cx, -cy); pill(cx, cy, w, h, clamp(p * 2)); x.restore();
+  x.save(); x.globalAlpha = .7 * clamp(p * 2); x.font = F(600, 22); x.textAlign = 'center'; x.fillStyle = '#d8ffe6';
+  x.fillText('*скидка не распространяется на пакет «Макси»', 540, 1048); x.restore();
 }
 
-// ---------- mini bubbles ----------
-const minis = [
-  { x: 95, y: 590, r: 44, k: 'red', l: '%', d: .9 },
-  { x: 995, y: 545, r: 38, k: 'violet', l: '📚', d: 1.1 },
-  { x: 80, y: 775, r: 34, k: 'violet', l: '🔥', d: 1.3 },
-  { x: 300, y: 830, r: 26, k: 'red', l: '%', d: 1.5 },
-  { x: 1030, y: 905, r: 28, k: 'red', l: '★', d: 1.2 },
-  { x: 470, y: 885, r: 20, k: 'violet', l: '%', d: 1.4 },
-  { x: 40, y: 690, r: 16, k: 'red', l: '', d: 1.6 },
-];
-function minisDraw(t) {
-  minis.forEach((m, i) => {
-    const p = prog(t, m.d, .6); if (p <= 0) return;
-    const s = elastic(p);
-    const mx = m.x + Math.sin(t * 1.3 + i) * 12, my = m.y + Math.cos(t * 1.1 + i * 2) * 14;
-    const r = m.r * s; if (r < 1) return;
-    sphere(mx, my, r, m.k);
-    if (m.l) { x.save(); x.font = m.l.length > 1 ? `${r * .9}px "Noto Color Emoji"` : font(UNB, r * .9); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#fff'; x.fillText(m.l, mx, my + r * .05); x.restore(); }
-  });
-}
-
-// ---------- main composition ----------
 function draw(t) {
-  x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, W, H);
+  x.setTransform(1, 0, 0, 1, 0, 0);
   background(t);
-  // gentle camera push-in
-  const z = 1 + .035 * easeInOut(clamp(t / DUR));
+  const z = 1 + .03 * easeInOut(clamp(t / DUR));
   x.translate(540, 560); x.scale(z, z); x.translate(-540, -560);
 
-  minisDraw(t);
+  // chrome decor
+  chromeTube(arrowPts, easeInOut(prog(t, .1, 1.1)), 30, true);
+  x.save(); x.translate(Math.sin(t * .8) * 6, Math.cos(t * .7) * 8);
+  chromeTube(swirlPts, easeInOut(prog(t, .5, 1.6)), 30, false); x.restore();
 
-  // big sphere -50%
-  const bp = prog(t, .45, 1.1);
-  if (bp > 0) {
-    const s = elastic(bp);
-    const cx = 520 + Math.sin(t * 1.2) * 8, cy = 630 + Math.cos(t * 1.4) * 10, r = 215 * s;
-    sphere(cx, cy, r, 'main');
-    const tp = prog(t, .95, .6);
-    if (tp > 0) {
-      const ts = backOut(tp, 2.6);
-      x.save(); x.translate(cx, cy - 10); x.scale(ts, ts);
-      glossyText('−50%', 0, 0, 132, { rot: -.12 + Math.sin(t * 1.6) * .03 });
-      x.restore();
-      x.save(); x.globalAlpha = tp; x.font = font(MON, 26); x.textAlign = 'center'; x.fillStyle = '#ffe6f7';
-      x.translate(cx, cy + 112); x.rotate(-.05);
-      x.fillText('НА ПЕРВЫЙ МЕСЯЦ', 0, 0); x.restore();
-    }
-  }
-  // small sphere -20%
-  const sp = prog(t, 1.15, 1.0);
-  if (sp > 0) {
-    const s = elastic(sp), ang = t * .7;
-    const cx = 830 + Math.cos(ang) * 14, cy = 700 + Math.sin(ang) * 18, r = 112 * s;
-    sphere(cx, cy, r, 'red');
-    x.save(); x.translate(cx, cy); x.scale(s, s);
-    glossyText('−20%', 0, -4, 50, { rot: .22, skew: -.15, colors: ['#ffffff', '#ffe0ef', '#ffb0d6'], depth: 5 });
-    x.restore();
-  }
+  // notebook & plus
+  const np = prog(t, .8, .9);
+  if (np > 0) { const e = easeOut(np); notebook(130 - (1 - e) * 300, 845 + Math.sin(t * 1.1) * 10, -.3 + Math.sin(t * .9) * .03); }
+  const pp = prog(t, 1.0, .9);
+  if (pp > 0) { const s = elastic(pp); limePlus(1010, 1000 + Math.sin(t * 1.2) * 10, 120 * s, .15 + t * .08); limeBall(885, 505 + Math.cos(t * 1.4) * 10, 28 * s); }
+  const bp2 = prog(t, 1.3, .8);
+  if (bp2 > 0) limeBall(150 + Math.sin(t) * 8, 520 + Math.cos(t * 1.2) * 12, 26 * elastic(bp2));
 
-  // notes
-  note(t, 2.2, 'без оценок!!!', 190, 455, -.14, [200, 490, 310, 560, -40]);
-  note(t, 3.0, 'и без стресса', 200, 870, -.06, null);
-  note(t, 3.8, 'мини-классы до 8!', 820, 470, .1, null);
-  note(t, 4.6, 'на репетиторство*', 840, 850, .07, null);
+  // discounts
+  const bp = prog(t, .7, 1.1);
+  if (bp > 0) { const s = elastic(bp); bigBadge(440 + Math.sin(t * 1.1) * 6, 625 + Math.cos(t * 1.3) * 8, 175 * s, t, prog(t, 1.2, .6)); }
+  const gp = prog(t, 1.2, 1.0);
+  if (gp > 0) { const s = elastic(gp); glassBadge(735 + Math.cos(t * .8) * 8, 650 + Math.sin(t * .9) * 10, 125 * s, prog(t, 1.6, .6)); }
 
-  // "учёба вдохновляет" ring note around sphere bottom-left
-  const rp = easeOut(prog(t, 5.2, .7));
-  if (rp > 0) {
-    x.save(); x.translate(520, 630); x.rotate(-.3);
-    x.beginPath(); x.ellipse(0, 0, 270, 250, 0, Math.PI * .55, Math.PI * .55 + Math.PI * 1.1 * rp);
-    x.strokeStyle = 'rgba(255,140,224,.8)'; x.lineWidth = 4; x.setLineDash([2, 12]); x.lineCap = 'round'; x.stroke(); x.restore();
-  }
-
-  title(t);
-  // CTA drawn without camera zoom so it stays crisp in frame
+  header(t);
   x.setTransform(1, 0, 0, 1, 0, 0);
+  chip(t);
   cta(t);
-
-  // fade at the very end for a smooth loop
-  const f = 0;
-  if (f > 0) { x.fillStyle = `rgba(5,1,9,${f})`; x.fillRect(0, 0, W, H); }
 }
 window.DUR = DUR;
-window.drawAt = t => { draw(t); };
-window.ready = document.fonts.load(font(UNB, 40), 'ЧЁРНАЯ SHKOLA').then(() => Promise.all([
-  document.fonts.load(font(MON, 30), 'Записаться'), document.fonts.load(font(CAV, 40), 'без оценок'),
-  document.fonts.load('40px "Noto Color Emoji"', '📚🔥')])).then(() => { draw(0); return true; });
+window.drawAt = t => draw(t);
+window.ready = Promise.all([document.fonts.load(F(800, 40), 'Чёрная SHKOLA'), document.fonts.load(F(600, 40), 'Международная')]).then(() => { draw(0); return true; });
 </script></body></html>
