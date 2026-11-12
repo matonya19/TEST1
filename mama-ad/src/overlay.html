@@ -1,0 +1,128 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../build/node_modules/@fontsource/manrope/800.css">
+<link rel="stylesheet" href="../build/node_modules/@fontsource/manrope/600.css">
+<style>html,body{margin:0;background:transparent}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<img id="logo" LOGO_SRC style="display:none">
+<script>
+// Transparent overlay: speech bubbles over the Kling clips + the branded end card.
+const P = new URLSearchParams(location.search);
+const DATE = P.get('date') || '20';
+const W = 1080, H = 1920;
+const c = document.getElementById('c'), x = c.getContext('2d');
+const LIME = '#a8f52c', DG = '#06301a', TAU = Math.PI * 2;
+const F = (w, s) => `${w} ${s}px Manrope`;
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const prog = (t, s, d) => clamp((t - s) / d);
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const backOut = (p, s = 2.2) => 1 + (s + 1) * Math.pow(p - 1, 3) + s * Math.pow(p - 1, 2);
+function rr(px, py, w, h, r) {
+  x.beginPath(); x.moveTo(px + r, py); x.arcTo(px + w, py, px + w, py + h, r);
+  x.arcTo(px + w, py + h, px, py + h, r); x.arcTo(px, py + h, px, py, r); x.arcTo(px, py, px + w, py, r); x.closePath();
+}
+// BUBBLES and END are filled in by the build script (times are global seconds)
+const BUBBLES = window.BUBBLES || [];
+const END = window.END || 999;
+const DUR = window.DUR || 30;
+
+function wrap(str, maxW) {
+  const words = str.split(' '), lines = []; let line = '';
+  for (const w of words) { const t = line ? line + ' ' + w : w; if (x.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; }
+  lines.push(line); return lines;
+}
+function bubble(b, t) {
+  const p = prog(t, b.s, .35), out = prog(t, b.e - .25, .25);
+  if (p <= 0 || out >= 1) return;
+  const size = b.size || 50;
+  x.font = F(800, size);
+  const lines = wrap(b.text, 700), lh = size * 1.22;
+  const tw = Math.max(...lines.map(l => x.measureText(l).width));
+  const w = tw + 80, h = lines.length * lh + 56;
+  const sc = backOut(p) * (1 - out * .3), a = clamp(p * 3) * (1 - out);
+  x.save(); x.globalAlpha = a; x.translate(b.x, b.y); x.rotate(b.rot || 0); x.scale(sc, sc);
+  // bubble body
+  x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowBlur = 30; x.shadowOffsetY = 10;
+  const dark = b.style === 'dark';
+  rr(-w / 2, -h / 2, w, h, 40); x.fillStyle = dark ? DG : '#fff'; x.fill();
+  // tail
+  if (b.tail) {
+    const [tx, ty] = b.tail; const bx = clamp(tx * .4, -w / 2 + 60, w / 2 - 60), by = ty > 0 ? h / 2 - 2 : -h / 2 + 2;
+    x.beginPath(); x.moveTo(bx - 26, by); x.lineTo(tx, ty); x.lineTo(bx + 26, by); x.closePath(); x.fill();
+  }
+  x.shadowColor = 'transparent';
+  x.lineWidth = 5; x.strokeStyle = LIME; rr(-w / 2, -h / 2, w, h, 40); x.stroke();
+  // speaker tag
+  if (b.who) {
+    x.font = F(800, 26); const ww = x.measureText(b.who).width + 34;
+    rr(-w / 2 + 30, -h / 2 - 22, ww, 44, 22); x.fillStyle = LIME; x.fill();
+    x.fillStyle = DG; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(b.who, -w / 2 + 47, -h / 2 + 1);
+  }
+  x.font = F(800, size); x.fillStyle = dark ? '#fff' : DG; x.textAlign = 'center'; x.textBaseline = 'middle';
+  lines.forEach((l, i) => x.fillText(l, 0, -((lines.length - 1) * lh) / 2 + i * lh + 3));
+  x.restore();
+}
+
+// ---------- branded end card ----------
+function glow(cx, cy, r, col, a) {
+  const g = x.createRadialGradient(cx, cy, 0, cx, cy, r);
+  g.addColorStop(0, col.replace('A', a)); g.addColorStop(1, col.replace('A', 0)); x.fillStyle = g; x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+}
+function endCard(t) {
+  const lt = t - END; if (lt < 0) return;
+  const a = easeOut(clamp(lt / .45));
+  x.save(); x.globalAlpha = a;
+  x.fillStyle = '#03140c'; x.fillRect(0, 0, W, H);
+  glow(80, 1300, 700, 'rgba(0,200,90,A)', .5); glow(1040, 300, 560, 'rgba(0,230,200,A)', .42); glow(1000, 1700, 600, 'rgba(30,220,80,A)', .45);
+  const logo = document.getElementById('logo'), lw = 300, lh = lw * logo.naturalHeight / logo.naturalWidth;
+  x.drawImage(logo, 540 - lw / 2, 320, lw, lh);
+  x.restore();
+  const step = (s, d = .5) => easeOut(prog(lt, s, d));
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  let p = step(.2);
+  x.save(); x.globalAlpha = p; x.translate(0, (1 - p) * 30); x.font = F(800, 92); x.fillStyle = '#fff';
+  x.fillText('Чёрная пятница', 540, 590); x.fillText('в SHKOLA', 540, 695); x.restore();
+  p = prog(lt, .55, .6);
+  if (p > 0) {
+    const s = backOut(p);
+    x.save(); x.translate(540, 1010); x.scale(s, s); x.rotate(-.03);
+    x.shadowColor = 'rgba(168,245,44,.5)'; x.shadowBlur = 50;
+    rr(-380, -190, 760, 380, 44);
+    const g = x.createLinearGradient(0, -190, 0, 190); g.addColorStop(0, '#d6ff86'); g.addColorStop(.5, LIME); g.addColorStop(1, '#7ad410');
+    x.fillStyle = g; x.fill(); x.shadowColor = 'transparent';
+    x.font = F(800, 28); if ('letterSpacing' in x) x.letterSpacing = '2px';
+    const lbl = 'РЕПЕТИТОРСТВО', lw2 = x.measureText(lbl).width + 44;
+    rr(-lw2 / 2, -160, lw2, 54, 27); x.fillStyle = DG; x.fill(); x.fillStyle = LIME; x.fillText(lbl, 0, -132);
+    if ('letterSpacing' in x) x.letterSpacing = '0px';
+    x.fillStyle = DG; x.font = F(800, 190); x.fillText('−20%', 0, 10);
+    x.font = F(800, 42); x.fillText('на пакеты репетиторства*', 0, 135);
+    x.restore();
+  }
+  p = step(1.1);
+  x.save(); x.globalAlpha = p; x.font = F(600, 44); x.fillStyle = '#fff';
+  x.fillText(`Только до ${DATE} ноября`, 540, 1300); x.restore();
+  p = prog(lt, 1.4, .5);
+  if (p > 0) {
+    const s = backOut(p) * (1 + .02 * Math.sin(lt * 5)), cy = 1450, w = 820, h = 100;
+    x.save(); x.translate(540, cy); x.scale(s, s);
+    x.shadowColor = 'rgba(168,245,44,.6)'; x.shadowBlur = 36; rr(-w / 2, -h / 2, w, h, h / 2);
+    const g = x.createLinearGradient(0, -h / 2, 0, h / 2); g.addColorStop(0, '#d2ff7a'); g.addColorStop(.5, LIME); g.addColorStop(1, '#79d10f');
+    x.fillStyle = g; x.fill(); x.shadowColor = 'transparent';
+    rr(-w / 2 + 16, -h / 2 + 6, w - 32, h * .36, h * .18); x.fillStyle = 'rgba(255,255,255,.35)'; x.fill();
+    x.font = F(800, 38); x.fillStyle = DG; x.fillText('Записаться на пробный урок', 0, 3); x.restore();
+  }
+  p = step(1.6);
+  x.save(); x.globalAlpha = .75 * p; x.font = F(600, 26); x.fillStyle = '#d8ffe6';
+  x.fillText('*скидка не распространяется на пакет «Макси»', 540, 1580); x.restore();
+}
+
+function draw(t) {
+  x.clearRect(0, 0, W, H);
+  for (const b of BUBBLES) bubble(b, t);
+  endCard(t);
+}
+window.drawAt = draw;
+window.ready = Promise.all([document.fonts.load(F(800, 40), 'Ма-ам SHKOLA 0123456789%−*«»'), document.fonts.load(F(600, 40), 'Только 0123456789'),
+  document.getElementById('logo').decode()]).then(() => true);
+</script></body></html>
