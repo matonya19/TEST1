@@ -82,7 +82,7 @@ python -m bot.main                 # отправить в Telegram и сохр�
 
 ## Запуск по расписанию (GitHub Actions)
 
-Workflow лежит в `.github/workflows/weekly-social-report.yml` и запускается каждый понедельник в 06:07 UTC (09:07 МСК).
+Workflow лежит в `.github/workflows/weekly-social-report.yml` и запускается каждый понедельник в 03:17 UTC (06:17 МСК; GitHub может задержать запуск на пару часов).
 
 1. Смёржите ветку в основную: GitHub запускает расписания только с ветки по умолчанию.
 2. В **Settings → Secrets and variables → Actions** добавьте:
