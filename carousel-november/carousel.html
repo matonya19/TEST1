@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--mint:#8FDCCD;--mint-d:#5FC3AF;--beige:#F1E8DA;--beige-d:#E4D5BE;--ink:#222222;--soft:#4a4a4a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#ccc;font-family:'Manrope',sans-serif;color:var(--ink)}
+.s{width:1080px;height:1440px;position:relative;overflow:hidden;margin-bottom:20px;padding:110px 96px}
+.mint{background:var(--mint)} .beige{background:var(--beige)}
+.logo{display:block;height:150px;margin:0 auto}
+.logo.sm{height:92px;position:absolute;top:70px;left:50%;transform:translateX(-50%)}
+.foot{position:absolute;bottom:80px;left:0;right:0;text-align:center;font-weight:800;font-size:26px;letter-spacing:.24em;text-transform:uppercase}
+.pill{display:inline-block;padding:16px 34px;border-radius:999px;font-weight:700;font-size:28px;letter-spacing:.12em;text-transform:uppercase}
+.pill.dark{background:var(--ink);color:var(--beige)} .pill.mint{background:var(--mint)} .pill.beige{background:var(--beige)}
+h1{font-weight:800;line-height:1.02;letter-spacing:-.02em}
+.kicker{font-weight:600;font-size:32px;letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
+.big{font-weight:800;letter-spacing:-.04em;line-height:.9}
+.circle{position:absolute;border-radius:50%}
+.card{background:#fff;border-radius:40px;padding:44px 48px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:34px 0;border-bottom:2px solid rgba(34,34,34,.15)}
+.row:last-child{border-bottom:0}
+.row .l{font-size:34px;font-weight:500;line-height:1.25}
+.row .l small{display:block;font-size:24px;font-weight:400;color:var(--soft);margin-top:6px}
+.row .r{font-size:76px;font-weight:800;letter-spacing:-.03em}
+.num{position:absolute;top:84px;right:96px;font-weight:700;font-size:28px;letter-spacing:.1em}
+.dev{position:absolute;top:84px;left:96px;font-weight:700;font-size:28px;letter-spacing:.18em;text-transform:uppercase}
+</style></head><body>
+
+<!-- 1 COVER -->
+<section class="s mint" id="s1">
+  <div class="circle" style="width:900px;height:900px;background:var(--beige);right:-380px;bottom:-330px"></div>
+  <img class="logo" src="logo.png">
+  <div style="position:relative;margin-top:150px">
+    <span class="pill dark">Только в ноябре</span>
+    <h1 style="font-size:104px;margin-top:48px">Квартиры<br>по ценам,<br>которых больше<br>не будет</h1>
+  </div>
+  <div style="position:absolute;right:96px;bottom:230px;text-align:right">
+    <div style="font-size:40px;font-weight:600">скидки</div>
+    <div class="big" style="font-size:260px">до&nbsp;24%</div>
+  </div>
+  <div class="foot" style="text-align:left;left:96px">до 30 ноября · листайте →</div>
+</section>
+
+<!-- 2 KAVTARADZE -->
+<section class="s beige" id="s2">
+  <div class="dev">Метрополь</div><div class="num">01 / 04</div>
+  <div style="margin-top:150px">
+    <div class="kicker">ЖК на Кавтарадзе</div>
+    <h1 style="font-size:96px;margin-top:28px">Квартиры<br>с&nbsp;тремя&nbsp;спальнями</h1>
+  </div>
+  <div class="circle" style="width:760px;height:760px;background:var(--mint);left:160px;top:560px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+    <div style="font-size:40px;font-weight:600">скидка</div>
+    <div class="big" style="font-size:250px">20%</div>
+    <div style="font-size:34px;font-weight:500;margin-top:14px">или 18% — в зависимости<br>от квартиры</div>
+  </div>
+  <div class="foot">Объект от Room &amp; Bloom</div>
+</section>
+
+<!-- 3 ORTACHALA -->
+<section class="s mint" id="s3">
+  <div class="dev">Метрополь</div><div class="num">02 / 04</div>
+  <div style="margin-top:150px">
+    <div class="kicker">ЖК в Ортачала</div>
+    <h1 style="font-size:92px;margin-top:28px">Выберите удобный<br>способ оплаты</h1>
+  </div>
+  <div class="card" style="margin-top:70px">
+    <div class="row"><div class="l">Единовременная оплата<small>100% сразу</small></div><div class="r">−24%</div></div>
+    <div class="row"><div class="l">Рассрочка 50 / 30 / 20<small>три платежа</small></div><div class="r">−21%</div></div>
+    <div class="row"><div class="l">Рассрочка 20 / 20 / 60<small>минимальный старт</small></div><div class="r">−18%</div></div>
+  </div>
+  <div class="foot">Объект от Room &amp; Bloom</div>
+</section>
+
+<!-- 4 BOULEVARD -->
+<section class="s beige" id="s4">
+  <div class="dev">Boulevard</div><div class="num">03 / 04</div>
+  <div style="margin-top:150px">
+    <div class="kicker">Проект у моря</div>
+    <h1 style="font-size:96px;margin-top:28px">Два специальных<br>предложения</h1>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:36px;margin-top:70px">
+    <div class="card" style="background:var(--mint)">
+      <span class="pill beige" style="font-size:24px;padding:12px 26px">Блок D</span>
+      <div style="font-size:60px;font-weight:800;margin-top:26px;line-height:1.05">Паркинг в подарок</div>
+      <div style="font-size:32px;margin-top:14px">при покупке квартиры 155 м²</div>
+    </div>
+    <div class="card">
+      <span class="pill mint" style="font-size:24px;padding:12px 26px">Блок C</span>
+      <div style="font-size:60px;font-weight:800;margin-top:26px;line-height:1.05">6 месяцев без платежей</div>
+      <div style="font-size:32px;margin-top:14px">после первоначального взноса —<br>ежемесячные платежи только с июня</div>
+    </div>
+  </div>
+  <div class="foot">Объект от Room &amp; Bloom</div>
+</section>
+
+<!-- 5 DEKA -->
+<section class="s mint" id="s5">
+  <div class="dev">Deka</div><div class="num">04 / 04</div>
+  <div style="margin-top:150px">
+    <div class="kicker">ЖК на Лиси</div>
+    <h1 style="font-size:96px;margin-top:28px">Скидка на шесть<br>квартир</h1>
+  </div>
+  <div class="big" style="font-size:300px;margin-top:60px;white-space:nowrap">до&nbsp;6%</div>
+  <div style="display:flex;gap:24px;margin-top:60px">
+    <div class="card" style="flex:1;background:var(--beige)"><div style="font-size:72px;font-weight:800">6</div><div style="font-size:30px;margin-top:6px">квартир участвуют<br>в акции</div></div>
+    <div class="card" style="flex:1;background:var(--beige)"><div style="font-size:72px;font-weight:800">10%</div><div style="font-size:30px;margin-top:6px">первоначальный<br>взнос</div></div>
+  </div>
+  <div class="foot">Количество ограничено</div>
+</section>
+
+<!-- 6 CTA -->
+<section class="s beige" id="s6">
+  <div class="circle" style="width:620px;height:620px;background:var(--mint);left:-200px;top:-220px"></div>
+  <div class="circle" style="width:420px;height:420px;background:var(--mint);right:-140px;bottom:-120px"></div>
+  <div style="position:relative;text-align:center;margin-top:300px">
+    <span class="pill dark">Акция до 30 ноября</span>
+    <h1 style="font-size:96px;margin-top:56px">Успейте<br>зафиксировать цену</h1>
+    <div style="font-size:42px;line-height:1.35;margin-top:48px;font-weight:400">Пишите нам в директ —<br>подберём квартиру, пришлём<br>планировки и цены</div>
+  </div>
+  <img class="logo" src="logo.png" style="position:absolute;bottom:170px;left:50%;transform:translateX(-50%);height:140px">
+  <div class="foot" style="bottom:90px;font-size:22px">Room &amp; Bloom · rent &amp; sale</div>
+</section>
+</body></html>
