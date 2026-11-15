@@ -1,0 +1,69 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../build/node_modules/@fontsource/manrope/800.css">
+<link rel="stylesheet" href="../build/node_modules/@fontsource/manrope/600.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#888;font-family:Manrope,sans-serif;color:#1B2440}
+.p{width:1080px;position:relative;overflow:hidden;background:#FFF7E2;display:flex;flex-direction:column;padding:70px 72px 64px}
+.p.a{height:1350px;padding:54px 72px 50px}.p.b{height:1920px;padding:240px 72px 280px}
+.blob{position:absolute;border-radius:50%;filter:blur(10px)}
+.y{background:#FFD23F;width:620px;height:620px;right:-220px;top:-200px}
+.bl{background:#BFE3FF;width:520px;height:520px;left:-240px;bottom:-200px}
+.y2{background:#FFE58A;width:300px;height:300px;left:-120px;top:420px;opacity:.7}
+.z{position:relative;z-index:1}
+.top{display:flex;justify-content:space-between;align-items:center}
+.logo{height:92px}
+.tag{font-weight:800;font-size:26px;letter-spacing:2px;background:#1B2440;color:#fff;padding:12px 26px;border-radius:30px}
+h1{font-weight:800;font-size:94px;line-height:1.04;letter-spacing:-3px;margin-top:36px}
+.b h1{margin-top:60px}
+h1 span{background:linear-gradient(transparent 62%,#FFD23F 62%);padding:0 6px}
+h1 b{color:#1E96EA;white-space:nowrap}
+.sub{font-weight:600;font-size:36px;line-height:1.25;margin-top:22px;max-width:880px}
+.b .sub{margin-top:34px}
+.mid{display:flex;gap:30px;align-items:center;margin-top:24px}
+.b .mid{margin-top:60px}
+ul{list-style:none;display:flex;flex-direction:column;gap:12px;flex:1}
+.b ul{gap:18px}
+li{display:flex;align-items:center;gap:20px;background:#fff;border-radius:26px;padding:13px 20px;font-weight:800;font-size:27px;line-height:1.2;box-shadow:0 8px 24px rgba(27,36,64,.08)}
+.b li{padding:20px 22px}
+li i{flex:none;width:58px;height:58px;border-radius:18px;background:#E6F4FF;display:flex;align-items:center;justify-content:center;font-style:normal;font-family:"Noto Color Emoji";font-size:32px}
+/* laptop */
+.lap{flex:none;width:360px;margin:0 26px}
+
+.scr{background:#1B2440;border-radius:22px 22px 0 0;padding:14px;aspect-ratio:16/11}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;height:100%}
+.grid div{border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:"Noto Color Emoji";font-size:64px}
+
+.base{height:22px;background:#C9D3E6;border-radius:0 0 26px 26px;margin:0 -26px;box-shadow:0 12px 24px rgba(27,36,64,.15)}
+.info{display:flex;gap:16px;margin-top:24px}
+.b .info{margin-top:60px}
+.chip{flex:1;background:#1E96EA;color:#fff;border-radius:28px;padding:14px 10px;text-align:center}
+.chip small{display:block;font-weight:600;font-size:24px;opacity:.9}
+.chip b{font-weight:800;font-size:42px;line-height:1.1}
+
+.grow{flex:1}
+.cta{display:flex;align-items:center;gap:30px;background:#1B2440;color:#fff;border-radius:40px;padding:18px 26px;margin-top:22px}
+.cta img{width:150px;height:150px;border-radius:18px;border:8px solid #fff;background:#fff}
+.cta .t{font-weight:800;font-size:40px;line-height:1.1}
+.cta .t em{font-style:normal;color:#FFD23F}
+.cta .u{font-weight:600;font-size:25px;margin-top:12px;opacity:.9;word-break:break-all}
+</style></head><body>
+<!-- same content, two formats -->
+<div class="p a" id="a"></div><div class="p b" id="b"></div>
+<template id="t">
+ <div class="blob y"></div><div class="blob bl"></div><div class="blob y2"></div>
+ <div class="top z"><img class="logo" src="logo.png"><div class="tag">ОНЛАЙН · БЕСПЛАТНО</div></div>
+ <h1 class="z"><span>День открытых</span><br><span>дверей</span> <b>в&nbsp;SHKOLA</b></h1>
+ <div class="sub z">Сомневаетесь, подойдёт ли онлайн-школа вашему ребёнку? Покажем всё изнутри.</div>
+ <div class="mid z">
+  <div class="lap"><div class="scr"><div class="grid">
+   <div style="background:#FFE9A8">👩‍🏫</div><div style="background:#CFE9FF">👧</div><div style="background:#FFD9C7">👦</div><div style="background:#DDF3D0">🧒</div></div></div><div class="base"></div></div>
+  <ul><li><i>🎥</i>Как проходят онлайн-уроки</li><li><i>🧩</i>Как устроена учебная платформа</li><li><i>🤝</i>Как преподаватели и кураторы работают с детьми</li><li><i>🏆</i>Каких результатов достигают ученики</li></ul>
+ </div>
+ <div class="info z"><div class="chip"><small>дата</small><b>18 ноября</b></div><div class="chip"><small>время</small><b>16:00 МСК</b></div><div class="chip"><small>формат</small><b>Онлайн</b></div></div>
+ <div class="grow"></div>
+ <div class="cta z"><img src="qr.png"><div><div class="t">Участие <em>бесплатное</em>.<br>Наведите камеру на код</div><div class="u">start.bizon365.ru/room/211000/shkola</div></div></div>
+</template>
+<script>for(const id of ['a','b'])document.getElementById(id).appendChild(document.getElementById('t').content.cloneNode(true));
+window.over=[...document.querySelectorAll('.p')].map(p=>p.scrollHeight-p.clientHeight);</script>
+</body></html>
