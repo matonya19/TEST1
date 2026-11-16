@@ -1,0 +1,92 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../build/node_modules/@fontsource/manrope/800.css">
+<link rel="stylesheet" href="../build/node_modules/@fontsource/manrope/600.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#777;font-family:Manrope,sans-serif;color:#1B2440}
+.s{width:1080px;height:1350px;position:relative;overflow:hidden;background:#FFF7E2;margin-bottom:20px}
+.blob{position:absolute;border-radius:50%}
+.in{position:absolute;inset:0;padding:56px 64px 110px;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center;flex:none}
+.top img{height:70px}
+.tag{font-weight:800;font-size:22px;letter-spacing:2px;background:#1B2440;color:#fff;padding:10px 22px;border-radius:30px}
+.content{flex:1;min-height:0;display:flex;flex-direction:column}
+.foot{position:absolute;left:64px;right:64px;bottom:40px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:26px;color:#1B2440}
+.foot .n{opacity:.55}.foot .a{background:#1B2440;color:#fff;border-radius:30px;padding:8px 22px;font-size:24px}
+h1{font-weight:800;letter-spacing:-2px;line-height:1.04}
+h1 span{background:linear-gradient(transparent 60%,#FFD23F 60%);padding:0 6px}
+h2{font-weight:800;font-size:62px;line-height:1.06;letter-spacing:-1.5px;margin:28px 0 24px;text-wrap:balance}
+p{font-weight:600;font-size:38px;line-height:1.3;text-wrap:pretty}
+.card{background:#fff;border-radius:36px;padding:30px 32px 30px;box-shadow:0 10px 30px rgba(27,36,64,.08);display:flex;gap:26px;flex:1;min-height:0;margin-bottom:22px;border-left:14px solid #FFD23F}
+.card:nth-of-type(even){border-left-color:#1E96EA}
+.ic{flex:none;width:124px;height:124px;border-radius:34px;background:#FFF1C2;display:flex;align-items:center;justify-content:center;font-family:"Noto Color Emoji";font-size:70px}
+.card:nth-of-type(even) .ic{background:#E1F1FF}
+.cb{flex:1;display:flex;flex-direction:column;min-width:0}
+.ct{font-weight:800;font-size:47px;line-height:1.1;letter-spacing:-.5px;text-wrap:balance}
+.cn{font-weight:800;font-size:35px;color:#1E96EA;margin-top:10px}
+.cd{font-weight:600;font-size:35px;line-height:1.26;margin-top:14px;text-wrap:pretty}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto;padding-top:14px}
+.chip{font-weight:800;font-size:30px;padding:11px 24px;border-radius:26px;background:#1B2440;color:#fff}
+.chip.g{background:#EEF1F7;color:#1B2440}
+.em{position:absolute;font-family:"Noto Color Emoji";display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fff;box-shadow:0 12px 30px rgba(27,36,64,.14)}
+.big .ct{font-size:62px}.big .cn{font-size:42px;margin-top:14px}.big .cd{font-size:44px;margin-top:22px}.big .chip{font-size:30px;padding:13px 26px}.big .ic{width:150px;height:150px;font-size:86px}.big .card{padding:44px 40px;flex:none}.big .chips{padding-top:34px;margin-top:0}
+.tight .ct{font-size:44px}.tight .cd{font-size:32px}.tight .cn{font-size:33px}
+.btnline{display:inline-block;background:#1B2440;color:#fff;font-weight:800;font-size:36px;padding:22px 40px;border-radius:50px;align-self:flex-start}
+</style></head><body><div id="root"></div>
+<script>
+const MK=[
+ ['Нарисуем робота и узнаем секреты погоды',[
+  ['🤖','«Рисуем робота»','Ксения Позднякова','Придумаем своего робота и нарисуем его с помощью простого и цветных карандашей',['16 ноября · 14:00 МСК'],'Для 1–4 классов'],
+  ['🌪','«Атмосферные вихри»','Матвей Кривошапко','Узнаем, какими бывают торнадо, и познакомимся с удивительными явлениями погоды',['16 ноября · 16:00 МСК'],'Для 5–8 классов']]],
+ ['Попробуем творить вместе с нейросетями',[
+  ['💻','«Просто о сложном: вайбкодинг»','Владимир Голышев','Обсудим, как ИИ помогает воплощать идеи, и попробуем поэкспериментировать',['17 ноября · 14:00 МСК'],'Для 5–11 классов'],
+  ['🎨','«Когда картины оживают»','Виктория Голышева','Нарисуем свою «Звёздную ночь» и узнаем, как оживить рисунок с помощью нейросети',['17 ноября · 15:00 МСК'],'Для 1–11 классов']]],
+ ['Придумаем историю и освоим рыболовные узлы',[
+  ['📖','«Как написать свою первую книгу»','Мария Смирнова','Обсудим, с чего начать, где искать вдохновение и как превратить идею в историю',['18 ноября · 14:00 МСК'],'Для 5–11 классов'],
+  ['🎣','«Секреты успешной рыбалки»','Дамир Ерёмин','Познакомимся с основами рыбалки и попробуем самостоятельно завязать рыболовные узлы',['19 ноября · 14:00 МСК'],'Для 1–4 классов']]],
+ ['Разберёмся, как работают сердце и ИИ',[
+  ['❤️','«Сердце и кровеносная система»','Виктория Юрченко','Узнаем, как работает сердце, и потренируемся измерять пульс',['20 ноября · 14:00 МСК'],'Для 5–11 классов'],
+  ['🤖','«ИИ: просто, интересно, для себя»','Полина Зайцева','Познакомимся с искусственным интеллектом и обсудим вопросы о нём простыми словами',['20 ноября · 15:00 МСК'],'Для 3–8 классов']]],
+ ['Поиграем в команде и попробуем себя на сцене',[
+  ['🎮','«Основы игры Dandy’s World»','Василиса Лукащук','Разберём персонажей, правила и управление. Попробуем пройти первые этажи вместе',[],'Для ребят 8–12 лет с опытом игр в Roblox'],
+  ['🎭','«Театральное искусство»','Эвита Ильина','Поработаем над выразительной речью, попробуем передавать эмоции и разыграем мини-сценки',[],'Для 1–11 классов']]],
+ ['Создадим открытку и рамку для любимых фотографий',[
+  ['🎄','«Новогодняя открытка в Canva»','Есения Масина','Создадим свою открытку, которую можно сохранить или отправить близким',['24 ноября · 15:00 МСК'],'Для 5–11 классов'],
+  ['🍓','«Клубничная фоторамка своими руками»','Таисия Сапрыкина','Сделаем необычную фоторамку для своей комнаты или в подарок',['24 ноября · 16:00 МСК'],'Для 1–11 классов']]],
+ ['Смастерим подарок и оживим бумажных героев',[
+  ['🎁','«Новогодний подарок»','Ирем Мехтиева','Подготовим бумагу, карандаши и ножницы — будем делать подарок своими руками',['25 ноября · 16:00 МСК'],'Для 1–11 классов'],
+  ['🎬','«Оживляем бумажных героев для съёмки видео»','Захар Богданов','Создадим бумажных персонажей и узнаем, как оживить их для видео',['26 ноября · 14:00 МСК'],'Для 1–4 классов']]],
+ ['Создадим свою анимацию и первую программу',[
+  ['🎞','«Анимация: создаём свои мультики»','Лев Толмачев','Попробуем оживить персонажей в приложении «Рисуем мультики 2». Подойдёт начинающим',['27 ноября · 15:00 МСК'],'Для 5–11 классов'],
+  ['🐍','«Первая программа на Python»','Артём Пелых','Познакомимся с основами программирования и попробуем написать простую программу',['30 ноября · 16:00 МСК'],'Для 4–11 классов, от 9 лет']]],
+ ['А ещё — нарисуем свой пейзаж',[
+  ['🌿','«Учимся живописи: пейзажи гуашью»','Аида Высоткова','Возьмём краски и попробуем создать пейзаж со своими цветами и настроением',['Дату и время сообщим дополнительно'],'Для 3–6 классов']]],
+];
+const N=12, root=document.getElementById('root');
+const blobs=i=>{const v=[['#FFD23F',520,'right:-200px;top:-190px'],['#BFE3FF',440,'left:-200px;bottom:-190px']];const w=[['#BFE3FF',480,'right:-190px;top:-180px'],['#FFE58A',420,'left:-190px;bottom:-170px']];
+ return (i%2?w:v).map(([c,s,p])=>`<div class="blob" style="background:${c};width:${s}px;height:${s}px;${p}"></div>`).join('')};
+const shell=(i,tag,body,arrow=true,cls='')=>`<div class="s ${arrow===true||arrow===false?'':''}${typeof arrow==='string'?arrow:cls}" id="s${i}">${blobs(i)}<div class="in"><div class="top"><img src="logo.png"><div class="tag">${tag}</div></div><div class="content">${body}</div></div>
+ <div class="foot"><span class="n">${i} / ${N}</span>${arrow!==false?'<span class="a">листайте →</span>':'<span></span>'}</div></div>`;
+let h='';
+h+=shell(1,'КОНКУРС МАСТЕР-КЛАССОВ',`
+ <h1 style="font-size:132px;margin-top:56px"><span>А сегодня</span><br><span>учитель — я!</span></h1>
+ <p style="margin-top:34px;font-size:44px;max-width:780px">Рисовать, создавать мультики, программировать и даже писать книги…</p>
+ <div style="flex:1;position:relative">
+  ${[['🎨',150,20,30],['🤖',140,215,95],['🐍',125,420,20],['📖',150,600,90],['🎭',130,810,20],['🎣',120,410,170],['🎬',115,60,200]].map(([e,s,l,t])=>`<div class="em" style="width:${s}px;height:${s}px;font-size:${s*.55}px;left:${l}px;top:${t}px">${e}</div>`).join('')}
+ </div>
+ <p style="font-weight:800;font-size:46px;line-height:1.18">Ученики SHKOLA проведут свои мастер-классы</p>
+ <div class="btnline" style="margin-top:26px">Выбирайте, на какой прийти →</div>`,false);
+h+=shell(2,'О КОНКУРСЕ',`
+ <h1 style="font-size:104px;margin-top:80px"><span>«Я умею —</span><br><span>и тебя научу!»</span></h1>
+ <p style="margin-top:56px;font-size:44px">В SHKOLA запускается <b style="font-weight:800">второй конкурс</b>, в рамках которого ученики становятся ведущими мастер-классов</p>
+ <p style="margin-top:34px;font-size:44px">Ребята поделятся своими увлечениями, объяснят, покажут и предложат попробовать вместе</p>
+ <div style="flex:1"></div><div class="btnline">Знакомьтесь с ведущими →</div>`,false);
+MK.forEach(([title,cards],k)=>{const i=k+3;
+ h+=shell(i,'МАСТЕР-КЛАССЫ',`<h2>${title}</h2>`+cards.map(([e,t,n,d,dates,gr])=>`<div class="card"><div class="ic">${e}</div><div class="cb"><div class="ct">${t}</div><div class="cn">${n}</div><div class="cd">${d}</div><div class="chips">${dates.map(x=>`<span class="chip">${x}</span>`).join('')}<span class="chip g">${gr}</span></div></div></div>`).join('')+(cards.length<2?`<div style="flex:1;position:relative">${[['🎨',170,90,20],['🖌',135,330,80],['🌄',175,545,10],['🌻',125,790,75]].map(([e,z,l,t])=>`<div class="em" style="width:${z}px;height:${z}px;font-size:${z*.55}px;left:${l}px;top:${t}px">${e}</div>`).join('')}</div>`:''),cards.length<2?'big':(i===10?'tight':''));});
+h+=shell(12,'ВЫБИРАЙТЕ',`
+ <h1 style="font-size:92px;margin-top:80px;white-space:nowrap"><span>Какой мастер-класс</span><br><span>выберет ваш</span><br><span>ребёнок?</span></h1>
+ <p style="margin-top:50px;font-size:44px">Покажите ему программу — здесь можно найти занятие по своему увлечению или попробовать что-то впервые</p>
+ <div style="flex:1"></div>
+ <div style="background:#1E96EA;color:#fff;border-radius:40px;padding:36px 40px"><p style="font-weight:800;font-size:46px;color:#fff">Сохраните расписание</p><p style="font-size:38px;margin-top:12px;color:#fff">И напишите в комментариях, какой мастер-класс заинтересовал больше всего <span style="font-family:'Noto Color Emoji'">💙</span></p></div>`,false);
+root.innerHTML=h;
+</script></body></html>
