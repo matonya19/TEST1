@@ -1,0 +1,50 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../build/node_modules/@fontsource/manrope/800.css">
+<link rel="stylesheet" href="../build/node_modules/@fontsource/manrope/600.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#777;font-family:Manrope,sans-serif;color:#fff}
+.s{width:1080px;height:1920px;position:relative;overflow:hidden;margin-bottom:20px;background:radial-gradient(800px 700px at 100% 0%,rgba(120,200,255,.55),transparent 70%),radial-gradient(800px 700px at 0% 100%,rgba(60,40,200,.45),transparent 70%),linear-gradient(165deg,#2B8BEE 0%,#1F5FD6 55%,#1B3FA8 100%)}
+.logo{position:absolute;top:130px;left:50%;transform:translateX(-50%);height:80px}
+.in{position:absolute;inset:0;padding:270px 72px 330px;display:flex;flex-direction:column;align-items:center}
+.tag{font-weight:800;font-size:27px;letter-spacing:3px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.5);padding:11px 26px;border-radius:30px;margin-bottom:34px;flex:none}
+h1{font-weight:800;font-size:112px;line-height:1.03;letter-spacing:-2.5px;text-align:center;flex:none}
+h1 em{font-style:normal;color:#FFD23F}
+p{font-weight:600;font-size:44px;line-height:1.28;text-align:center;text-wrap:balance;flex:none}
+.grow{flex:1;min-height:0;width:100%;position:relative;margin:30px 0}
+.t{position:absolute;border-radius:48px;border:8px solid #fff;box-shadow:0 18px 40px rgba(10,30,90,.35)}
+.chips{display:flex;gap:16px;width:100%;flex:none}
+.chip{flex:1;background:#fff;color:#1B2440;border-radius:30px;padding:20px 8px;text-align:center}
+.chip small{display:block;font-weight:600;font-size:26px;opacity:.75}.chip b{font-weight:800;font-size:38px;line-height:1.1;white-space:nowrap}
+.btn{background:#FFD23F;color:#1B2440;font-weight:800;font-size:42px;padding:26px 54px;border-radius:60px;box-shadow:0 12px 30px rgba(10,30,90,.3);flex:none;margin-top:30px}
+.list{display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%}
+.it{background:#fff;color:#1B2440;border-radius:34px;padding:16px 20px 16px 16px;display:flex;align-items:center;gap:18px;font-weight:800;font-size:33px;line-height:1.15}
+.it img{flex:none;width:104px;height:104px;border-radius:26px}
+</style></head><body>
+<div class="s" id="s1"><img class="logo" src="logo_teal.png"><div class="in">
+ <div class="tag">КОНКУРС МАСТЕР-КЛАССОВ</div>
+ <h1>А сегодня<br><em>учитель — я!</em></h1>
+ <p style="margin-top:34px">Ученики SHKOLA сами проводят мастер-классы и учат тому, что умеют лучше всего</p>
+ <div class="grow">
+  <img class="t" src="il_robot.jpg" style="width:300px;left:20px;top:10px;transform:rotate(-6deg)">
+  <img class="t" src="il_theater.jpg" style="width:270px;left:340px;top:70px;transform:rotate(4deg)">
+  <img class="t" src="il_python.jpg" style="width:290px;left:630px;top:0;transform:rotate(-3deg)">
+  <img class="t" src="il_starry.jpg" style="width:250px;left:160px;top:330px;transform:rotate(5deg)">
+  <img class="t" src="il_fishing.jpg" style="width:260px;left:500px;top:350px;transform:rotate(-5deg)">
+ </div>
+ <div class="chips"><div class="chip"><small>сколько</small><b>17 занятий</b></div><div class="chip"><small>когда</small><b>16–30 ноября</b></div><div class="chip"><small>формат</small><b>Онлайн</b></div></div>
+</div></div>
+
+<div class="s" id="s2"><img class="logo" src="logo_teal.png"><div class="in">
+ <div class="tag">ПРОГРАММА В НОВОМ ПОСТЕ</div>
+ <h1 style="font-size:92px">Какой мастер-класс выберет <em>ваш ребёнок?</em></h1>
+ <div class="grow" style="display:flex;align-items:center"><div class="list">
+  <div class="it"><img src="il_robot.jpg">Рисуем робота</div><div class="it"><img src="il_vibecode.jpg">Вайбкодинг</div>
+  <div class="it"><img src="il_book.jpg">Первая книга</div><div class="it"><img src="il_anim.jpg">Свои мультики</div>
+  <div class="it"><img src="il_theater.jpg">Театр</div><div class="it"><img src="il_python.jpg">Python</div>
+  <div class="it"><img src="il_gouache.jpg">Пейзаж гуашью</div><div class="it"><img src="il_gift.jpg">Подарок своими руками</div>
+ </div></div>
+ <p>И ещё девять тем — от торнадо до рыбалки</p>
+ <div class="btn">Смотрите расписание в посте</div>
+</div></div>
+</body></html>
