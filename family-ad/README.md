@@ -3,3 +3,4 @@
 - `shkola_semeyny_sovet_1080x1920.mp4` — готовый ролик 9:16, 25,5 сек, голоса + тихий фон, без музыки.
 - `keyframes/` — ключевые кадры (nano-banana), `clips/` — клипы Kling 2.5 Turbo Pro, `voices/` — голоса (мама, папа, кот — ElevenLabs v3; дочка — MiniMax) и итоговая дорожка `_mix.wav`.
 - `src/` — запросы к fal.ai и монтажный план `plan.json`; облачка и финальная карточка — вариант `overlay.html` из `mama-ad/src/` в жёлто-синей гамме.
+- `cover_1080x1920.png` — обложка рилса (текст и плашки в центральной зоне 3:4), исходник `src/cover.html`.
