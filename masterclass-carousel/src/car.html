@@ -9,7 +9,7 @@ body{background:#777;font-family:Manrope,sans-serif;color:#1B2440}
 .blob{position:absolute;border-radius:50%}
 .in{position:absolute;inset:0;padding:56px 64px 110px;display:flex;flex-direction:column}
 .top{display:flex;justify-content:space-between;align-items:center;flex:none}
-.top img{height:84px;background:#fff;padding:12px 20px;border-radius:24px;box-shadow:0 8px 22px rgba(10,30,90,.25)}
+.top img{height:76px;filter:drop-shadow(0 4px 10px rgba(10,30,90,.25))}
 .tag{font-weight:800;font-size:22px;letter-spacing:2px;background:rgba(255,255,255,.18);color:#fff;border:2px solid rgba(255,255,255,.5);padding:10px 22px;border-radius:30px}
 .content{flex:1;min-height:0;display:flex;flex-direction:column}
 .foot{position:absolute;left:64px;right:64px;bottom:40px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:26px;color:#fff}
@@ -71,7 +71,7 @@ const AV={'Владимир Голышев':'av_golyshev.png','Виктория 
 const IL={'Ксения Позднякова':'robot','Матвей Кривошапко':'tornado','Мария Смирнова':'book','Дамир Ерёмин':'fishing','Виктория Юрченко':'heart','Полина Зайцева':'ai','Василиса Лукащук':'game','Есения Масина':'card','Ирем Мехтиева':'gift','Захар Богданов':'paper','Артём Пелых':'python','Аида Высоткова':'gouache'};
 const N=12, root=document.getElementById('root');
 const blobs=i=>'';
-const shell=(i,tag,body,arrow=true,cls='')=>`<div class="s ${arrow===true||arrow===false?'':''}${typeof arrow==='string'?arrow:cls}" id="s${i}">${blobs(i)}<div class="in"><div class="top"><img src="logo.png"><div class="tag">${tag}</div></div><div class="content">${body}</div></div>
+const shell=(i,tag,body,arrow=true,cls='')=>`<div class="s ${arrow===true||arrow===false?'':''}${typeof arrow==='string'?arrow:cls}" id="s${i}">${blobs(i)}<div class="in"><div class="top"><img src="logo_teal.png"><div class="tag">${tag}</div></div><div class="content">${body}</div></div>
  <div class="foot"><span class="n">${i} / ${N}</span>${arrow!==false?'<span class="a">листайте →</span>':'<span></span>'}</div></div>`;
 let h='';
 h+=shell(1,'КОНКУРС МАСТЕР-КЛАССОВ',`
