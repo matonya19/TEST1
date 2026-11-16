@@ -11,30 +11,32 @@ const F=(w,s)=>`${w} ${s}px Manrope`,CV=s=>`700 ${s}px Caveat`;
 function rr(px,py,w,h,r){x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath();}
 function draw(t){
   x.clearRect(0,0,W,H);
-  // soft darkening top & bottom for legibility
-  let g=x.createLinearGradient(0,0,0,700);g.addColorStop(0,'rgba(8,38,84,.88)');g.addColorStop(.6,'rgba(8,38,84,.55)');g.addColorStop(1,'rgba(8,38,84,0)');x.fillStyle=g;x.fillRect(0,0,W,700);
-  g=x.createLinearGradient(0,1300,0,H);g.addColorStop(0,'rgba(8,38,84,0)');g.addColorStop(.5,'rgba(8,38,84,.78)');g.addColorStop(1,'rgba(8,38,84,.94)');x.fillStyle=g;x.fillRect(0,1300,W,620);
+  let g=x.createLinearGradient(0,0,0,760);g.addColorStop(0,'rgba(8,38,84,.9)');g.addColorStop(.62,'rgba(8,38,84,.6)');g.addColorStop(1,'rgba(8,38,84,0)');x.fillStyle=g;x.fillRect(0,0,W,760);
+  g=x.createLinearGradient(0,1380,0,H);g.addColorStop(0,'rgba(8,38,84,0)');g.addColorStop(1,'rgba(8,38,84,.6)');x.fillStyle=g;x.fillRect(0,1380,W,540);
   x.textAlign='center';x.textBaseline='middle';
-  // title (handwritten), revealed left to right
-  const L=[['Школа,',310,.4],['в которую хочется',408,.9]];
-  for(const [s,y,st] of L){const p=ease(prog(t,st,1.0));if(p<=0)continue;
+  // logo on top
+  let p=ease(prog(t,.1,.6));
+  if(p>0){const lg=document.getElementById('logo'),lw=230,lh=lw*lg.naturalHeight/lg.naturalWidth;
+    x.save();x.globalAlpha=p;x.drawImage(lg,540-lw/2,232,lw,lh);x.restore();}
+  // handwritten title
+  const L=[['Школа,',392,.3],['в которую хочется',488,.7]];
+  for(const [s,y,st] of L){const q=ease(prog(t,st,.9));if(q<=0)continue;
     x.save();x.font=CV(112);const w=x.measureText(s).width;
-    x.beginPath();x.rect(540-w/2-20,y-100,(w+40)*p,200);x.clip();
-    x.shadowColor='rgba(0,0,0,.55)';x.shadowBlur=24;x.shadowOffsetY=6;x.fillStyle='#FFFFFF';x.fillText(s,540,y);x.restore();}
-  let p=ease(prog(t,2.0,.8));
-  if(p>0){x.save();x.globalAlpha=p;x.font=F(800,40);x.fillStyle='#fff';x.shadowColor='rgba(0,0,0,.6)';x.shadowBlur=16;
-    x.fillText('Учёба без оценок и стресса, прямо из дома',540,510+(1-p)*16);x.restore();}
-  // open day plate
-  p=ease(prog(t,3.6,.8));
+    x.beginPath();x.rect(540-w/2-20,y-90,(w+40)*q,180);x.clip();
+    x.shadowColor='rgba(0,0,0,.5)';x.shadowBlur=20;x.shadowOffsetY=5;x.fillStyle='#fff';x.fillText(s,540,y);x.restore();}
+  // tagline on a soft pill
+  p=ease(prog(t,1.5,.7));
+  if(p>0){x.save();x.globalAlpha=p;x.font=F(800,36);const s='Учёба без оценок и стресса, прямо из дома',w=x.measureText(s).width+64;
+    rr(540-w/2,560,w,68,34);x.fillStyle='rgba(8,38,84,.72)';x.fill();x.fillStyle='#fff';x.fillText(s,540,596);x.restore();}
+  // open day plate (early) with call to action
+  p=ease(prog(t,1.2,.7));
   if(p>0){x.save();x.globalAlpha=p;x.translate(0,(1-p)*40);
-    x.shadowColor='rgba(0,0,0,.45)';x.shadowBlur=40;x.shadowOffsetY=12;rr(90,1368,900,186,44);x.fillStyle='#FFFFFF';x.fill();x.shadowColor='transparent';
-    x.fillStyle='#0B2A5B';x.font=F(800,54);x.fillText('День открытых дверей',540,1428);
-    x.font=F(800,34);x.fillStyle='#1E7FD6';x.font=F(800,38);x.fillText('18 ноября · 16:00 МСК · онлайн',540,1500);x.restore();}
-  // logo
-  p=ease(prog(t,.8,.8));
-  if(p>0){const lg=document.getElementById('logo'),lw=250,lh=lw*lg.naturalHeight/lg.naturalWidth;
-    x.save();x.globalAlpha=p;x.drawImage(lg,540-lw/2,1586,lw,lh);
-    x.font=F(600,26);x.fillStyle='rgba(255,255,255,.85)';x.fillText('Онлайн-школа',540,1586+lh+28);x.restore();}
+    x.shadowColor='rgba(0,0,0,.4)';x.shadowBlur=40;x.shadowOffsetY=12;rr(90,1392,900,236,44);x.fillStyle='#fff';x.fill();x.shadowColor='transparent';
+    x.fillStyle='#0B2A5B';x.font=F(800,54);x.fillText('День открытых дверей',540,1444);
+    x.font=F(800,38);x.fillStyle='#1E7FD6';x.fillText('18 ноября · 16:00 МСК · онлайн',540,1510);
+    const c='Регистрация — по ссылке в описании';x.font=F(800,30);const cw=x.measureText(c).width+56;
+    const pulse=1+.02*Math.sin(t*4);x.translate(540,1576);x.scale(pulse,pulse);
+    rr(-cw/2,-28,cw,56,28);x.fillStyle='#FFD23F';x.fill();x.fillStyle='#0B2A5B';x.fillText(c,0,2);x.restore();}
 }
 window.drawAt=draw;
 window.ready=Promise.all([document.fonts.load(CV(60),'Школа, в которую хочется'),document.fonts.load(F(800,40),'Учёба 0123456789·'),document.fonts.load(F(600,40),'Международная'),document.getElementById('logo').decode()]).then(()=>true);
