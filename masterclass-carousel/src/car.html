@@ -17,12 +17,14 @@ h1{font-weight:800;letter-spacing:-2px;line-height:1.04}
 h1 span{background:linear-gradient(transparent 60%,#FFD23F 60%);padding:0 6px}
 h2{font-weight:800;font-size:62px;line-height:1.06;letter-spacing:-1.5px;margin:28px 0 24px;text-wrap:balance}
 p{font-weight:600;font-size:38px;line-height:1.3;text-wrap:pretty}
-.card{background:#fff;border-radius:36px;padding:30px 32px 30px;box-shadow:0 10px 30px rgba(27,36,64,.08);display:flex;gap:26px;flex:1;min-height:0;margin-bottom:22px;border-left:14px solid #FFD23F}
+.card{background:#fff;border-radius:36px;padding:30px 32px 30px;box-shadow:0 10px 30px rgba(27,36,64,.08);display:flex;flex-direction:column;flex:1;min-height:0;margin-bottom:22px;border-left:14px solid #FFD23F}
+.row{display:flex;gap:26px}
 .card:nth-of-type(even){border-left-color:#1E96EA}
 .ic{flex:none;width:124px;height:124px;border-radius:34px;background:#FFF1C2;display:flex;align-items:center;justify-content:center;font-family:"Noto Color Emoji";font-size:70px}
 .card:nth-of-type(even) .ic{background:#E1F1FF}
-.ph{flex:none;width:150px;height:150px;position:relative}.ph img{width:150px;height:150px;border-radius:50%;object-fit:cover;border:6px solid #FFD23F;box-shadow:0 8px 20px rgba(27,36,64,.18)}.card:nth-of-type(even) .ph img{border-color:#1E96EA}.ph span{position:absolute;right:-10px;bottom:-8px;width:62px;height:62px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-family:"Noto Color Emoji";font-size:34px;box-shadow:0 4px 12px rgba(27,36,64,.2)}
-.big .ph,.big .ph img{width:200px;height:200px}.big .ph span{width:80px;height:80px;font-size:44px}
+.ph{flex:none;width:180px;height:180px;position:relative}.ph img{width:180px;height:180px;border-radius:42px;object-fit:cover;border:6px solid #FFD23F;box-shadow:0 8px 20px rgba(27,36,64,.18)}.card:nth-of-type(even) .ph img{border-color:#1E96EA}.ph span{position:absolute;right:-12px;bottom:-10px;width:62px;height:62px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-family:"Noto Color Emoji";font-size:34px;box-shadow:0 4px 12px rgba(27,36,64,.2)}
+.ph.il img{border:none}
+.big .ph,.big .ph img{width:250px;height:250px}.big .ph span{width:80px;height:80px;font-size:44px}
 .cb{flex:1;display:flex;flex-direction:column;min-width:0}
 .ct{font-weight:800;font-size:47px;line-height:1.1;letter-spacing:-.5px;text-wrap:balance}
 .cn{font-weight:800;font-size:35px;color:#1E96EA;margin-top:10px}
@@ -31,8 +33,8 @@ p{font-weight:600;font-size:38px;line-height:1.3;text-wrap:pretty}
 .chip{font-weight:800;font-size:30px;padding:11px 24px;border-radius:26px;background:#1B2440;color:#fff}
 .chip.g{background:#EEF1F7;color:#1B2440}
 .em{position:absolute;font-family:"Noto Color Emoji";display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fff;box-shadow:0 12px 30px rgba(27,36,64,.14)}
-.big .ct{font-size:62px}.big .cn{font-size:42px;margin-top:14px}.big .cd{font-size:44px;margin-top:22px}.big .chip{font-size:30px;padding:13px 26px}.big .ic{width:150px;height:150px;font-size:86px}.big .card{padding:44px 40px;flex:none}.big .chips{padding-top:34px;margin-top:0}
-.tight .ct{font-size:44px}.tight .cd{font-size:32px}.tight .cn{font-size:33px}
+.big .ct{font-size:54px}.big .cn{font-size:42px;margin-top:14px}.big .cd{font-size:40px;margin-top:18px}.big .chip{font-size:30px;padding:13px 26px}.big .ic{width:150px;height:150px;font-size:86px}.big .card{padding:44px 40px;flex:none}.big .chips{padding-top:34px;margin-top:0}.big .row{gap:36px}
+
 .btnline{display:inline-block;background:#1B2440;color:#fff;font-weight:800;font-size:36px;padding:22px 40px;border-radius:50px;align-self:flex-start}
 </style></head><body><div id="root"></div>
 <script>
@@ -64,7 +66,8 @@ const MK=[
  ['А ещё — нарисуем свой пейзаж',[
   ['🌿','«Учимся живописи: пейзажи гуашью»','Аида Высоткова','Возьмём краски и попробуем создать пейзаж со своими цветами и настроением',['Дату и время сообщим дополнительно'],'Для 3–6 классов']]],
 ];
-const AV={'Ксения Позднякова':'pozdnyakova','Матвей Кривошапко':'krivoshapko','Владимир Голышев':'golyshev','Виктория Голышева':'golysheva','Мария Смирнова':'smirnova','Василиса Лукащук':'lukashchuk','Эвита Ильина':'ilyina','Таисия Сапрыкина':'saprykina','Полина Зайцева':'zaitseva','Ирем Мехтиева':'mekhtieva','Аида Высоткова':'vysotkova'};
+const AV={'Владимир Голышев':'av_golyshev.png','Виктория Голышева':'av_golysheva.png','Эвита Ильина':'av_ilyina.png','Таисия Сапрыкина':'av_saprykina.png','Лев Толмачев':'av_tolmachev.png'};
+const IL={'Ксения Позднякова':'robot','Матвей Кривошапко':'tornado','Мария Смирнова':'book','Дамир Ерёмин':'fishing','Виктория Юрченко':'heart','Полина Зайцева':'ai','Василиса Лукащук':'game','Есения Масина':'card','Ирем Мехтиева':'gift','Захар Богданов':'paper','Артём Пелых':'python','Аида Высоткова':'gouache'};
 const N=12, root=document.getElementById('root');
 const blobs=i=>{const v=[['#FFD23F',520,'right:-200px;top:-190px'],['#BFE3FF',440,'left:-200px;bottom:-190px']];const w=[['#BFE3FF',480,'right:-190px;top:-180px'],['#FFE58A',420,'left:-190px;bottom:-170px']];
  return (i%2?w:v).map(([c,s,p])=>`<div class="blob" style="background:${c};width:${s}px;height:${s}px;${p}"></div>`).join('')};
@@ -75,7 +78,7 @@ h+=shell(1,'КОНКУРС МАСТЕР-КЛАССОВ',`
  <h1 style="font-size:132px;margin-top:56px"><span>А сегодня</span><br><span>учитель — я!</span></h1>
  <p style="margin-top:34px;font-size:44px;max-width:780px">Рисовать, создавать мультики, программировать и даже писать книги…</p>
  <div style="flex:1;position:relative">
-  ${[['🎨',150,20,30],['🤖',140,215,95],['🐍',125,420,20],['📖',150,600,90],['🎭',130,810,20],['🎣',120,410,170],['🎬',115,60,200]].map(([e,s,l,t])=>`<div class="em" style="width:${s}px;height:${s}px;font-size:${s*.55}px;left:${l}px;top:${t}px">${e}</div>`).join('')}
+  ${[['robot',175,0,20,-6],['starry',155,195,75,5],['theater',175,370,10,-4],['python',155,565,70,6],['anim',165,740,20,4]].map(([e,z,l,t,r])=>`<img src="il_${e}.jpg" style="position:absolute;width:${z}px;height:${z}px;left:${l}px;top:${t}px;border-radius:40px;transform:rotate(${r}deg);box-shadow:0 14px 30px rgba(27,36,64,.18);border:6px solid #fff">`).join('')}
  </div>
  <p style="font-weight:800;font-size:46px;line-height:1.18">Ученики SHKOLA проведут свои мастер-классы</p>
  <div class="btnline" style="margin-top:26px">Выбирайте, на какой прийти →</div>`,false);
@@ -85,7 +88,7 @@ h+=shell(2,'О КОНКУРСЕ',`
  <p style="margin-top:34px;font-size:44px">Ребята поделятся своими увлечениями, объяснят, покажут и предложат попробовать вместе</p>
  <div style="flex:1"></div><div class="btnline">Знакомьтесь с ведущими →</div>`,false);
 MK.forEach(([title,cards],k)=>{const i=k+3;
- h+=shell(i,'МАСТЕР-КЛАССЫ',`<h2>${title}</h2>`+cards.map(([e,t,n,d,dates,gr])=>`<div class="card">${AV[n]?`<div class="ph"><img src="av_${AV[n]}.png"><span>${e}</span></div>`:`<div class="ic">${e}</div>`}<div class="cb"><div class="ct">${t}</div><div class="cn">${n}</div><div class="cd">${d}</div><div class="chips">${dates.map(x=>`<span class="chip">${x}</span>`).join('')}<span class="chip g">${gr}</span></div></div></div>`).join('')+(cards.length<2?`<div style="flex:1;position:relative">${[['🎨',170,90,20],['🖌',135,330,80],['🌄',175,545,10],['🌻',125,790,75]].map(([e,z,l,t])=>`<div class="em" style="width:${z}px;height:${z}px;font-size:${z*.55}px;left:${l}px;top:${t}px">${e}</div>`).join('')}</div>`:''),cards.length<2?'big':(i===10?'tight':''));});
+ h+=shell(i,'МАСТЕР-КЛАССЫ',`<h2>${title}</h2>`+cards.map(([e,t,n,d,dates,gr])=>`<div class="card"><div class="row">${AV[n]?`<div class="ph"><img src="${AV[n]}"><span>${e}</span></div>`:`<div class="ph il"><img src="il_${IL[n]}.jpg"></div>`}<div class="cb"><div class="ct">${t}</div><div class="cn">${n}</div><div class="cd">${d}</div></div></div><div class="chips">${dates.map(x=>`<span class="chip">${x}</span>`).join('')}<span class="chip g">${gr}</span></div></div>`).join('')+(cards.length<2?`<div style="flex:1;position:relative">${[['🎨',150,110,10],['🖌',120,340,50],['🌄',150,545,0],['🌻',115,780,45]].map(([e,z,l,t])=>`<div class="em" style="width:${z}px;height:${z}px;font-size:${z*.55}px;left:${l}px;top:${t}px">${e}</div>`).join('')}</div>`:''),cards.length<2?'big':(i===10?'tight':''));});
 h+=shell(12,'ВЫБИРАЙТЕ',`
  <h1 style="font-size:92px;margin-top:80px;white-space:nowrap"><span>Какой мастер-класс</span><br><span>выберет ваш</span><br><span>ребёнок?</span></h1>
  <p style="margin-top:50px;font-size:44px">Покажите ему программу — здесь можно найти занятие по своему увлечению или попробовать что-то впервые</p>
