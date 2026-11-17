@@ -37,7 +37,9 @@ body{background:#0B0812}
 .title{position:absolute;left:0;right:0;text-align:center;font-weight:900;color:#9B5CFF;letter-spacing:-.05em;line-height:.8}
 .logo svg{display:block}
 .flow{position:absolute;left:72px;right:72px}
-.fit{display:block;white-space:nowrap;font-weight:900;color:#9B5CFF;letter-spacing:-.05em;line-height:.82;text-align:center}
+.fit{display:block;white-space:nowrap;font-weight:700;color:#A874FF;letter-spacing:-.04em;line-height:.9;text-align:center}
+.dark{position:absolute;left:0;right:0;bottom:0;z-index:1}
+.flow{z-index:3}
 .logo svg path{fill:#fff}
 """
 
@@ -62,23 +64,24 @@ def poster_purple(fmt):
     s.append(place(PCUT, F, 785, fy, "polina_cut.png", fade))
     # передние нижние буквы
     if story:
-        s.append('<div class="L" style="left:-40px;top:1760px;font-size:760px">ВО</div>')
+        s.append('<div class="L" style="z-index:2;left:-40px;top:1760px;font-size:760px">ВО</div>')
     else:
-        s.append('<div class="L" style="left:-30px;top:1290px;font-size:560px">ВО</div>')
+        s.append('<div class="L" style="z-index:2;left:-30px;top:1290px;font-size:560px">ВО</div>')
     # центр — один поток: заголовок (каждая строка во всю ширину), город, инфо
-    ty = 860 if story else 560
+    ty = 900 if story else 600
     tl = (270 + 95) if story else 150
     s.append(f'<div class="abs t" style="left:0;right:0;top:{tl}px;text-align:center;font-size:{32 if story else 28}px">Сила сообществ — вечер, где сообщества<br>Тбилиси знакомятся вживую</div>')
     s.append(f'<div class="abs t" style="left:28px;top:{ty - 34}px;font-size:22px">27.11</div>')
     cs = 88 if story else 72
     ds = 60 if story else 48
+    s.append(f'<div class="dark" style="top:{ty - 170}px;background:linear-gradient(180deg,rgba(11,8,18,0),rgba(11,8,18,.88) 170px,rgba(11,8,18,.96))"></div>')
     s.append(f'''<div class="flow" style="top:{ty}px">
 <span class="fit">СООБЩЕСТВО</span><span class="fit">СИЛЬНЕЕ</span><span class="fit">ОДИНОЧЕСТВА</span>
 <div style="text-align:center;font-weight:900;font-size:{cs}px;letter-spacing:-.04em;line-height:1;color:#fff;margin-top:14px">В ТБИЛИСИ</div>
 <div class="tb" style="font-size:{22 if story else 20}px;margin-top:18px">СИЛА СООБЩЕСТВ &nbsp;·&nbsp; ПОЛИНА · TEXTURA &nbsp;·&nbsp; МАКСИМ · CO.SPACE</div>
 <div style="display:flex;gap:40px;margin-top:22px"><div style="flex:1"><div class="tb" style="font-size:{ds}px">27 НОЯБРЯ<br>ПЯТНИЦА</div><div class="t" style="font-size:{ds}px">19:00</div></div>
 <div class="tb" style="flex:1;font-size:{34 if story else 28}px;padding-top:6px">GINGER HOTEL<br>ВХОД<br>СВОБОДНЫЙ</div></div></div>
-<script>document.fonts.ready.then(()=>{{const W=document.querySelector('.flow').clientWidth;document.querySelectorAll('.fit').forEach(e=>{{e.style.fontSize='100px';e.style.display='inline-block';const w=e.getBoundingClientRect().width;e.style.fontSize=(100*W/w)+'px';e.style.display='block'}})}})</script>''')
+<script>document.fonts.ready.then(()=>{{const W=document.querySelector('.flow').clientWidth;document.querySelectorAll('.fit').forEach(e=>{{e.style.fontSize='100px';e.style.display='inline-block';const w=e.getBoundingClientRect().width;e.style.fontSize=(100*W*.8/w)+'px';e.style.display='block'}})}})</script>''')
     ly = 270 if story else 60
     s.append(f'<div class="abs logo" style="left:50%;transform:translateX(-50%);top:{ly}px">{LOGO.replace("width=\"77\"", "width=\"120\"").replace("height=\"38\"", "height=\"59\"")}</div>')
     css = BASE % dict(H=H) + A_CSS
