@@ -30,6 +30,7 @@ body{font-family:'Inter Display','Inter',sans-serif;color:#fff;position:relative
  linear-gradient(180deg,rgba(26,26,46,.96) 0%%,rgba(26,26,46,.72) %(g1)d%%,rgba(26,26,46,.25) %(g2)d%%,rgba(26,26,46,.35) %(g3)d%%,rgba(26,26,46,.97) %(g4)d%%),
  radial-gradient(700px 500px at 100%% 0%%,rgba(74,108,247,.45),transparent 70%%)}
 svg.net{position:absolute;left:0;top:0}
+.glow{position:absolute;left:-200px;right:-200px;bottom:-300px;height:700px;background:radial-gradient(closest-side,rgba(74,108,247,.35),transparent)}
 .person{position:absolute;-webkit-mask-image:linear-gradient(180deg,#000 62%%,transparent 92%%)}
 .halo{position:absolute;border-radius:50%%;border:3px solid;box-shadow:0 0 40px currentColor}
 .person img{height:100%%;display:block;filter:drop-shadow(0 0 30px rgba(74,108,247,.35))}
@@ -105,6 +106,28 @@ def net_svg(L):
     return f'<svg class="net" width="{W}" height="{H}" viewBox="0 0 {W} {H}">{defs}{"".join(out)}</svg>'
 
 
+def deco_svg(L, zones):
+    """Абстрактная сеть точек в пустых зонах (верх/низ сторис), продолжает связи фото."""
+    rnd = random.Random(11)
+    W, H = L["W"], L["H"]
+    pts = []
+    for y0, y1, n in zones:
+        for _ in range(n):
+            pts.append((rnd.randint(20, W - 20), rnd.randint(y0, y1), rnd.choice([4, 5, 6, 8, 10, 14, 18]), rnd.choice(COLORS)))
+    out = []
+    for i, a in enumerate(pts):
+        d = sorted(range(len(pts)), key=lambda j: (pts[j][0] - a[0]) ** 2 + (pts[j][1] - a[1]) ** 2)
+        for j in d[1:3]:
+            b = pts[j]
+            out.append(f'<line x1="{a[0]}" y1="{a[1]}" x2="{b[0]}" y2="{b[1]}" stroke="#C7CEFF" stroke-width="1.5" opacity=".28"/>')
+    for x, y, r, c in pts:
+        if r >= 10:
+            out.append(f'<circle cx="{x}" cy="{y}" r="{r * 2.2:.0f}" fill="{c}" opacity=".12"/>')
+            out.append(f'<circle cx="{x}" cy="{y}" r="{r + 10}" fill="none" stroke="{c}" stroke-width="2" opacity=".5"/>')
+        out.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c}" opacity=".9"/>')
+    return f'<svg class="net" width="{W}" height="{H}" viewBox="0 0 {W} {H}">{"".join(out)}</svg>'
+
+
 def person(img, pos):
     a = (pos["fy"] + 220 - pos["top"]) / pos["h"] * 100
     b = (pos["fy"] + 370 - pos["top"]) / pos["h"] * 100
@@ -120,6 +143,7 @@ for fmt, L in FMT.items():
                      mono=L["mono"], h1=L["h1"], h1s=L["h1s"], info=L["info"], g1=g[0], g2=g[1], g3=g[2], g4=g[3])
     ph, mh = heads(L)
     body = f"""<img class="bg" src="group.src.jpg"><div class="shade"></div>
+<div class="glow"></div>{deco_svg(L, [(30, 250, 11), (1560, 1890, 17)]) if fmt == "9x16" else ""}
 {net_svg(L)}
 {person('max_cut.png', L['mx'])}{person('polina_cut.png', L['pol'])}
 <div class="name" style="left:{L['polname'][0]}px;top:{L['polname'][1]}px"><i style="background:#EC4899"></i>Полина <small>TEXTURA</small></div>
