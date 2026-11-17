@@ -37,7 +37,7 @@ body{background:#0B0812}
 .title{position:absolute;left:0;right:0;text-align:center;font-weight:900;color:#9B5CFF;letter-spacing:-.05em;line-height:.8}
 .logo svg{display:block}
 .flow{position:absolute;left:72px;right:72px}
-.fit{display:block;white-space:nowrap;font-weight:700;color:#A874FF;letter-spacing:-.04em;line-height:.9;text-align:center}
+.fit{display:block;white-space:nowrap;font-weight:900;color:#A874FF;letter-spacing:-.05em;line-height:.86;text-align:center}
 .dark{position:absolute;left:0;right:0;bottom:0;z-index:1}
 .flow{z-index:3}
 .logo svg path{fill:#fff}
@@ -74,7 +74,7 @@ def poster_purple(fmt):
     s.append(f'<div class="abs t" style="left:28px;top:{ty - 34}px;font-size:22px">27.11</div>')
     cs = 88 if story else 72
     ds = 60 if story else 48
-    s.append(f'<div class="dark" style="top:{ty - 170}px;background:linear-gradient(180deg,rgba(11,8,18,0),rgba(11,8,18,.88) 170px,rgba(11,8,18,.96))"></div>')
+    s.append(f'<div class="dark" style="top:{ty - 320}px;background:linear-gradient(180deg,rgba(11,8,18,0),rgba(11,8,18,.35) 160px,rgba(11,8,18,.62) 320px,rgba(11,8,18,.72) 70%,rgba(11,8,18,.85))"></div>')
     s.append(f'''<div class="flow" style="top:{ty}px">
 <span class="fit">СООБЩЕСТВО</span><span class="fit">СИЛЬНЕЕ</span><span class="fit">ОДИНОЧЕСТВА</span>
 <div style="text-align:center;font-weight:900;font-size:{cs}px;letter-spacing:-.04em;line-height:1;color:#fff;margin-top:14px">В ТБИЛИСИ</div>
