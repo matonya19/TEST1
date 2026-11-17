@@ -30,10 +30,10 @@ def build(fmt):
     story = fmt == "9x16"
     H = 1920 if story else 1350
     bh = H; bw = 1200 * H / 1500; bx = -(bw - 1080) / 2
-    F = 175 if story else 150
-    mfx, pfx = (300, 790) if story else (320, 770)
+    F = 210 if story else 185
+    mfx, pfx = (285, 800) if story else (295, 790)
     top = 270 if story else 60
-    infoy = 600 if story else 400
+    infoy = 560 if story else 330
     mainy = infoy + 110
     ms = 72 if story else 62
     datey = mainy + ms * 2 + (60 if story else 40)
