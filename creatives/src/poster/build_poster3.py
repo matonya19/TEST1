@@ -12,14 +12,14 @@ COLORS = ["#4A6CF7", "#F59E0B", "#EC4899", "#10B981", "#A5B4FC", "#FFFFFF"]
 FMT = {
     # person: left, top, h (высота вырезки)
     "4x5": dict(W=1080, H=1350, s=0.95, ox=430, oy=-80, top=60, mono=170, h1=228, h1s=94,
-                pol=dict(left=400, top=390, h=880), mx=dict(left=60, top=520, h=600), info=1125,
-                polname=(640, 1000), maxname=(70, 1010)),
+                pol=dict(left=405,top=432,h=870), mx=dict(left=115,top=461,h=521), info=1125,
+                polname=(600, 1010), maxname=(90, 1010)),
     "9x16": dict(W=1080, H=1920, s=1.0, ox=470, oy=-300, top=270, mono=390, h1=455, h1s=96,
-                 pol=dict(left=390, top=690, h=920), mx=dict(left=50, top=830, h=640), info=1460,
-                 polname=(640, 1330), maxname=(60, 1340)),
+                 pol=dict(left=390,top=669,h=946), mx=dict(left=89,top=700,h=567), info=1460,
+                 polname=(600, 1340), maxname=(70, 1340)),
 }
-PCUT = (933, 1146, .43, .12)   # w, h, центр головы x/y в долях
-MCUT = (902, 1059, .40, .22)
+PCUT = (933, 1146, .403, .170)   # w, h, центр головы x/y в долях
+MCUT = (902, 1059, .395, .229)
 
 CSS = """
 *{margin:0;padding:0;box-sizing:border-box}
@@ -35,11 +35,11 @@ svg.net{position:absolute;left:0;top:0}
 .person img{height:100%%;display:block;filter:drop-shadow(0 0 30px rgba(74,108,247,.35))}
 .logo{position:absolute;left:72px;top:%(top)dpx}.logo svg{width:112px;height:auto;display:block}
 .pill{position:absolute;right:72px;top:%(pt)dpx;border:2px solid rgba(255,255,255,.55);border-radius:40px;padding:12px 26px;font-size:30px;font-weight:500;background:rgba(26,26,46,.4)}
-.mono{position:absolute;left:72px;top:%(mono)dpx;font-family:'JetBrains Mono',monospace;font-size:40px;color:#A5B4FC}
+.mono{position:absolute;left:72px;top:%(mono)dpx;font-family:'JetBrains Mono',monospace;font-size:40px;color:#C3CCFF;text-shadow:0 0 16px rgba(120,140,255,.7)}
 .mono s{text-decoration:none;color:#6B75B8}
 .mono b{display:inline-block;width:22px;height:44px;background:#A5B4FC;vertical-align:-8px;margin-left:6px}
-h1{position:absolute;left:72px;right:60px;top:%(h1)dpx;font-size:%(h1s)dpx;line-height:1;font-weight:800;letter-spacing:-3px;text-shadow:0 4px 30px rgba(0,0,0,.5)}
-h1 em{font-style:normal;background:linear-gradient(90deg,#F59E0B,#EC4899);-webkit-background-clip:text;color:transparent}
+h1{position:absolute;left:72px;right:60px;top:%(h1)dpx;font-size:%(h1s)dpx;line-height:1;font-weight:800;letter-spacing:-3px;color:#fff;text-shadow:0 0 24px rgba(255,255,255,.25),0 4px 30px rgba(0,0,0,.7)}
+h1 em{font-style:normal;background:linear-gradient(90deg,#FFC21A 0%%,#FF7A2F 45%%,#FF3EA5 100%%);-webkit-background-clip:text;color:transparent;filter:drop-shadow(0 0 18px rgba(255,90,140,.55)) brightness(1.15) saturate(1.3)}
 .name{position:absolute;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.95);color:#1A1A2E;border-radius:40px;
  padding:10px 22px 10px 12px;font-size:28px;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .name i{width:22px;height:22px;border-radius:50%%;display:block}
@@ -99,7 +99,8 @@ def net_svg(L):
 
 
 def person(img, pos):
-    return f'<div class="person" style="left:{pos["left"]}px;top:{pos["top"]}px;height:{pos["h"]}px"><img src="{img}"></div>'
+    m = "-webkit-mask-image:linear-gradient(180deg,#000 82%,transparent 100%)" if "max" in img else ""
+    return f'<div class="person" style="left:{pos["left"]}px;top:{pos["top"]}px;height:{pos["h"]}px;{m}"><img src="{img}"></div>'
 
 
 for fmt, L in FMT.items():
