@@ -113,18 +113,18 @@ def deco_svg(L, zones):
     pts = []
     for y0, y1, n in zones:
         for _ in range(n):
-            pts.append((rnd.randint(20, W - 20), rnd.randint(y0, y1), rnd.choice([4, 5, 6, 8, 10, 14, 18]), rnd.choice(COLORS)))
+            pts.append((rnd.randint(20, W - 20), rnd.randint(y0, y1), rnd.choice([4, 5, 6, 8, 10, 14, 18]), "#C7CEFF"))
     out = []
     for i, a in enumerate(pts):
         d = sorted(range(len(pts)), key=lambda j: (pts[j][0] - a[0]) ** 2 + (pts[j][1] - a[1]) ** 2)
         for j in d[1:3]:
             b = pts[j]
-            out.append(f'<line x1="{a[0]}" y1="{a[1]}" x2="{b[0]}" y2="{b[1]}" stroke="#C7CEFF" stroke-width="1.5" opacity=".28"/>')
+            out.append(f'<line x1="{a[0]}" y1="{a[1]}" x2="{b[0]}" y2="{b[1]}" stroke="#C7CEFF" stroke-width="1.5" opacity=".18"/>')
     for x, y, r, c in pts:
         if r >= 10:
-            out.append(f'<circle cx="{x}" cy="{y}" r="{r * 2.2:.0f}" fill="{c}" opacity=".12"/>')
-            out.append(f'<circle cx="{x}" cy="{y}" r="{r + 10}" fill="none" stroke="{c}" stroke-width="2" opacity=".5"/>')
-        out.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c}" opacity=".9"/>')
+            out.append(f'<circle cx="{x}" cy="{y}" r="{r * 2.2:.0f}" fill="{c}" opacity=".05"/>')
+            out.append(f'<circle cx="{x}" cy="{y}" r="{r + 10}" fill="none" stroke="{c}" stroke-width="1.5" opacity=".25"/>')
+        out.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c}" opacity=".3"/>')
     return f'<svg class="net" width="{W}" height="{H}" viewBox="0 0 {W} {H}">{"".join(out)}</svg>'
 
 
