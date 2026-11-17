@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Карусель — клуб</title>
+<style>
+  :root{
+    --cream:#F5EDE1; --sand:#DCC7AA; --caramel:#B07A4F; --choc:#4A2E22;
+    --terra:#9C5236; --milk:#F6E6C6; --dark:#3B2418;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#222;font-family:"Inter Display","Inter","Noto Color Emoji",sans-serif;display:flex;flex-direction:column;align-items:center;gap:40px;padding:40px 0}
+  .slide{width:1500px;height:2000px;position:relative;overflow:hidden;flex:none}
+  .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .abs{position:absolute}
+  .h{font-weight:700;letter-spacing:-0.055em;line-height:.98}
+  .t{font-weight:300;letter-spacing:-0.045em;line-height:1.08}
+  .b{font-weight:700}
+  p+p{margin-top:.55em}
+</style>
+</head>
+<body>
+
+<!-- 1. Обложка -->
+<section class="slide" id="s1">
+  <img class="bg" src="photos/c1.jpg" style="object-position:50% 40%">
+  <div class="abs" style="inset:0;background:linear-gradient(180deg,rgba(59,36,24,.8) 0%,rgba(59,36,24,0) 30%,rgba(59,36,24,0) 55%,rgba(59,36,24,.9) 85%)"></div>
+  <div class="abs h" style="left:110px;top:150px;font-size:150px;color:var(--milk)">привет,</div>
+  <div class="abs h" style="right:110px;top:300px;font-size:150px;color:var(--milk)">это наш клуб</div>
+  <div class="abs t" style="left:110px;bottom:330px;font-size:66px;color:var(--milk)">клуб предпринимателей в Батуми</div>
+  <div class="abs t" style="left:110px;bottom:150px;font-size:56px;color:var(--sand)">[ здесь знакомятся, делятся опытом<br>и находят своих ]</div>
+</section>
+
+<!-- 2. Зачем клуб: фото по центру -->
+<section class="slide" id="s2" style="background:var(--choc)">
+  <div class="abs h" style="left:110px;top:120px;font-size:112px;color:var(--sand)">я знаю, как важно,<br>чтобы было с кем обсудить</div>
+  <img class="abs" src="photos/c6.jpg" style="left:330px;top:500px;width:660px;height:940px;object-fit:cover;object-position:50% 30%">
+  <div class="abs t" style="left:1030px;top:900px;width:370px;font-size:50px;color:#fff">новую идею, сложное решение или то, что пока не получается</div>
+  <div class="abs h" style="left:0;right:0;top:1580px;text-align:center;font-size:100px;color:var(--caramel)">[ поэтому мы создали<br>клуб предпринимателей ]</div>
+</section>
+
+<!-- 3. Разный бизнес: фото в рамке + список -->
+<section class="slide" id="s3" style="background:var(--caramel)">
+  <div class="abs h" style="left:110px;top:120px;font-size:124px;color:var(--milk)">у нас разный бизнес</div>
+  <img class="abs" src="photos/c2.jpg" style="left:110px;top:330px;width:780px;height:1000px;object-fit:cover;object-position:50% 30%">
+  <div class="abs t" style="left:950px;top:520px;font-size:56px;line-height:1.12;color:var(--dark)">
+    кто-то строит<br>дома<br><br>кто-то развивает<br>магазины<br><br>кто-то занимается<br>образованием<br>или инвестициями
+  </div>
+  <div class="abs h" style="left:110px;top:1430px;font-size:84px;color:var(--dark)">[ а вопросы часто похожи ]</div>
+  <div class="abs t" style="left:110px;top:1580px;width:1280px;font-size:56px;color:var(--milk)">где искать клиентов, как делегировать<br>и когда уже перестать делать всё самому</div>
+</section>
+
+<!-- 4. Вторники: фото сверху, цвет снизу -->
+<section class="slide" id="s4" style="background:var(--sand)">
+  <img class="abs" src="photos/c7.jpg" style="left:0;top:0;width:1500px;height:1080px;object-fit:cover;object-position:50% 25%">
+  <div class="abs" style="left:0;top:0;width:1500px;height:1080px;background:linear-gradient(180deg,rgba(59,36,24,.9) 0%,rgba(59,36,24,.7) 30%,rgba(59,36,24,0) 55%)"></div>
+  <div class="abs h" style="left:110px;top:110px;font-size:124px;color:var(--milk)">по вторникам<br>мы встречаемся</div>
+  <div class="abs t" style="left:110px;right:110px;top:1160px;text-align:center;font-size:50px;color:var(--dark)">
+    <p>участник выступает с темой, в которой у него есть опыт</p>
+    <p>или проводим <span class="b">мастермайнд</span> — разбираем запросы друг друга и вместе ищем решения</p>
+  </div>
+  <div class="abs h" style="left:110px;right:110px;top:1580px;text-align:center;font-size:68px;line-height:1.05;color:var(--terra)">[ можно задать тот самый вопрос, который давно крутится в голове ]</div>
+</section>
+
+<!-- 5. Здесь можно: фразы раскиданы по фото -->
+<section class="slide" id="s5">
+  <img class="bg" src="photos/c8.jpg" style="object-position:50% 50%">
+  <div class="abs" style="inset:0;background:linear-gradient(180deg,rgba(245,237,225,.85) 0%,rgba(245,237,225,0) 18%,rgba(245,237,225,0) 50%,rgba(245,237,225,.85) 66%,rgba(245,237,225,.95) 100%)"></div>
+  <div class="abs h" style="left:0;right:0;top:110px;text-align:center;font-size:130px;color:var(--choc)">[ здесь можно ]</div>
+  <div class="abs t" style="left:110px;top:1180px;font-size:58px;color:var(--choc)">рассказать<br>о своём деле</div>
+  <div class="abs t" style="right:110px;top:1240px;text-align:right;font-size:58px;color:var(--choc)">услышать:<br><span class="b">«у меня тоже так было»</span></div>
+  <div class="abs t" style="left:110px;top:1460px;font-size:58px;color:var(--choc)">посмотреть на свою задачу<br>чужими глазами</div>
+  <div class="abs t" style="right:110px;top:1620px;text-align:right;font-size:58px;color:var(--choc)">найти полезный<br>контакт</div>
+  <div class="abs t" style="left:110px;top:1760px;font-size:58px;color:var(--choc)">поделиться тем,<br>что сработало у тебя</div>
+</section>
+
+<!-- 6. Мои вопросы: цвет сверху, фото снизу -->
+<section class="slide" id="s6" style="background:var(--cream)">
+  <img class="abs" src="photos/c4.jpg" style="left:0;top:1000px;width:1500px;height:1000px;object-fit:cover;object-position:50% 40%">
+  <div class="abs h" style="left:110px;top:120px;font-size:112px;color:var(--choc)">я тоже прихожу сюда<br>со своими вопросами</div>
+  <div class="abs t" style="right:110px;top:420px;width:900px;text-align:right;font-size:50px;color:var(--choc)">на одной из встреч познакомилась с людьми, с которыми увидела возможности для сотрудничества и продвижения нашей онлайн-школы</div>
+  <div class="abs h" style="left:110px;top:740px;font-size:72px;color:var(--caramel)">[ заранее никогда не знаешь,<br>к кому сядешь рядом ]</div>
+</section>
+
+<!-- 7. Окружение: фото по центру -->
+<section class="slide" id="s7" style="background:var(--terra)">
+  <div class="abs h" style="left:110px;top:120px;font-size:100px;color:var(--milk)">для меня окружение —<br>это когда есть кому написать</div>
+  <div class="abs h" style="left:110px;top:360px;font-size:60px;color:var(--sand)">«слушай, а как вы это решили?»</div>
+  <img class="abs" src="photos/c5.jpg" style="left:330px;top:520px;width:660px;height:920px;object-fit:cover;object-position:50% 35%">
+  <div class="abs t" style="left:1030px;top:900px;width:370px;font-size:50px;color:#fff">и можно честно сказать: «я пока не понимаю, что делать»</div>
+  <div class="abs h" style="left:0;right:0;top:1580px;text-align:center;font-size:92px;color:var(--dark)">[ даже если ты руководитель<br>и обычно все<br>спрашивают тебя ]</div>
+</section>
+
+<!-- 8. Финал -->
+<section class="slide" id="s8">
+  <img class="bg" src="photos/c3.jpg" style="object-position:50% 25%">
+  <div class="abs" style="inset:0;background:linear-gradient(180deg,rgba(59,36,24,.8) 0%,rgba(59,36,24,0) 22%,rgba(59,36,24,0) 46%,rgba(59,36,24,.85) 64%,rgba(59,36,24,.95) 100%)"></div>
+  <div class="abs h" style="left:0;right:0;top:110px;text-align:center;font-size:124px;color:var(--milk)">давай знакомиться<br>во вторник</div>
+  <div class="abs t" style="left:110px;right:110px;top:1340px;text-align:center;font-size:52px;color:var(--milk)">если ты предприниматель в Батуми —<br>приходи на встречу</div>
+  <div class="abs h" style="left:0;right:0;top:1500px;text-align:center;font-size:96px;color:var(--sand)">напиши мне «КЛУБ» в директ</div>
+  <div class="abs t" style="left:110px;right:110px;top:1640px;text-align:center;font-size:48px;color:var(--milk)">пришлю тему, время, место и условия участия</div>
+  <svg class="abs" style="left:0;top:1740px" width="1500" height="260" viewBox="0 0 1500 260">
+    <path id="arc" d="M480,70 Q750,250 1020,70" fill="none"/>
+    <text font-family="Inter Display, Noto Color Emoji" font-weight="300" font-size="60" letter-spacing="-2" fill="#F6E6C6">
+      <textPath href="#arc" startOffset="50%" text-anchor="middle">[ до встречи 🤍 ]</textPath>
+    </text>
+  </svg>
+</section>
+
+</body>
+</html>
