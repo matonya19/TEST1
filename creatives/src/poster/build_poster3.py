@@ -66,6 +66,13 @@ def net_svg(L):
     s, ox, oy = L["s"], L["ox"], L["oy"]
     pts = [(x * K * s - ox, y * K * s - oy) for x, y in FACES]
     keep = [i for i, (x, y) in enumerate(pts) if 30 < x < L['W'] - 30 and 0 < y < L['H']]
+    def hidden(x, y):
+        for q, c in ((L["pol"], PCUT), (L["mx"], MCUT)):
+            w = q["h"] * c[0] / c[1]
+            if q["left"] - 40 < x < q["left"] + w + 40 and y > q["top"] + q["h"] * .3:
+                return True
+        return False
+    keep = [i for i in keep if not hidden(*pts[i])]
     FW = [FWID[i] for i in keep]
     pts = [pts[i] for i in keep]
     out = []
