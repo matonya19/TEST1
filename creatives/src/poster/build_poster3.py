@@ -12,11 +12,11 @@ COLORS = ["#4A6CF7", "#F59E0B", "#EC4899", "#10B981", "#A5B4FC", "#FFFFFF"]
 FMT = {
     # person: left, top, h (высота вырезки)
     "4x5": dict(W=1080, H=1350, s=0.95, ox=430, oy=-80, top=60, mono=170, h1=228, h1s=94,
-                pol=dict(left=405,top=432,h=870), mx=dict(left=115,top=461,h=521), info=1125,
-                polname=(600, 1010), maxname=(90, 1010)),
+                pol=dict(left=463,top=480,h=880,fy=630), mx=dict(left=22,top=509,h=528,fy=630), info=1085,
+                polname=(622, 895), maxname=(70, 895)),
     "9x16": dict(W=1080, H=1920, s=1.0, ox=470, oy=-300, top=270, mono=390, h1=455, h1s=96,
-                 pol=dict(left=390,top=669,h=946), mx=dict(left=89,top=700,h=567), info=1460,
-                 polname=(600, 1340), maxname=(70, 1340)),
+                pol=dict(left=456,top=715,h=910,fy=870), mx=dict(left=21,top=745,h=546,fy=870), info=1290,
+                polname=(625, 1135), maxname=(75, 1135)),
 }
 PCUT = (933, 1146, .403, .170)   # w, h, центр головы x/y в долях
 MCUT = (902, 1059, .395, .229)
@@ -106,7 +106,9 @@ def net_svg(L):
 
 
 def person(img, pos):
-    m = "-webkit-mask-image:linear-gradient(180deg,#000 82%,transparent 100%)" if "max" in img else ""
+    a = (pos["fy"] + 220 - pos["top"]) / pos["h"] * 100
+    b = (pos["fy"] + 370 - pos["top"]) / pos["h"] * 100
+    m = f"-webkit-mask-image:linear-gradient(180deg,#000 {a:.1f}%,transparent {b:.1f}%)"
     return f'<div class="person" style="left:{pos["left"]}px;top:{pos["top"]}px;height:{pos["h"]}px;{m}"><img src="{img}"></div>'
 
 
