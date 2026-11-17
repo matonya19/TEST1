@@ -30,17 +30,20 @@ def build(fmt):
     story = fmt == "9x16"
     H = 1920 if story else 1350
     bh = H; bw = 1200 * H / 1500; bx = -(bw - 1080) / 2
-    F = 140 if story else 120
-    top = 270 if story else 70
-    mainy = 720 if story else 520
-    ms = 70 if story else 60
-    datey = 1080 if story else 800
+    F = 175 if story else 150
+    mfx, pfx = (300, 790) if story else (320, 770)
+    top = 270 if story else 60
+    infoy = 600 if story else 400
+    mainy = infoy + 110
+    ms = 72 if story else 62
+    datey = mainy + ms * 2 + (60 if story else 40)
+    logo = LOGO.replace('width="77"', 'width="110"').replace('height="38"', 'height="54"')
     body = f"""<img class="bg" src="crowd_purple.jpg"><div class="vig"></div>
-{person_bottom(MCUT, F, 210, H, 'max_purple.png')}{person_bottom(PCUT, F, 875, H, 'polina_purple.png')}
-<div class="abs small" style="left:90px;top:{top}px;font-size:20px">Сила сообществ<br>Ginger Hotel · сбор 19:00<br>вход свободный</div>
+{person_bottom(MCUT, F, mfx, H, 'max_purple.png')}{person_bottom(PCUT, F, pfx, H, 'polina_purple.png')}
+<div class="abs" style="left:50%;transform:translateX(-50%);top:{top}px">{logo}</div>
+<div class="abs small" style="left:90px;top:{infoy}px;font-size:20px">Сила сообществ · Ginger Hotel<br>сбор 19:00 · вход свободный</div>
 <div class="abs main" style="left:90px;top:{mainy}px;font-size:{ms}px">Ведёшь сообщество?<br>Расскажи о нём.</div>
-<div class="abs main" style="right:90px;top:{datey}px;font-size:{40 if story else 36}px;text-align:right;color:#E3D4FF">27 ноября<br>в Тбилиси</div>
-<div class="abs" style="left:50%;transform:translateX(-50%);bottom:{(320 if story else 70)}px">{LOGO.replace('width="77"','width="110"').replace('height="38"','height="54"')}</div>"""
+<div class="abs main" style="right:90px;top:{datey}px;font-size:{42 if story else 38}px;text-align:right;color:#E3D4FF">27 ноября<br>в Тбилиси</div>"""
     css = CSS % dict(H=H, bx=bx)
     return f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>{body}</body></html>'
 
