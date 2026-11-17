@@ -115,7 +115,7 @@ def deco_svg(L, zones):
         cols = n
         for k in range(n):
             x = int((k + .5) * (W / cols) + rnd.randint(-50, 50))
-            pts.append((x, rnd.randint(y0, y1), rnd.randint(26, 46), COLORS[(k + zi * 3) % len(COLORS)]))
+            pts.append((x, rnd.randint(y0, y1), rnd.randint(26, 46), "#FFFFFF"))
     # точки сети на фото — чтобы дуги уходили к людям
     s_, ox, oy = L["s"], L["ox"], L["oy"]
     faces = [(x * s_ - ox, y * s_ - oy) for x, y in FACES]
@@ -123,17 +123,17 @@ def deco_svg(L, zones):
     out = []
     def arc(a, b, grad, op, lift=50):
         mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - lift
-        st = 'url(#dg)' if grad else '#C7CEFF'
-        out.append(f'<path d="M{a[0]:.0f},{a[1]:.0f} Q{mx:.0f},{my:.0f} {b[0]:.0f},{b[1]:.0f}" stroke="{st}" stroke-width="{2.5 if grad else 1.5}" fill="none" opacity="{op}"/>')
+        st = '#FFFFFF'
+        out.append(f'<path d="M{a[0]:.0f},{a[1]:.0f} Q{mx:.0f},{my:.0f} {b[0]:.0f},{b[1]:.0f}" stroke="{st}" stroke-width="{2 if grad else 1.5}" fill="none" opacity="{op}"/>')
     for i, p in enumerate(pts):
         d = sorted(range(len(pts)), key=lambda j: (pts[j][0] - p[0]) ** 2 + (pts[j][1] - p[1]) ** 2)
         for n_, j in enumerate(d[1:3]):
             if i < j:
-                arc(p, pts[j], (i + n_) % 3 == 0, .55 if (i + n_) % 3 == 0 else .3, rnd.choice([-40, 40, 60]))
+                arc(p, pts[j], (i + n_) % 3 == 0, .16 if (i + n_) % 3 == 0 else .1, rnd.choice([-40, 40, 60]))
     # длинные дуги от верхней/нижней сети к людям на фото
     for x, y, r, c in pts:
-        out.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="none" stroke="{c}" stroke-width="2.5" opacity=".5"/>')
-        out.append(f'<circle cx="{x + r * .7:.0f}" cy="{y - r * .7:.0f}" r="7" fill="{c}" opacity=".85"/>')
+        out.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="none" stroke="{c}" stroke-width="2" opacity=".14"/>')
+        out.append(f'<circle cx="{x + r * .7:.0f}" cy="{y - r * .7:.0f}" r="6" fill="{c}" opacity=".25"/>')
     defs = '<defs><linearGradient id="dg" x1="0" x2="1"><stop offset="0" stop-color="#FFB800"/><stop offset=".55" stop-color="#FF5A1F"/><stop offset="1" stop-color="#FF2E8A"/></linearGradient></defs>'
     return f'<svg class="net" width="{W}" height="{H}" viewBox="0 0 {W} {H}">{defs}{"".join(out)}</svg>'
 
