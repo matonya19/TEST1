@@ -29,18 +29,20 @@ def place(cut, F, fx, fy, img, fade=None):
 
 # ---------------- A: огромные буквы ----------------
 A_CSS = """
-.bg{position:absolute;inset:0;background:url(group_duo.jpg) center/cover;opacity:.55}
-.sh{position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,22,51,.7),rgba(20,22,51,.15) 35%,rgba(20,22,51,.35) 60%,rgba(20,22,51,.85))}
-.L{position:absolute;font-weight:900;color:#6B8AFF;line-height:.8;letter-spacing:-.04em}
-.t{color:#B9C6FF;font-weight:600;line-height:1.05;letter-spacing:-.01em;text-shadow:0 2px 14px rgba(10,12,40,.8)}
-.tb{color:#B9C6FF;font-weight:800;line-height:.95;letter-spacing:-.02em;text-shadow:0 2px 14px rgba(10,12,40,.8)}
-.title{position:absolute;left:0;right:0;text-align:center;font-weight:900;color:#6B8AFF;letter-spacing:-.05em;line-height:.8}
+body{background:#0D0D10}
+.bg{position:absolute;inset:0;background:url(group.src.jpg) center/cover;filter:grayscale(1) brightness(.55) contrast(1.05);opacity:.5}
+.sh{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,13,16,.75),rgba(13,13,16,.2) 35%,rgba(13,13,16,.45) 60%,rgba(13,13,16,.92))}
+.L{position:absolute;font-weight:900;color:#FF6A1A;line-height:.8;letter-spacing:-.04em}
+.t{color:rgba(255,255,255,.72);font-weight:600;line-height:1.05;letter-spacing:-.01em;text-shadow:0 2px 14px rgba(0,0,0,.8)}
+.tb{color:#fff;font-weight:800;line-height:.95;letter-spacing:-.02em;text-shadow:0 2px 14px rgba(0,0,0,.8)}
+.title{position:absolute;left:0;right:0;text-align:center;font-weight:900;color:#FF6A1A;letter-spacing:-.05em;line-height:.8}
 .logo svg{display:block}
-.logo svg path{fill:#8EA6FF}
+.logo svg path{fill:#fff}
 """
 
 
 def poster_a(fmt):
+    # тёмная версия: оранжевые буквы, ч/б фон
     story = fmt == "9x16"
     H = 1920 if story else 1350
     F = 178 if story else 165
