@@ -34,16 +34,16 @@ svg.net{position:absolute;left:0;top:0}
 .halo{position:absolute;border-radius:50%%;border:3px solid;box-shadow:0 0 40px currentColor}
 .person img{height:100%%;display:block;filter:drop-shadow(0 0 30px rgba(74,108,247,.35))}
 .logo{position:absolute;left:72px;top:%(top)dpx}.logo svg{width:112px;height:auto;display:block}
-.pill{position:absolute;right:72px;top:%(pt)dpx;border:2px solid rgba(255,255,255,.55);border-radius:40px;padding:12px 26px;font-size:30px;font-weight:500;background:rgba(26,26,46,.4)}
+.pill{position:absolute;right:72px;top:%(pt)dpx;border-radius:40px;padding:14px 30px;font-size:30px;font-weight:700;color:#fff;background:linear-gradient(90deg,#FFB800 0%%,#FF5A1F 55%%,#FF2E8A 100%%)}
 .mono{position:absolute;left:72px;top:%(mono)dpx;font-family:'JetBrains Mono',monospace;font-size:40px;color:#C3CCFF;text-shadow:0 0 16px rgba(120,140,255,.7)}
 .mono s{text-decoration:none;color:#6B75B8}
 .mono b{display:inline-block;width:22px;height:44px;background:#A5B4FC;vertical-align:-8px;margin-left:6px}
 h1{position:absolute;left:72px;right:60px;top:%(h1)dpx;font-size:%(h1s)dpx;line-height:1;font-weight:800;letter-spacing:-3px;color:#fff;text-shadow:0 0 24px rgba(255,255,255,.25),0 4px 30px rgba(0,0,0,.7)}
 h1 em{font-style:normal;text-shadow:none;background:linear-gradient(90deg,#FFB800 0%%,#FF5A1F 55%%,#FF2E8A 100%%);-webkit-background-clip:text;color:transparent}
-.name{position:absolute;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.95);color:#1A1A2E;border-radius:40px;
+.name{position:absolute;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#fff;border-radius:40px;
  padding:10px 22px 10px 12px;font-size:28px;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .name i{width:22px;height:22px;border-radius:50%%;display:block}
-.name small{font-size:20px;font-weight:600;color:#4A4E6E}
+.name small{font-size:20px;font-weight:600;color:rgba(255,255,255,.75)}
 .info{position:absolute;left:0;right:0;top:%(info)dpx;text-align:center}
 .lead{font-size:30px;color:rgba(255,255,255,.85);font-weight:500;margin-bottom:14px}
 .date{font-size:64px;font-weight:800;letter-spacing:-2px}
