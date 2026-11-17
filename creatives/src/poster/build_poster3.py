@@ -107,25 +107,35 @@ def net_svg(L):
 
 
 def deco_svg(L, zones):
-    """Абстрактная сеть точек в пустых зонах (верх/низ сторис), продолжает связи фото."""
-    rnd = random.Random(11)
+    """Сеть в пустых зонах сторис — в том же стиле, что связи на фото: кольца с точкой и дуги."""
+    rnd = random.Random(5)
     W, H = L["W"], L["H"]
     pts = []
-    for y0, y1, n in zones:
-        for _ in range(n):
-            pts.append((rnd.randint(20, W - 20), rnd.randint(y0, y1), rnd.choice([4, 5, 6, 8, 10, 14, 18]), "#C7CEFF"))
+    for zi, (y0, y1, n) in enumerate(zones):
+        cols = n
+        for k in range(n):
+            x = int((k + .5) * (W / cols) + rnd.randint(-50, 50))
+            pts.append((x, rnd.randint(y0, y1), rnd.randint(26, 46), COLORS[(k + zi * 3) % len(COLORS)]))
+    # точки сети на фото — чтобы дуги уходили к людям
+    s_, ox, oy = L["s"], L["ox"], L["oy"]
+    faces = [(x * s_ - ox, y * s_ - oy) for x, y in FACES]
+    faces = [f for f in faces if 40 < f[0] < W - 40]
     out = []
-    for i, a in enumerate(pts):
-        d = sorted(range(len(pts)), key=lambda j: (pts[j][0] - a[0]) ** 2 + (pts[j][1] - a[1]) ** 2)
-        for j in d[1:3]:
-            b = pts[j]
-            out.append(f'<line x1="{a[0]}" y1="{a[1]}" x2="{b[0]}" y2="{b[1]}" stroke="#C7CEFF" stroke-width="1.5" opacity=".18"/>')
+    def arc(a, b, grad, op, lift=50):
+        mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - lift
+        st = 'url(#dg)' if grad else '#C7CEFF'
+        out.append(f'<path d="M{a[0]:.0f},{a[1]:.0f} Q{mx:.0f},{my:.0f} {b[0]:.0f},{b[1]:.0f}" stroke="{st}" stroke-width="{2.5 if grad else 1.5}" fill="none" opacity="{op}"/>')
+    for i, p in enumerate(pts):
+        d = sorted(range(len(pts)), key=lambda j: (pts[j][0] - p[0]) ** 2 + (pts[j][1] - p[1]) ** 2)
+        for n_, j in enumerate(d[1:3]):
+            if i < j:
+                arc(p, pts[j], (i + n_) % 3 == 0, .55 if (i + n_) % 3 == 0 else .3, rnd.choice([-40, 40, 60]))
+    # длинные дуги от верхней/нижней сети к людям на фото
     for x, y, r, c in pts:
-        if r >= 10:
-            out.append(f'<circle cx="{x}" cy="{y}" r="{r * 2.2:.0f}" fill="{c}" opacity=".05"/>')
-            out.append(f'<circle cx="{x}" cy="{y}" r="{r + 10}" fill="none" stroke="{c}" stroke-width="1.5" opacity=".25"/>')
-        out.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c}" opacity=".3"/>')
-    return f'<svg class="net" width="{W}" height="{H}" viewBox="0 0 {W} {H}">{"".join(out)}</svg>'
+        out.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="none" stroke="{c}" stroke-width="2.5" opacity=".5"/>')
+        out.append(f'<circle cx="{x + r * .7:.0f}" cy="{y - r * .7:.0f}" r="7" fill="{c}" opacity=".85"/>')
+    defs = '<defs><linearGradient id="dg" x1="0" x2="1"><stop offset="0" stop-color="#FFB800"/><stop offset=".55" stop-color="#FF5A1F"/><stop offset="1" stop-color="#FF2E8A"/></linearGradient></defs>'
+    return f'<svg class="net" width="{W}" height="{H}" viewBox="0 0 {W} {H}">{defs}{"".join(out)}</svg>'
 
 
 def person(img, pos):
@@ -143,7 +153,7 @@ for fmt, L in FMT.items():
                      mono=L["mono"], h1=L["h1"], h1s=L["h1s"], info=L["info"], g1=g[0], g2=g[1], g3=g[2], g4=g[3])
     ph, mh = heads(L)
     body = f"""<img class="bg" src="group.src.jpg"><div class="shade"></div>
-<div class="glow"></div>{deco_svg(L, [(30, 250, 11), (1560, 1890, 17)]) if fmt == "9x16" else ""}
+<div class="glow"></div>{deco_svg(L, [(50, 230, 6), (1580, 1700, 5), (1740, 1870, 6)]) if fmt == "9x16" else ""}
 {net_svg(L)}
 {person('max_cut.png', L['mx'])}{person('polina_cut.png', L['pol'])}
 <div class="name" style="left:{L['polname'][0]}px;top:{L['polname'][1]}px"><i style="background:#EC4899"></i>Полина <small>TEXTURA</small></div>
