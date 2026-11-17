@@ -78,9 +78,9 @@ def poster_purple(fmt):
     s.append(f'''<div class="flow" style="top:{ty}px">
 <span class="fit">СООБЩЕСТВО</span><span class="fit">СИЛЬНЕЕ</span><span class="fit">ОДИНОЧЕСТВА</span>
 <div style="text-align:center;font-weight:900;font-size:{cs}px;letter-spacing:-.04em;line-height:1;color:#fff;margin-top:14px">В ТБИЛИСИ</div>
-<div class="tb" style="font-weight:500;letter-spacing:.02em;font-size:{22 if story else 20}px;margin-top:18px">СИЛА СООБЩЕСТВ &nbsp;·&nbsp; ПОЛИНА · TEXTURA &nbsp;·&nbsp; МАКСИМ · CO.SPACE</div>
-<div style="display:flex;gap:40px;margin-top:22px"><div style="flex:1"><div class="tb" style="font-size:{ds}px">27 НОЯБРЯ<br>ПЯТНИЦА</div><div class="t" style="font-size:{ds}px">19:00</div></div>
-<div class="tb" style="font-weight:500;line-height:1.1;flex:1;font-size:{34 if story else 28}px;padding-top:6px">GINGER HOTEL<br>ВХОД<br>СВОБОДНЫЙ</div></div></div>
+<div class="tb" style="font-weight:500;letter-spacing:.02em;text-align:center;font-size:{22 if story else 20}px;margin-top:18px">СИЛА СООБЩЕСТВ &nbsp;·&nbsp; ПОЛИНА · TEXTURA &nbsp;·&nbsp; МАКСИМ · CO.SPACE</div>
+<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px"><div><div class="tb" style="font-size:{ds}px">27 НОЯБРЯ<br>ПЯТНИЦА</div><div class="t" style="font-size:{ds}px">19:00</div></div>
+<div style="text-align:right"><div class="tb" style="font-weight:500;line-height:1.1;font-size:{38 if story else 32}px">GINGER HOTEL<br>ТБИЛИСИ</div><div style="display:inline-block;margin-top:{18 if story else 14}px;background:#A874FF;color:#0B0812;font-weight:800;border-radius:40px;padding:{16 if story else 12}px {30 if story else 24}px;font-size:{30 if story else 24}px">ВХОД СВОБОДНЫЙ</div></div></div></div>
 <script>document.fonts.ready.then(()=>{{const W=document.querySelector('.flow').clientWidth;document.querySelectorAll('.fit').forEach(e=>{{e.style.fontSize='100px';e.style.display='inline-block';const w=e.getBoundingClientRect().width;e.style.fontSize=(100*W*.8/w)+'px';e.style.display='block'}})}})</script>''')
     ly = 270 if story else 60
     s.append(f'<div class="abs logo" style="left:50%;transform:translateX(-50%);top:{ly}px">{LOGO.replace("width=\"77\"", "width=\"120\"").replace("height=\"38\"", "height=\"59\"")}</div>')
