@@ -1,0 +1,50 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../build/node_modules/@fontsource/manrope/800.css">
+<link rel="stylesheet" href="../build/node_modules/@fontsource/manrope/600.css">
+<style>html,body{margin:0;background:transparent}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas><img id="logo" src="logo_teal.png" style="display:none">
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),W=1080,H=1920,END=38;
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),prog=(t,s,d)=>clamp((t-s)/d),ease=p=>1-Math.pow(1-p,3),back=(p,s=2)=>1+(s+1)*Math.pow(p-1,3)+s*Math.pow(p-1,2);
+const F=(w,s)=>`${w} ${s}px Manrope`;
+function rr(px,py,w,h,r){x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath();}
+const O=9.3;
+const SUBS=[[9.51,10.9,'Привет, я Вова!'],[11.55,15.9,'В любимых играх мне кое-что не нравилось, поэтому я решил сделать свои'],
+[16.19,19.0,'Код писать не умел — помогли ChatGPT и Codex'],[19.25,20.6,'Это вайбкодинг'],[20.73,23.2,'Я объясняю идею, а нейросеть пишет код'],
+[23.39,25.6,'Я проверяю и предлагаю улучшения'],[25.75,28.5,'В моей самолёто-стрелялке — космические бои'],[28.67,31.8,'Управляй кораблём, уклоняйся от врагов и побеждай'],
+[31.99,36.6,'В другой игре собери ракету по частям и отправляйся исследовать космос'],[36.79,40.2,'Так можно делать не только игры — ещё сайты и приложения'],
+[40.37,43.95,'В разговорном клубе «Просто о сложном» покажу свои игры'],[44.15,46.1,'Обсудим, как делать собственное'],[46.25,47.3,'Приходи!']].map(([a,b,s])=>[a-O,b-O,s]);
+function wrap(s,maxW){const ws=s.split(' '),ls=[];let l='';for(const w of ws){const t=l?l+' '+w:w;if(x.measureText(t).width>maxW&&l){ls.push(l);l=w;}else l=t;}ls.push(l);return ls;}
+function draw(t){
+  x.clearRect(0,0,W,H);x.textAlign='center';x.textBaseline='middle';
+  if(t<END+.5){
+    // name tag on the frame
+    let p=ease(prog(t,.4,.6));
+    if(p>0){x.save();x.globalAlpha=p;x.font=F(800,34);const s='Владимир Голышев, ученик SHKOLA',w=x.measureText(s).width+56;
+      rr(68,1128,w,64,32);x.fillStyle='rgba(11,26,58,.82)';x.fill();x.fillStyle='#fff';x.textAlign='left';x.fillText(s,96,1162);x.restore();x.textAlign='center';}
+    // subtitles
+    for(const [a,b,s] of SUBS){ if(t<a||t>b) continue;
+      const q=back(prog(t,a,.22),1.6);x.save();x.translate(540,1332);x.scale(.92+.08*q,.92+.08*q);x.globalAlpha=clamp(prog(t,a,.12));
+      x.font=F(800,58);const ls=wrap(s,960),lh=72;
+      x.shadowColor='rgba(8,20,70,.55)';x.shadowBlur=18;x.shadowOffsetY=4;
+      ls.forEach((l,i)=>{x.fillStyle=(s==='Это вайбкодинг'||s==='Приходи!')?'#FFD23F':'#fff';x.fillText(l,0,(i-(ls.length-1)/2)*lh);});x.restore(); }
+    // date plate
+    p=ease(prog(t,1.2,.7));
+    if(p>0){x.save();x.globalAlpha=p;x.translate(0,(1-p)*40);rr(110,1492,860,104,52);x.fillStyle='#fff';x.fill();
+      x.fillStyle='#1B2440';x.font=F(800,40);x.fillText('17 ноября · 14:00 МСК · 5–11 классы',540,1546);x.restore();}
+  }
+  // end card
+  const lt=t-END; if(lt>=0){ const a=ease(clamp(lt/.4));
+    x.save();x.globalAlpha=a;let g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#2B8BEE');g.addColorStop(.55,'#1F5FD6');g.addColorStop(1,'#1B3FA8');x.fillStyle=g;x.fillRect(0,0,W,H);
+    const lg=document.getElementById('logo'),lw=300,lh=lw*lg.naturalHeight/lg.naturalWidth;x.drawImage(lg,540-lw/2,330,lw,lh);x.restore();
+    let p=ease(prog(lt,.15,.5));x.save();x.globalAlpha=p;x.translate(0,(1-p)*30);x.fillStyle='#fff';x.font=F(800,104);x.fillText('Приходи',540,620);x.fillText('на мастер-класс!',540,740);
+    x.font=F(800,60);x.fillStyle='#FFD23F';x.fillText('«Просто о сложном:',540,900);x.fillText('вайбкодинг»',540,975);x.restore();
+    p=prog(lt,.6,.6); if(p>0){const s=back(p);x.save();x.translate(540,1170);x.scale(s,s);x.rotate(-.02);x.shadowColor='rgba(8,20,70,.35)';x.shadowBlur=40;x.shadowOffsetY=14;
+      rr(-430,-120,860,240,44);x.fillStyle='#fff';x.fill();x.shadowColor='transparent';x.fillStyle='#1B2440';x.font=F(800,66);x.fillText('17 ноября · 14:00 МСК',0,-36);
+      x.font=F(600,40);x.fillText('онлайн · для 5–11 классов',0,50);x.restore();}
+    p=ease(prog(lt,1.0,.5));x.save();x.globalAlpha=p;x.font=F(600,40);x.fillStyle='#fff';x.fillText('Ведущий — Владимир Голышев, ученик SHKOLA',540,1380);
+    const cw=760;rr(540-cw/2,1450,cw,92,46);x.fillStyle='#FFD23F';x.fill();x.fillStyle='#1B2440';x.font=F(800,36);x.fillText('Как подключиться — в описании',540,1498);x.restore();
+  }
+}
+window.drawAt=draw;window.ready=Promise.all([document.fonts.load(F(800,40),'Привет ChatGPT 0123456789·«»—'),document.fonts.load(F(600,40),'онлайн 0123456789'),document.getElementById('logo').decode()]).then(()=>true);
+</script></body></html>
