@@ -46,7 +46,7 @@ def poster_a(fmt):
     story = fmt == "9x16"
     H = 1920 if story else 1350
     F = 178 if story else 165
-    fy = 700 if story else 430
+    fy = 680 if story else 395
     s = []
     s.append('<div class="bg"></div><div class="sh"></div>')
     # задние буквы
@@ -61,18 +61,18 @@ def poster_a(fmt):
     s.append(place(PCUT, F, 785, fy, "polina_cut.png", fade))
     # передние нижние буквы
     if story:
-        s.append('<div class="L" style="left:-40px;top:1640px;font-size:760px">ВО</div>')
+        s.append('<div class="L" style="left:-40px;top:1700px;font-size:760px">ВО</div>')
     else:
-        s.append('<div class="L" style="left:-30px;top:1200px;font-size:560px">ВО</div>')
+        s.append('<div class="L" style="left:-30px;top:1235px;font-size:560px">ВО</div>')
     # центр
-    ty = 1020 if story else 690
-    ts = 300 if story else 250
-    s.append(f'<div class="title" style="top:{ty}px;font-size:{ts}px">СВОИХ</div>')
+    ty = 940 if story else 590
+    ts = 245 if story else 212
+    s.append(f'<div class="title" style="top:{ty}px;font-size:{ts}px">НАЙДИ<br>СВОИХ</div>')
     s.append(f'<div class="abs t" style="left:28px;top:{ty - 34}px;font-size:22px">27.11</div>')
     s.append(f'<div class="abs t" style="right:28px;top:{ty - 34}px;font-size:22px">Тбилиси</div>')
     tl = (270 + 95) if story else 150
     s.append(f'<div class="abs t" style="left:0;right:0;top:{tl}px;text-align:center;font-size:{32 if story else 28}px">ИИ ускоряет всё.<br>А найти своих — всё сложнее</div>')
-    by = ty + ts * .8 + 26
+    by = ty + ts * 1.6 + 26
     s.append(f'<div class="abs tb" style="left:72px;top:{by:.0f}px;font-size:24px">СИЛА СООБЩЕСТВ &nbsp;·&nbsp; ПОЛИНА · TEXTURA &nbsp;·&nbsp; МАКСИМ · CO.SPACE</div>')
     ds = 64 if story else 54
     s.append(f'<div class="abs" style="left:72px;top:{by + 50:.0f}px"><div class="tb" style="font-size:{ds}px">27 НОЯБРЯ<br>ПЯТНИЦА</div><div class="t" style="font-size:{ds}px">19:00</div></div>')
