@@ -92,7 +92,7 @@ els.append(f'''<div class="a" style="left:120px;top:262px;width:500px;z-index:5;
 <div class="h" style="font-size:70px;margin-top:22px">Ведёшь<br>сообщество<br>в Тбилиси?</div>
 <div style="font-size:28px;line-height:1.35;margin-top:26px;font-weight:500">Тебя уже ищут. Покажем,<br>как сделать, чтобы нашли.</div></div>''')
 els.append('<div class="cut" style="left:545px;top:430px;width:535px;height:750px;overflow:hidden;z-index:4;'
-           'clip-path:path(\'M80,0 H535 V686 A64,64 0 0 1 471,750 H80 Z\')"><img src="../max_stage_cut.png" style="height:1560px"></div>')
+           'clip-path:path(\'M80,0 H535 V686 A64,64 0 0 1 471,750 H80 Z\')"><img src="../max_portrait_cut.png" style="height:1050px;margin-left:-5px"></div>')
 els.append(f'<div class="a" style="left:110px;top:1080px;z-index:6"><span class="pillw" style="font-size:22px;padding:12px 22px"><i></i>Максим · Co.Space</span></div>')
 
 # ---------- 2. Проблема ----------
@@ -107,7 +107,7 @@ els.append(f'''<div class="a body" style="left:{x + 72}px;top:930px;width:780px;
 
 # ---------- 3. Решение (фото через границу 2|3) ----------
 x = 2 * S
-els.append(f'<div class="ph" style="left:{x - 250}px;top:150px;width:1200px;height:500px;background-image:url(../group_duo.jpg);background-position:50% 45%;z-index:1"></div>')
+els.append(f'<div class="ph" style="left:{x - 250}px;top:150px;width:1200px;height:500px;background-image:url(../studio_duo.jpg);background-position:50% 55%;z-index:1"></div>')
 els.append(f'<div class="a" style="left:{x + 72}px;top:612px;z-index:7"><span class="pillw"><i></i>68 сообществ Тбилиси уже в каталоге</span></div>')
 els.append(f'''<div class="a" style="left:{x + 72}px;top:770px;z-index:7"><div class="kick">Что мы даём</div>
 <div class="h" style="font-size:54px;margin-top:20px">Своя страница<br>в каталоге —</div>

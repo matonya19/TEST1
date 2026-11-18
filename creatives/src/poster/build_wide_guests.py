@@ -40,7 +40,7 @@ rects = [(72, 650, 650, 330), (330, 830, 678, 400)]
 mask_r = "".join(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="64" fill="white"/>' for x, y, w, h in rects)
 els.append(f'''<svg class="a" style="left:0;top:0;z-index:2" width="{W}" height="{H}"><defs>{GOO}
 <mask id="m1"><g filter="url(#goo)">{mask_r}</g></mask></defs>
-<image href="../audience.jpg" x="-260" y="560" width="1560" height="1040" preserveAspectRatio="xMidYMid slice" mask="url(#m1)"/></svg>''')
+<image href="../conf.jpg" x="-250" y="300" width="1560" height="1040" preserveAspectRatio="xMidYMid slice" mask="url(#m1)"/></svg>''')
 els.append(f'''<div class="a" style="left:72px;top:200px;z-index:5"><div class="kick">Для тех, кто ищет своих</div>
 <div class="h" style="font-size:86px;margin-top:24px">Переехал в Тбилиси,<br>а своих людей<br><em>пока нет?</em></div></div>''')
 els.append(f'<div class="a" style="left:110px;top:1120px;z-index:6"><span class="pillw" style="font-size:24px;padding:14px 24px"><i></i>Знакомо. Расскажем, где их искать</span></div>')
@@ -54,7 +54,7 @@ els.append(f'<div class="a cnt" style="left:{x + 160}px;top:1080px;font-size:22p
 
 # ---------- 3. 68 сообществ (фото через границу 3|4) ----------
 x = 2 * S
-els.append(f'<div class="ph" style="left:{x + 470}px;top:180px;width:538px;height:400px;background-image:url(../group_duo.jpg);background-position:50% 40%;z-index:1"></div>')
+els.append(f'<div class="ph" style="left:{x + 470}px;top:180px;width:538px;height:400px;background-image:url(../studio_duo.jpg);background-position:50% 50%;z-index:1"></div>')
 els.append(f'''<div class="a" style="left:{x + 60}px;top:200px;z-index:5"><div class="h" style="font-size:300px;color:{P};letter-spacing:-.06em;line-height:.85">68</div></div>''')
 els.append(f'''<div class="a" style="left:{x + 72}px;top:720px;z-index:5"><div class="kick">Что мы сделали</div>
 <div class="h" style="font-size:66px;margin-top:22px">сообществ Тбилиси —<br><em>в одном месте</em></div></div>''')
@@ -85,7 +85,7 @@ x = 5 * S
 els.append(f'''<div class="a" style="left:{x + 72}px;top:200px;z-index:5"><div class="kick">Афиша недели</div>
 <div class="h" style="font-size:72px;margin-top:22px">Все встречи —<br><em>в одной афише</em></div></div>''')
 els.append(f'''<div class="a glass" style="left:{x + 120}px;top:500px;width:840px;z-index:5;overflow:hidden;transform:rotate(-3deg);box-shadow:0 40px 90px rgba(0,0,0,.55)">
-<div style="height:300px;background:url(../stage.jpg) 50% 32%/cover;filter:saturate(.9)"></div>
+<div style="height:300px;background:url(../outdoor.jpg) -616px -246px/1760px auto"></div>
 <div style="padding:34px 40px 40px"><div class="kick" style="color:rgba(255,255,255,.55)">Пт · 27 ноября · 19:00</div>
 <div style="font-size:54px;font-weight:700;letter-spacing:-.03em;margin:14px 0 8px">Сила сообществ</div>
 <div style="font-size:26px;color:rgba(255,255,255,.6);margin-bottom:28px">Ginger Hotel · вход свободный</div>
