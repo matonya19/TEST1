@@ -40,26 +40,41 @@ h2{font-weight:800;letter-spacing:-.035em;line-height:1}
 .pill{display:inline-block;background:#A874FF;color:#0B0812;font-weight:800;border-radius:50px;padding:16px 30px;font-size:28px}
 .person{position:absolute}
 .person img{height:100%;display:block}
+
+/* ---- инверсия для карусели лидеров ---- */
+body.inv{background:#9466FF;color:#120A22}
+.inv .p{color:#fff}
+.inv .giant{color:#120A22}
+.inv .lead{color:rgba(18,10,34,.86)}
+.inv .muted,.inv .num,.inv .swipe,.inv .foot{color:rgba(18,10,34,.62)}
+.inv .top svg path{fill:#120A22}
+.inv .ph{filter:grayscale(1) contrast(1.15) brightness(.9);mix-blend-mode:multiply;opacity:.75}
+.inv .shade{background:linear-gradient(180deg,rgba(148,102,255,.45),rgba(148,102,255,.2) 18%,rgba(148,102,255,.97) 40%)}
+.inv .step b{background:#120A22;color:#fff}
+.inv .step div{color:#120A22}
+.inv .chat{background:#120A22;border-color:#120A22;color:#fff}
+.inv .me{background:#9466FF;color:#120A22}
+.inv .pill{background:#120A22;color:#fff}
 """
 
 
-def page(body, n, total=7, swipe=True, foot=""):
+def page(body, n, total=7, swipe=True, foot="", inv=False):
     sw = '<div class="swipe">листай →</div>' if swipe else ""
     ft = f'<div class="foot">{foot}</div>' if foot else ""
-    return (f'<!doctype html><html><head><meta charset="utf-8"><style>{CSS}</style></head><body>{body}'
+    return (f'<!doctype html><html><head><meta charset="utf-8"><style>{CSS}</style></head><body{" class=inv" if inv else ""}>{body}'
             f'<div class="top"><div>{LOGO}</div><div class="num">{n:02d} / {total:02d}</div></div>{sw}{ft}</body></html>')
 
 
-def dots():
+def dots(c="#A874FF", line="#C9A8FF", lone="#5B556B"):
     """Одна точка в стороне и связанная группа — образ «один / вместе»."""
     pts = [(700, 240, 34), (840, 170, 22), (900, 320, 40), (770, 390, 28), (640, 360, 20), (860, 470, 24), (960, 450, 16), (720, 500, 14)]
     edges = [(0, 1), (1, 2), (0, 3), (2, 3), (3, 4), (0, 4), (3, 5), (2, 6), (5, 6), (4, 7), (5, 7)]
     s = '<svg class="abs" style="left:0;top:180px" width="1080" height="620">'
-    s += '<circle cx="220" cy="430" r="20" fill="#5B556B"/><circle cx="220" cy="430" r="52" fill="none" stroke="#5B556B" stroke-width="2" stroke-dasharray="3 10"/>'
+    s += f'<circle cx="220" cy="430" r="20" fill="{lone}"/><circle cx="220" cy="430" r="52" fill="none" stroke="{lone}" stroke-width="2" stroke-dasharray="3 10"/>'
     for i, j in edges:
-        s += f'<line x1="{pts[i][0]}" y1="{pts[i][1]}" x2="{pts[j][0]}" y2="{pts[j][1]}" stroke="#C9A8FF" stroke-width="2" opacity=".45"/>'
+        s += f'<line x1="{pts[i][0]}" y1="{pts[i][1]}" x2="{pts[j][0]}" y2="{pts[j][1]}" stroke="{line}" stroke-width="2" opacity=".45"/>'
     for x, y, r in pts:
-        s += f'<circle cx="{x}" cy="{y}" r="{r * 1.7:.0f}" fill="#A874FF" opacity=".15"/><circle cx="{x}" cy="{y}" r="{r}" fill="#A874FF"/>'
+        s += f'<circle cx="{x}" cy="{y}" r="{r * 1.7:.0f}" fill="{c}" opacity=".15"/><circle cx="{x}" cy="{y}" r="{r}" fill="{c}"/>'
     return s + '</svg>'
 
 
@@ -117,34 +132,34 @@ B = [
     page('''<div class="ph"></div><div class="shade"></div>
 <div class="giant" style="left:-40px;top:110px;font-size:560px;opacity:.9">С</div>
 <h1 class="abs" style="left:72px;right:60px;top:600px;font-size:110px">Ведёшь<br>сообщество<br>в Тбилиси?</h1>
-<h2 class="abs p" style="left:72px;top:1000px;font-size:62px">Тебя уже ищут. Правда</h2>''', 1),
-    page(f'''{dots()}
+<h2 class="abs p" style="left:72px;top:1000px;font-size:62px">Тебя уже ищут. Правда</h2>''', 1, inv=True),
+    page(f'''{dots('#120A22', '#120A22', '#F3ECFF')}
 <h1 class="abs" style="left:72px;right:72px;top:700px;font-size:72px">В Тбилиси всё время<br>приезжают люди,<br><span class="p">которым нужны<br>именно вы.</span></h1>
-<div class="abs lead" style="left:72px;right:110px;top:1060px">Но ваш чат закрытый, а в поиске его не найти. Давай это исправим.</div>''', 2),
+<div class="abs lead" style="left:72px;right:110px;top:1060px">Но ваш чат закрытый, а в поиске его не найти. Давай это исправим.</div>''', 2, inv=True),
     page('''<h2 class="abs muted" style="left:72px;top:220px;font-size:48px">Своя страница<br>в каталоге Тбилиси —</h2>
 <div class="giant" style="left:60px;top:450px;font-size:182px;line-height:.9">бесплатно</div>
-<div class="abs lead" style="left:72px;right:110px;top:860px">Рассказываешь, кто вы и чем живёте. А новенькие в городе находят вас сами — по интересам.</div>''', 3),
+<div class="abs lead" style="left:72px;right:110px;top:860px">Рассказываешь, кто вы и чем живёте. А новенькие в городе находят вас сами — по интересам.</div>''', 3, inv=True),
     page('''<h1 class="abs" style="left:72px;top:190px;font-size:84px">Твои встречи —<br><span class="p">в афише города</span></h1>
 <div class="abs" style="left:72px;right:72px;top:500px">
 <div class="step"><b>1</b><div>Сам добавляешь встречу в кабинете сообщества</div></div>
 <div class="step"><b>2</b><div>Люди записываются через Telegram — без таблиц и личных сообщений</div></div>
 <div class="step"><b>3</b><div>Бот сам напомнит им о встрече. Тебе ничего не нужно делать</div></div></div>
-<div class="abs muted" style="left:72px;top:1130px;font-size:28px;font-weight:600">Меньше рутины — больше времени на своих</div>''', 4),
+<div class="abs muted" style="left:72px;top:1130px;font-size:28px;font-weight:600">Меньше рутины — больше времени на своих</div>''', 4, inv=True),
     page('''<h1 class="abs" style="left:72px;top:190px;font-size:84px">Кстати, вы уже<br><span class="p">можете быть у нас</span></h1>
 <div class="abs chat" style="left:72px;right:72px;top:500px">
 <div class="msg me">t.me/твой_чат</div>
 <div class="msg bot">Это сообщество уже есть в каталоге. Сделать страницу вашей?</div>
 <div class="msg bot">Нет страницы? Поможем завести — около 3 минут.</div></div>
-<div class="abs lead" style="left:72px;right:110px;top:1050px">Просто пришли боту ссылку на свой чат или канал — он всё подскажет.</div>''', 5),
+<div class="abs lead" style="left:72px;right:110px;top:1050px">Просто пришли боту ссылку на свой чат или канал — он всё подскажет.</div>''', 5, inv=True),
     page(f'''{heroes()}
-<div class="abs" style="left:0;right:0;top:700px;bottom:0;background:linear-gradient(180deg,rgba(11,8,18,0),#0B0812 140px)"></div>
+<div class="abs" style="left:0;right:0;top:700px;bottom:0;background:linear-gradient(180deg,rgba(148,102,255,0),#9466FF 140px)"></div>
 <h1 class="abs" style="left:72px;right:72px;top:760px;font-size:80px">Расскажи о своих<br><span class="p">со сцены</span></h1>
 <div class="abs lead" style="left:72px;right:90px;top:960px;font-size:30px">На вечере «Сила сообществ» лидеры рассказывают, зачем создали своё сообщество и как в него попасть. На пилоте выступили 12 сообществ и пришли около 50 гостей.</div>
-<div class="abs" style="left:72px;top:1170px;font-size:26px;font-weight:700">27 ноября · Ginger Hotel · ведут Полина (TEXTURA) и Максим (Co.Space)</div>''', 6),
+<div class="abs" style="left:72px;top:1170px;font-size:26px;font-weight:700">27 ноября · Ginger Hotel · ведут Полина (TEXTURA) и Максим (Co.Space)</div>''', 6, inv=True),
     page('''<div class="ph"></div><div class="shade"></div>
 <h1 class="abs" style="left:72px;right:72px;top:520px;font-size:112px">Сообщество<br>сильнее<br><span class="p">одиночества</span></h1>
 <div class="abs" style="left:72px;top:960px"><span class="pill" style="font-size:32px;padding:20px 36px">Добавить сообщество — ссылка в профиле</span></div>
-<div class="abs lead" style="left:72px;right:90px;top:1090px;font-size:30px">Бесплатно, около 3 минут. Знаешь лидера сообщества? Перешли ему</div>''', 7, swipe=False, foot="@co.tbilisi"),
+<div class="abs lead" style="left:72px;right:90px;top:1090px;font-size:30px">Бесплатно, около 3 минут. Знаешь лидера сообщества? Перешли ему</div>''', 7, swipe=False, foot="@co.tbilisi", inv=True),
 ]
 
 for tag, slides in (("A", A), ("B", B)):
