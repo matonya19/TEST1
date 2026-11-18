@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Карусель — саммит</title>
+<style>
+  :root{
+    --cream:#F5EDE1; --sand:#DCC7AA; --caramel:#B07A4F; --choc:#4A2E22;
+    --terra:#9C5236; --milk:#F6E6C6; --dark:#3B2418;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#222;font-family:"Inter Display","Inter",sans-serif;display:flex;flex-direction:column;align-items:center;gap:40px;padding:40px 0}
+  .slide{width:1500px;height:2000px;position:relative;overflow:hidden;flex:none;background:var(--cream);color:var(--choc)}
+  .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .abs{position:absolute}
+  .h{font-weight:700;letter-spacing:-0.055em;line-height:.98}
+  .t{font-weight:300;letter-spacing:-0.04em;line-height:1.15}
+  .b{font-weight:700}
+  /* служебная строка сверху: метка + счётчик */
+  .meta{position:absolute;left:110px;right:110px;top:90px;display:flex;justify-content:space-between;
+        font-size:34px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--caramel)}
+  .rule{position:absolute;left:110px;right:110px;top:160px;height:2px;background:currentColor;opacity:.25}
+  .sp{position:absolute;left:110px;top:230px;width:1280px;height:1080px;object-fit:cover;filter:grayscale(1) sepia(.35) contrast(1.05)}
+  .name{position:absolute;left:110px;top:1380px;font-size:120px}
+  .role{position:absolute;left:110px;top:1530px;font-size:36px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--caramel)}
+  .desc{position:absolute;left:110px;right:110px;top:1610px;font-size:50px}
+</style>
+</head>
+<body>
+
+<!-- 1. Обложка -->
+<section class="slide" id="s1">
+  <img class="bg" src="photos/dubai.jpg" style="object-position:50% 40%">
+  <div class="abs" style="inset:0;background:linear-gradient(180deg,rgba(245,237,225,.92) 0%,rgba(245,237,225,.6) 22%,rgba(245,237,225,0) 38%,rgba(59,36,24,0) 70%,rgba(59,36,24,.9) 100%)"></div>
+  <div class="meta"><span>Megacampus Summit</span><span>Dubai</span></div>
+  <div class="abs h" style="left:110px;top:220px;font-size:136px">почему<br>собственники школы<br>летят учиться</div>
+  <div class="abs t" style="left:110px;bottom:120px;font-size:46px;color:var(--milk)">20–21 ноября · Coca-Cola Arena</div>
+</section>
+
+<!-- 2. Куда едем -->
+<section class="slide" id="s2">
+  <div class="meta"><span>в эти выходные</span><span>02</span></div><div class="rule" style="color:var(--caramel)"></div>
+  <div class="abs t" style="left:110px;top:240px;width:1280px;font-size:66px">мы с Женей едем в Дубай на <span class="b">Megacampus Summit</span> — один из крупнейших в мире образовательных форумов для предпринимателей и руководителей</div>
+  <img class="abs" src="photos/plane.jpg" style="left:110px;top:760px;width:1280px;height:1120px;object-fit:cover;object-position:50% 40%">
+</section>
+
+<!-- 3. Главный ответ -->
+<section class="slide" id="s3" style="background:var(--choc);color:var(--sand)">
+  <div class="meta" style="color:var(--caramel)"><span>нас часто спрашивают: зачем?</span><span>03</span></div><div class="rule" style="color:var(--caramel)"></div>
+  <div class="abs t" style="left:110px;top:240px;font-size:56px;color:var(--sand)">школа работает,<br>команда сильная,<br>дети учатся</div>
+  <div class="abs t" style="left:110px;top:900px;font-size:44px;color:var(--caramel)">ответ простой</div>
+  <div class="abs h" style="left:110px;top:980px;width:1300px;font-size:128px;color:var(--milk)">школа не может расти быстрее, чем растут её руководители</div>
+</section>
+
+<!-- 4. Честность -->
+<section class="slide" id="s4" style="background:var(--sand)">
+  <div class="meta" style="color:var(--terra)"><span>про честность</span><span>04</span></div><div class="rule" style="color:var(--terra)"></div>
+  <div class="abs t" style="left:110px;top:240px;width:1100px;font-size:60px">мы каждый день просим детей учиться, пробовать новое, не бояться сложного</div>
+  <div class="abs h" style="left:110px;top:1000px;width:1300px;font-size:116px;color:var(--dark)">было бы нечестно требовать этого от них — и при этом самим стоять на месте</div>
+</section>
+
+<!-- 5–9. Спикеры -->
+<section class="slide" id="s5">
+  <div class="meta"><span>кого мы едем слушать</span><span>1 / 5</span></div>
+  <img class="sp" src="photos/cameron.jpg" style="object-position:50% 25%">
+  <div class="name h">Джеймс Кэмерон</div>
+  <div class="role">режиссёр «Титаника» и «Аватара»</div>
+  <div class="desc t">о том, как воображение превращается в реальные проекты. «Титаник» и «Аватар» когда-то тоже были просто идеей, в которую никто, кроме автора, не верил</div>
+</section>
+
+<section class="slide" id="s6">
+  <div class="meta"><span>кого мы едем слушать</span><span>2 / 5</span></div>
+  <img class="sp" src="photos/ulrich.jpg" style="object-position:50% 25%">
+  <div class="name h">Дэйв Ульрих</div>
+  <div class="role">эксперт по лидерству и развитию талантов</div>
+  <div class="desc t">для нас это ключевая тема: сильная школа — это прежде всего сильная команда педагогов и кураторов</div>
+</section>
+
+<section class="slide" id="s7">
+  <div class="meta"><span>кого мы едем слушать</span><span>3 / 5</span></div>
+  <img class="sp" src="photos/hof.jpg" style="object-position:50% 25%">
+  <div class="name h">Вим Хоф</div>
+  <div class="role">тело, стресс, состояние</div>
+  <div class="desc t">о том, как управлять своим телом, стрессом и состоянием. это то, чему нам важно учить и детей</div>
+</section>
+
+<section class="slide" id="s8">
+  <div class="meta"><span>кого мы едем слушать</span><span>4 / 5</span></div>
+  <img class="sp" src="photos/sharot.jpg" style="object-position:50% 25%">
+  <div class="name h">Тали Шарот</div>
+  <div class="role">нейробиолог</div>
+  <div class="desc t">изучает, как мозг принимает решения и что на самом деле мотивирует человека меняться</div>
+</section>
+
+<section class="slide" id="s9">
+  <div class="meta"><span>кого мы едем слушать</span><span>5 / 5</span></div>
+  <img class="sp" src="photos/greene.jpg" style="object-position:50% 25%">
+  <div class="name h">Роберт Грин</div>
+  <div class="role">автор книг о стратегии</div>
+  <div class="desc t">о стратегии и о том, как думать на несколько шагов вперёд</div>
+</section>
+
+<!-- 10. Что получат ученики -->
+<section class="slide" id="s10" style="background:var(--terra);color:var(--milk)">
+  <div class="meta" style="color:var(--sand)"><span>что из этого получат наши ученики?</span><span>10</span></div><div class="rule" style="color:var(--sand)"></div>
+  <div class="abs t" style="left:110px;top:240px;width:1200px;font-size:60px">мир меняется так быстро, что знания, полученные пять лет назад, уже не работают</div>
+  <div class="abs h" style="left:110px;top:960px;width:1300px;font-size:104px">чтобы готовить детей к поступлению в лучшие университеты мира, мы сами должны понимать, куда движется этот мир</div>
+</section>
+
+<!-- 11. Финал -->
+<section class="slide" id="s11">
+  <div class="meta"><span>что мы привезём</span><span>11</span></div><div class="rule" style="color:var(--caramel)"></div>
+  <div class="abs t" style="left:110px;top:240px;width:1280px;font-size:58px">всё, что мы привезём, превратится в конкретные решения:</div>
+  <div class="abs t" style="left:110px;top:470px;font-size:58px;line-height:1.5">
+    <div>— как мы обучаем кураторов</div>
+    <div>— как мотивируем учеников</div>
+    <div>— как выстраиваем команду</div>
+  </div>
+  <div class="abs h" style="left:110px;top:1000px;width:1280px;font-size:104px">сильная команда взрослых — это всегда лучший результат для детей</div>
+  <div class="abs" style="left:110px;right:110px;top:1700px;height:2px;background:var(--caramel);opacity:.4"></div>
+  <div class="abs t" style="left:110px;top:1760px;font-size:52px;color:var(--caramel)">расскажем, что узнали. <span class="b">следите за новостями</span></div>
+</section>
+
+</body>
+</html>
