@@ -86,13 +86,13 @@ for gx, gy, gr in [(800, 200, 700), (2600, 1100, 800), (4700, 300, 700), (6900, 
 els.append(line())
 
 # ---------- 1. Обложка ----------
-els.append(blob([(72, 210, 600, 560), (560, 560, 450, 620)]))
+els.append(blob([(72, 210, 600, 560), (560, 560, 400, 620)]))
 els.append(f'''<div class="a" style="left:120px;top:262px;width:500px;z-index:5;color:{INK}">
 <div class="kick" style="color:{INK};opacity:.7">Для лидеров сообществ</div>
 <div class="h" style="font-size:70px;margin-top:22px">Ведёшь<br>сообщество<br>в Тбилиси?</div>
 <div style="font-size:28px;line-height:1.35;margin-top:26px;font-weight:500">Тебя уже ищут. Покажем,<br>как сделать, чтобы нашли.</div></div>''')
-els.append('<div class="cut" style="left:455px;top:430px;width:625px;height:760px;overflow:hidden;z-index:4;'
-           '-webkit-mask-image:linear-gradient(180deg,#000 76%,transparent 97%)"><img src="../max_stage_cut.png" style="height:1560px"></div>')
+els.append('<div class="cut" style="left:545px;top:430px;width:535px;height:750px;overflow:hidden;z-index:4;'
+           'clip-path:path(\'M80,0 H535 V686 A64,64 0 0 1 471,750 H80 Z\')"><img src="../max_stage_cut.png" style="height:1560px"></div>')
 els.append(f'<div class="a" style="left:110px;top:1080px;z-index:6"><span class="pillw" style="font-size:22px;padding:12px 22px"><i></i>Максим · Co.Space</span></div>')
 
 # ---------- 2. Проблема ----------
