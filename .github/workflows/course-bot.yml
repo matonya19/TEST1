@@ -1,0 +1,73 @@
+name: Course bot
+
+# Публикует посты курса и напоминания в ветку Telegram-группы.
+# Расписание и тексты — в course-bot/course.yaml.
+on:
+  schedule:
+    # Каждые 15 минут. GitHub иногда запускает с опозданием на 5–20 минут.
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "Что сделать"
+        type: choice
+        default: preview
+        options:
+          - preview   # показать расписание
+          - discover  # найти ID группы, ветки и file_id видео
+          - test      # проверочное сообщение в ветку (или пост дня в тестовый чат)
+          - run       # отправить всё, что пора, прямо сейчас
+      day:
+        description: "Для test: номер дня, чтобы прислать его пост в тестовый чат (пусто — просто проверка связи)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write  # чтобы запомнить, что уже отправлено (course-bot/data/sent.json)
+
+concurrency:
+  group: course-bot
+  cancel-in-progress: false
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: course-bot
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: course-bot/requirements.txt
+
+      - run: pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          COURSE_BOT_TOKEN: ${{ secrets.COURSE_BOT_TOKEN || secrets.TELEGRAM_BOT_TOKEN }}
+          COURSE_CHAT_ID: ${{ vars.COURSE_CHAT_ID }}
+          COURSE_THREAD_ID: ${{ vars.COURSE_THREAD_ID }}
+          COURSE_TEST_CHAT_ID: ${{ vars.COURSE_TEST_CHAT_ID }}
+          COMMAND: ${{ inputs.command || 'run' }}
+          DAY: ${{ inputs.day }}
+        run: |
+          set +e
+          python course_bot.py "$COMMAND" "$DAY" > /tmp/out.txt 2>&1; code=$?
+          cat /tmp/out.txt
+          { echo '```'; cat /tmp/out.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $code
+
+      - name: Remember what was sent
+        if: always() && (inputs.command || 'run') == 'run'
+        run: |
+          git config user.name "course-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/sent.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Course bot: sent log [skip ci]"
+          for i in 1 2 3 4; do git pull --rebase -q && git push -q && exit 0; sleep $((i * 5)); done
+          exit 1
