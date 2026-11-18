@@ -76,14 +76,14 @@ A = [
 <h2 class="abs" style="left:72px;top:600px;font-size:64px">сообществ Тбилиси<br>собрали в одном месте</h2>
 <div class="abs lead" style="left:72px;right:110px;top:860px">Мы сделали <b style="color:#fff">Co.Space</b> — каталог сообществ и афишу их встреч. Чтобы не искать по сотне чатов, а сразу видеть, кто чем живёт.</div>''', 3),
     page('''<h1 class="abs" style="left:72px;top:170px;font-size:88px">Тут есть<br><span class="p">свои для всех</span></h1>
-<div class="abs" style="left:72px;right:30px;top:420px">
+<div class="abs" style="left:72px;right:30px;top:390px">
 <span class="chip"><i></i>Предприниматели</span><span class="chip"><i></i>IT</span>
 <span class="chip"><i></i>Женские сообщества</span><span class="chip"><i></i>Спорт и бег</span>
 <span class="chip"><i></i>Проявленность и личный бренд</span><span class="chip"><i></i>Саморазвитие</span><span class="chip"><i></i>Книжные клубы</span>
 <span class="chip"><i></i>Творчество</span><span class="chip"><i></i>Нетворкинг</span>
 <span class="chip"><i></i>Кино</span><span class="chip"><i></i>Шахматы</span><span class="chip"><i></i>Языковые клубы</span><span class="chip"><i></i>Родители</span>
 <span class="chip" style="border-style:dashed;background:none">и ещё много</span></div>
-<div class="abs lead" style="left:72px;right:120px;top:1110px;font-size:30px">Выбирай по душе — от бизнес-клуба до пробежки по выходным.</div>''', 4),
+<div class="abs lead" style="left:72px;right:120px;top:1150px;font-size:30px">Выбирай по душе — от бизнес-клуба до пробежки по выходным.</div>''', 4),
     page('''<h1 class="abs" style="left:72px;top:190px;font-size:88px">Как это<br><span class="p">работает</span></h1>
 <div class="abs" style="left:72px;right:72px;top:480px">
 <div class="step"><b>1</b><div>Заходишь на Co.Space и выбираешь сообщество</div></div>
