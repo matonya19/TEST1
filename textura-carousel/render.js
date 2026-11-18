@@ -7,12 +7,12 @@ const path = require('path');
   const scale = Number(process.argv[2] || 1);
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1080, height: 1440 }, deviceScaleFactor: scale });
-  await page.goto('file://' + path.join(__dirname, 'carousel.html'));
+  await page.goto('file://' + path.join(__dirname, process.argv[3]||'carousel.html'));
   await page.evaluate(() => document.fonts.ready);
   await page.waitForLoadState('networkidle');
   const slides = await page.$$('section.slide');
   for (let i = 0; i < slides.length; i++) {
-    const out = path.join(__dirname, 'out', `slide-${String(i + 1).padStart(2, '0')}.png`);
+    const out = path.join(__dirname, 'out', `${process.argv[4]||'slide'}-${String(i + 1).padStart(2, '0')}.png`);
     await slides[i].screenshot({ path: out });
     console.log(out);
   }
