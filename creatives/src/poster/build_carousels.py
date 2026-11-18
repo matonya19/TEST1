@@ -26,7 +26,7 @@ h2{font-weight:800;letter-spacing:-.035em;line-height:1}
 .p{color:#A874FF}
 .lead{font-size:34px;line-height:1.3;font-weight:500;color:rgba(255,255,255,.88)}
 .muted{color:rgba(255,255,255,.6)}
-.chip{display:inline-flex;align-items:center;gap:14px;border:2px solid rgba(168,116,255,.6);background:rgba(168,116,255,.12);border-radius:60px;padding:20px 34px;font-size:44px;font-weight:700;margin:0 16px 20px 0}
+.chip{display:inline-flex;align-items:center;gap:12px;border:2px solid rgba(168,116,255,.6);background:rgba(168,116,255,.12);border-radius:60px;padding:16px 28px;font-size:36px;font-weight:700;margin:0 14px 18px 0}
 .chip i{width:18px;height:18px;border-radius:50%;background:#A874FF;display:block}
 .step{display:flex;gap:28px;align-items:flex-start;margin-bottom:34px}
 .step b{flex:none;width:72px;height:72px;border-radius:50%;background:#A874FF;color:#0B0812;font-size:36px;font-weight:900;display:flex;align-items:center;justify-content:center}
@@ -67,36 +67,40 @@ def dots():
 A = [
     page('''<div class="ph"></div><div class="shade"></div>
 <div class="giant" style="right:-60px;top:120px;font-size:620px;opacity:.9">?</div>
-<h1 class="abs" style="left:72px;right:72px;top:640px;font-size:112px">Переехали<br>в Тбилиси<br>и ещё не нашли<br><span class="p">своих?</span></h1>
-<div class="abs lead" style="left:72px;top:1150px;font-size:30px">Co.Space · сообщества и встречи Тбилиси</div>''', 1),
+<h1 class="abs" style="left:72px;right:72px;top:640px;font-size:108px">Переехал<br>в Тбилиси,<br>а своих людей<br><span class="p">пока нет?</span></h1>
+<div class="abs lead" style="left:72px;top:1150px;font-size:30px">Знакомо. Давай расскажем, где их искать →</div>''', 1),
     page(f'''{dots()}
-<h1 class="abs" style="left:72px;right:72px;top:820px;font-size:76px">В новом городе<br>есть всё.<br><span class="p">Кроме своих людей.</span></h1>
-<div class="abs lead" style="left:72px;right:140px;top:1080px">ИИ ускоряет всё — а найти своих<br>всё сложнее.</div>''', 2),
+<h1 class="abs" style="left:72px;right:72px;top:740px;font-size:76px">Квартиру нашёл,<br>кофейню любимую тоже.<br><span class="p">А поговорить не с кем.</span></h1>
+<div class="abs lead" style="left:72px;right:120px;top:1060px">Это нормально. В новом городе люди есть везде — просто непонятно, где <i>твои</i>.</div>''', 2),
     page('''<div class="giant" style="left:56px;top:150px;font-size:520px">68</div>
-<h2 class="abs" style="left:72px;top:600px;font-size:64px">сообществ Тбилиси<br>уже на сайте</h2>
-<div class="abs lead" style="left:72px;right:120px;top:860px"><b style="color:#fff">Co.Space</b> — каталог сообществ Тбилиси и афиша их встреч. Для тех, кто переехал и ищет своих.</div>''', 3),
-    page('''<h1 class="abs" style="left:72px;top:190px;font-size:96px">Найди<br><span class="p">своё</span></h1>
-<div class="abs" style="left:72px;right:40px;top:470px">
-<span class="chip"><i></i>Бег</span><span class="chip"><i></i>Книги</span><span class="chip"><i></i>IT</span>
-<span class="chip"><i></i>Шахматы</span><span class="chip"><i></i>Кино</span><span class="chip" style="border-style:dashed;background:none">и другие</span></div>
-<div class="abs lead" style="left:72px;right:120px;top:1000px">Выбирай по интересам — и сразу видно, как вступить.</div>''', 4),
+<h2 class="abs" style="left:72px;top:600px;font-size:64px">сообществ Тбилиси<br>собрали в одном месте</h2>
+<div class="abs lead" style="left:72px;right:110px;top:860px">Мы сделали <b style="color:#fff">Co.Space</b> — каталог сообществ и афишу их встреч. Чтобы не искать по сотне чатов, а сразу видеть, кто чем живёт.</div>''', 3),
+    page('''<h1 class="abs" style="left:72px;top:170px;font-size:88px">Тут есть<br><span class="p">свои для всех</span></h1>
+<div class="abs" style="left:72px;right:30px;top:420px">
+<span class="chip"><i></i>Предприниматели</span><span class="chip"><i></i>IT</span>
+<span class="chip"><i></i>Женские сообщества</span><span class="chip"><i></i>Спорт и бег</span>
+<span class="chip"><i></i>Проявленность и личный бренд</span><span class="chip"><i></i>Саморазвитие</span><span class="chip"><i></i>Книжные клубы</span>
+<span class="chip"><i></i>Творчество</span><span class="chip"><i></i>Нетворкинг</span>
+<span class="chip"><i></i>Кино</span><span class="chip"><i></i>Шахматы</span><span class="chip"><i></i>Языковые клубы</span><span class="chip"><i></i>Родители</span>
+<span class="chip" style="border-style:dashed;background:none">и ещё много</span></div>
+<div class="abs lead" style="left:72px;right:120px;top:1110px;font-size:30px">Выбирай по душе — от бизнес-клуба до пробежки по выходным.</div>''', 4),
     page('''<h1 class="abs" style="left:72px;top:190px;font-size:88px">Как это<br><span class="p">работает</span></h1>
 <div class="abs" style="left:72px;right:72px;top:480px">
-<div class="step"><b>1</b><div>Находишь сообщество на сайте Co.Space</div></div>
-<div class="step"><b>2</b><div>Жмёшь «Вступить» — бот в Telegram показывает, как попасть в сообщество</div></div>
-<div class="step"><b>3</b><div>Записываешься на встречу в пару нажатий — бот напомнит</div></div></div>
-<div class="abs muted" style="left:72px;top:1130px;font-size:28px;font-weight:600">Пару минут — и ты среди своих</div>''', 5),
-    page('''<h1 class="abs" style="left:72px;top:190px;font-size:88px">Встречи недели —<br><span class="p">в одной афише</span></h1>
+<div class="step"><b>1</b><div>Заходишь на Co.Space и выбираешь сообщество</div></div>
+<div class="step"><b>2</b><div>Жмёшь «Вступить» — бот в Telegram подскажет, как попасть внутрь</div></div>
+<div class="step"><b>3</b><div>Записываешься на встречу в пару нажатий. Бот напомнит, чтобы не забыл</div></div></div>
+<div class="abs muted" style="left:72px;top:1130px;font-size:28px;font-weight:600">Пара минут — и ты уже не один</div>''', 5),
+    page('''<h1 class="abs" style="left:72px;top:190px;font-size:84px">Все встречи недели —<br><span class="p">в одной афише</span></h1>
 <div class="abs card" style="left:72px;right:72px;top:500px">
 <div class="muted" style="font-size:24px;font-weight:700;letter-spacing:.1em">ПТ · 27 НОЯБРЯ · 19:00</div>
 <div style="font-size:56px;font-weight:800;letter-spacing:-.03em;margin:14px 0 10px">Сила сообществ</div>
 <div class="muted" style="font-size:28px;margin-bottom:28px">Ginger Hotel · вход свободный</div>
 <span class="pill">Регистрация</span></div>
-<div class="abs lead" style="left:72px;right:120px;top:1000px">Смотришь, что будет на этой неделе, записываешься — бот напомнит перед встречей.</div>''', 6),
+<div class="abs lead" style="left:72px;right:110px;top:1000px">Заглядывай в начале недели: что интересного, куда сходить. Например, на наш вечер 27 ноября — там будут сообщества со всего города.</div>''', 6),
     page('''<div class="ph"></div><div class="shade"></div>
 <h1 class="abs" style="left:72px;right:72px;top:560px;font-size:118px">Найди своих —<br><span class="p">найдёшь своё</span></h1>
 <div class="abs" style="left:72px;top:900px"><span class="pill" style="font-size:32px;padding:20px 36px">Сообщества Тбилиси — ссылка в профиле</span></div>
-<div class="abs lead" style="left:72px;top:1040px;font-size:30px">27 ноября — вечер «Сила сообществ» в Ginger Hotel</div>''', 7, swipe=False, foot="@co.tbilisi"),
+<div class="abs lead" style="left:72px;top:1040px;font-size:30px">Сохрани, чтобы не потерять. И отправь тому, кто тоже недавно переехал</div>''', 7, swipe=False, foot="@co.tbilisi"),
 ]
 
 
