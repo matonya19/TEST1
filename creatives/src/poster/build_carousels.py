@@ -41,7 +41,22 @@ h2{font-weight:800;letter-spacing:-.035em;line-height:1}
 .person{position:absolute}
 .person img{height:100%;display:block}
 
-/* ---- инверсия для карусели лидеров ---- */
+/* ---- карусель лидеров: тот же фон/шрифт/цвета, другая графика ---- */
+.eyebrow{position:absolute;left:72px;top:170px;display:flex;align-items:center;gap:14px;font-size:22px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.7)}
+.eyebrow i{width:14px;height:14px;border-radius:50%;background:#A874FF;display:block}
+.bar{position:absolute;left:72px;width:6px;background:#A874FF;border-radius:3px}
+.outline{position:absolute;font-weight:900;letter-spacing:-.05em;line-height:.8;color:transparent;-webkit-text-stroke:3px #A874FF}
+.frame{position:absolute;border-radius:36px;overflow:hidden;border:1.5px solid rgba(168,116,255,.35)}
+.frame div{position:absolute;inset:0;background-size:cover;filter:grayscale(1) brightness(.75) contrast(1.05)}
+.frame::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(11,8,18,.7));}
+.row{display:flex;align-items:center;gap:30px;border:1.5px solid rgba(168,116,255,.35);border-radius:28px;padding:28px 34px;margin-bottom:22px;background:#140F1E}
+.row b{font-size:64px;font-weight:900;color:transparent;-webkit-text-stroke:2px #A874FF;line-height:1;width:60px}
+.row div{font-size:32px;line-height:1.25;font-weight:600}
+.search{background:#17121F;border:1.5px solid rgba(255,255,255,.1);border-radius:28px;padding:30px 34px}
+.q{display:flex;align-items:center;gap:18px;font-size:32px;font-weight:600;padding-bottom:24px;border-bottom:1.5px solid rgba(255,255,255,.08)}
+.res{font-size:28px;color:rgba(255,255,255,.45);padding-top:24px;line-height:1.5}
+
+/* ---- инверсия (не используется) ---- */
 body.inv{background:#9466FF;color:#120A22}
 .inv .p{color:#fff}
 .inv .giant{color:#120A22}
@@ -128,38 +143,46 @@ def heroes(F=150, fy=520):
     return place((902, 1059, .395, .229, .326), 310, "max_cut.png") + place((933, 1146, .403, .170, .1955), 780, "polina_cut.png")
 
 
+EB = '<div class="eyebrow"><i></i>ДЛЯ ЛИДЕРОВ СООБЩЕСТВ</div>'
 B = [
-    page('''<div class="ph"></div><div class="shade"></div>
-<div class="giant" style="left:-40px;top:110px;font-size:560px;opacity:.9">С</div>
-<h1 class="abs" style="left:72px;right:60px;top:600px;font-size:110px">Ведёшь<br>сообщество<br>в Тбилиси?</h1>
-<h2 class="abs p" style="left:72px;top:1000px;font-size:62px">Тебя уже ищут. Правда</h2>''', 1, inv=True),
-    page(f'''{dots('#120A22', '#120A22', '#F3ECFF')}
-<h1 class="abs" style="left:72px;right:72px;top:700px;font-size:72px">В Тбилиси всё время<br>приезжают люди,<br><span class="p">которым нужны<br>именно вы.</span></h1>
-<div class="abs lead" style="left:72px;right:110px;top:1060px">Но ваш чат закрытый, а в поиске его не найти. Давай это исправим.</div>''', 2, inv=True),
-    page('''<h2 class="abs muted" style="left:72px;top:220px;font-size:48px">Своя страница<br>в каталоге Тбилиси —</h2>
-<div class="giant" style="left:60px;top:450px;font-size:182px;line-height:.9">бесплатно</div>
-<div class="abs lead" style="left:72px;right:110px;top:860px">Рассказываешь, кто вы и чем живёте. А новенькие в городе находят вас сами — по интересам.</div>''', 3, inv=True),
-    page('''<h1 class="abs" style="left:72px;top:190px;font-size:84px">Твои встречи —<br><span class="p">в афише города</span></h1>
-<div class="abs" style="left:72px;right:72px;top:500px">
-<div class="step"><b>1</b><div>Сам добавляешь встречу в кабинете сообщества</div></div>
-<div class="step"><b>2</b><div>Люди записываются через Telegram — без таблиц и личных сообщений</div></div>
-<div class="step"><b>3</b><div>Бот сам напомнит им о встрече. Тебе ничего не нужно делать</div></div></div>
-<div class="abs muted" style="left:72px;top:1130px;font-size:28px;font-weight:600">Меньше рутины — больше времени на своих</div>''', 4, inv=True),
-    page('''<h1 class="abs" style="left:72px;top:190px;font-size:84px">Кстати, вы уже<br><span class="p">можете быть у нас</span></h1>
-<div class="abs chat" style="left:72px;right:72px;top:500px">
+    page(EB + '''<div class="frame" style="left:72px;right:72px;top:240px;height:520px"><div style="background-image:url(../group.src.jpg);background-position:85% 40%"></div></div>
+<div class="bar" style="top:830px;height:300px"></div>
+<h1 class="abs" style="left:110px;right:60px;top:820px;font-size:96px">Ведёшь<br>сообщество<br>в Тбилиси?</h1>
+<h2 class="abs p" style="left:110px;top:1140px;font-size:52px">Тебя уже ищут. Правда</h2>''', 1),
+    page(EB + '''<div class="abs search" style="left:72px;right:72px;top:330px">
+<div class="q"><span style="color:#A874FF">⌕</span>книжный клуб тбилиси</div>
+<div class="res">Ничего не найдено.<br>Чат закрытый — снаружи его не видно.</div></div>
+<div class="bar" style="top:680px;height:300px"></div>
+<h1 class="abs" style="left:110px;right:72px;top:670px;font-size:70px">В Тбилиси всё время<br>приезжают люди,<br><span class="p">которым нужны<br>именно вы.</span></h1>
+<div class="abs lead" style="left:110px;right:90px;top:1050px">Но найти вас пока сложно. Давай это исправим.</div>''', 2),
+    page(EB + '''<h2 class="abs muted" style="left:72px;top:300px;font-size:48px">Своя страница<br>в каталоге Тбилиси —</h2>
+<div class="outline" style="left:66px;top:520px;font-size:184px">бесплатно</div>
+<div class="bar" style="top:860px;height:110px"></div>
+<div class="abs lead" style="left:110px;right:110px;top:852px">Рассказываешь, кто вы и чем живёте. А новенькие в городе находят вас сами — по интересам.</div>''', 3),
+    page(EB + '''<h1 class="abs" style="left:72px;top:250px;font-size:84px">Твои встречи —<br><span class="p">в афише города</span></h1>
+<div class="abs" style="left:72px;right:72px;top:520px">
+<div class="row"><b>1</b><div>Сам добавляешь встречу в кабинете сообщества</div></div>
+<div class="row"><b>2</b><div>Люди записываются через Telegram — без таблиц и личных сообщений</div></div>
+<div class="row"><b>3</b><div>Бот сам напомнит им о встрече. Тебе ничего не нужно делать</div></div></div>
+<div class="abs muted" style="left:72px;top:1150px;font-size:28px;font-weight:600">Меньше рутины — больше времени на своих</div>''', 4),
+    page(EB + '''<h1 class="abs" style="left:72px;top:250px;font-size:84px">Кстати, вы уже<br><span class="p">можете быть у нас</span></h1>
+<div class="abs chat" style="left:72px;right:72px;top:540px">
 <div class="msg me">t.me/твой_чат</div>
 <div class="msg bot">Это сообщество уже есть в каталоге. Сделать страницу вашей?</div>
 <div class="msg bot">Нет страницы? Поможем завести — около 3 минут.</div></div>
-<div class="abs lead" style="left:72px;right:110px;top:1050px">Просто пришли боту ссылку на свой чат или канал — он всё подскажет.</div>''', 5, inv=True),
-    page(f'''{heroes()}
-<div class="abs" style="left:0;right:0;top:700px;bottom:0;background:linear-gradient(180deg,rgba(148,102,255,0),#9466FF 140px)"></div>
-<h1 class="abs" style="left:72px;right:72px;top:760px;font-size:80px">Расскажи о своих<br><span class="p">со сцены</span></h1>
-<div class="abs lead" style="left:72px;right:90px;top:960px;font-size:30px">На вечере «Сила сообществ» лидеры рассказывают, зачем создали своё сообщество и как в него попасть. На пилоте выступили 12 сообществ и пришли около 50 гостей.</div>
-<div class="abs" style="left:72px;top:1170px;font-size:26px;font-weight:700">27 ноября · Ginger Hotel · ведут Полина (TEXTURA) и Максим (Co.Space)</div>''', 6, inv=True),
-    page('''<div class="ph"></div><div class="shade"></div>
-<h1 class="abs" style="left:72px;right:72px;top:520px;font-size:112px">Сообщество<br>сильнее<br><span class="p">одиночества</span></h1>
-<div class="abs" style="left:72px;top:960px"><span class="pill" style="font-size:32px;padding:20px 36px">Добавить сообщество — ссылка в профиле</span></div>
-<div class="abs lead" style="left:72px;right:90px;top:1090px;font-size:30px">Бесплатно, около 3 минут. Знаешь лидера сообщества? Перешли ему</div>''', 7, swipe=False, foot="@co.tbilisi", inv=True),
+<div class="bar" style="top:1060px;height:80px"></div>
+<div class="abs lead" style="left:110px;right:110px;top:1052px">Просто пришли боту ссылку на свой чат или канал — он всё подскажет.</div>''', 5),
+    page(EB + '''<div class="frame" style="left:72px;right:72px;top:240px;height:560px;background:#140F1E"></div>
+<div class="abs" style="left:72px;right:72px;top:240px;height:560px;overflow:hidden;border-radius:36px">''' + heroes(F=165, fy=230).replace('left:', 'left:').replace('../', '../') + '''</div>
+<div class="bar" style="top:860px;height:150px"></div>
+<h1 class="abs" style="left:110px;right:72px;top:850px;font-size:76px">Расскажи о своих<br><span class="p">со сцены</span></h1>
+<div class="abs lead" style="left:72px;right:90px;top:1040px;font-size:28px">На вечере «Сила сообществ» лидеры рассказывают, зачем создали своё сообщество и как в него попасть. На пилоте выступили 12 сообществ и пришли около 50 гостей.</div>
+<div class="abs" style="left:72px;top:1200px;font-size:24px;font-weight:700">27 ноября · Ginger Hotel · ведут Полина и Максим</div>''', 6, swipe=False),
+    page(EB + '''<div class="frame" style="left:72px;right:72px;top:240px;height:400px"><div style="background-image:url(../group.src.jpg);background-position:20% 45%"></div></div>
+<div class="bar" style="top:700px;height:300px"></div>
+<h1 class="abs" style="left:110px;right:72px;top:690px;font-size:100px">Сообщество<br>сильнее<br><span class="p">одиночества</span></h1>
+<div class="abs" style="left:72px;top:1040px"><span class="pill" style="font-size:30px;padding:20px 34px">Добавить сообщество — ссылка в профиле</span></div>
+<div class="abs lead" style="left:72px;right:90px;top:1150px;font-size:28px">Бесплатно, около 3 минут. Знаешь лидера сообщества? Перешли ему</div>''', 7, swipe=False, foot="@co.tbilisi"),
 ]
 
 for tag, slides in (("A", A), ("B", B)):
