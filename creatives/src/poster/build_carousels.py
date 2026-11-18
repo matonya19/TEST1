@@ -117,33 +117,34 @@ B = [
     page('''<div class="ph"></div><div class="shade"></div>
 <div class="giant" style="left:-40px;top:110px;font-size:560px;opacity:.9">С</div>
 <h1 class="abs" style="left:72px;right:60px;top:600px;font-size:110px">Ведёшь<br>сообщество<br>в Тбилиси?</h1>
-<h2 class="abs p" style="left:72px;top:1000px;font-size:66px">Тебя уже ищут</h2>''', 1),
+<h2 class="abs p" style="left:72px;top:1000px;font-size:62px">Тебя уже ищут. Правда</h2>''', 1),
     page(f'''{dots()}
-<h1 class="abs" style="left:72px;right:72px;top:820px;font-size:80px">Люди переезжают<br>и ищут <span class="p">своих</span></h1>
-<div class="abs lead" style="left:72px;right:140px;top:1020px">Помоги им найти твоё сообщество — в каталоге, где его видно.</div>''', 2),
-    page('''<h2 class="abs muted" style="left:72px;top:220px;font-size:48px">Страница сообщества<br>в каталоге Тбилиси</h2>
+<h1 class="abs" style="left:72px;right:72px;top:700px;font-size:72px">В Тбилиси всё время<br>приезжают люди,<br><span class="p">которым нужны<br>именно вы.</span></h1>
+<div class="abs lead" style="left:72px;right:110px;top:1060px">Но ваш чат закрытый, а в поиске его не найти. Давай это исправим.</div>''', 2),
+    page('''<h2 class="abs muted" style="left:72px;top:220px;font-size:48px">Своя страница<br>в каталоге Тбилиси —</h2>
 <div class="giant" style="left:60px;top:450px;font-size:182px;line-height:.9">бесплатно</div>
-<div class="abs lead" style="left:72px;right:120px;top:930px">По ней тебя находят те, кто недавно переехал и ищет своих.</div>''', 3),
-    page('''<h1 class="abs" style="left:72px;top:190px;font-size:88px">Твои встречи —<br><span class="p">в афише города</span></h1>
-<div class="abs" style="left:72px;right:72px;top:520px">
-<div class="step"><b>1</b><div>Добавляешь встречи сам в кабинете сообщества</div></div>
-<div class="step"><b>2</b><div>Люди записываются через Telegram</div></div>
-<div class="step"><b>3</b><div>Бот напоминает им о встрече</div></div></div>''', 4),
-    page('''<h1 class="abs" style="left:72px;top:190px;font-size:84px">Возможно,<br><span class="p">вы уже у нас есть</span></h1>
+<div class="abs lead" style="left:72px;right:110px;top:860px">Рассказываешь, кто вы и чем живёте. А новенькие в городе находят вас сами — по интересам.</div>''', 3),
+    page('''<h1 class="abs" style="left:72px;top:190px;font-size:84px">Твои встречи —<br><span class="p">в афише города</span></h1>
+<div class="abs" style="left:72px;right:72px;top:500px">
+<div class="step"><b>1</b><div>Сам добавляешь встречу в кабинете сообщества</div></div>
+<div class="step"><b>2</b><div>Люди записываются через Telegram — без таблиц и личных сообщений</div></div>
+<div class="step"><b>3</b><div>Бот сам напомнит им о встрече. Тебе ничего не нужно делать</div></div></div>
+<div class="abs muted" style="left:72px;top:1130px;font-size:28px;font-weight:600">Меньше рутины — больше времени на своих</div>''', 4),
+    page('''<h1 class="abs" style="left:72px;top:190px;font-size:84px">Кстати, вы уже<br><span class="p">можете быть у нас</span></h1>
 <div class="abs chat" style="left:72px;right:72px;top:500px">
 <div class="msg me">t.me/твой_чат</div>
 <div class="msg bot">Это сообщество уже есть в каталоге. Сделать страницу вашей?</div>
 <div class="msg bot">Нет страницы? Поможем завести — около 3 минут.</div></div>
-<div class="abs lead" style="left:72px;right:120px;top:1050px">Пришли боту ссылку на свой чат или канал.</div>''', 5),
+<div class="abs lead" style="left:72px;right:110px;top:1050px">Просто пришли боту ссылку на свой чат или канал — он всё подскажет.</div>''', 5),
     page(f'''{heroes()}
 <div class="abs" style="left:0;right:0;top:700px;bottom:0;background:linear-gradient(180deg,rgba(11,8,18,0),#0B0812 140px)"></div>
-<h1 class="abs" style="left:72px;right:72px;top:760px;font-size:84px">Вечер<br><span class="p">«Сила сообществ»</span></h1>
-<div class="abs lead" style="left:72px;right:90px;top:960px;font-size:30px">Лидеры рассказывают о своих сообществах со сцены, остальных показываем на слайде с QR. На пилотном вечере выступили 12 сообществ, пришли около 50 гостей.</div>
-<div class="abs" style="left:72px;top:1160px;font-size:26px;font-weight:700">27 ноября · Ginger Hotel · ведут Полина (TEXTURA) и Максим (Co.Space)</div>''', 6),
+<h1 class="abs" style="left:72px;right:72px;top:760px;font-size:80px">Расскажи о своих<br><span class="p">со сцены</span></h1>
+<div class="abs lead" style="left:72px;right:90px;top:960px;font-size:30px">На вечере «Сила сообществ» лидеры рассказывают, зачем создали своё сообщество и как в него попасть. На пилоте выступили 12 сообществ и пришли около 50 гостей.</div>
+<div class="abs" style="left:72px;top:1170px;font-size:26px;font-weight:700">27 ноября · Ginger Hotel · ведут Полина (TEXTURA) и Максим (Co.Space)</div>''', 6),
     page('''<div class="ph"></div><div class="shade"></div>
 <h1 class="abs" style="left:72px;right:72px;top:520px;font-size:112px">Сообщество<br>сильнее<br><span class="p">одиночества</span></h1>
 <div class="abs" style="left:72px;top:960px"><span class="pill" style="font-size:32px;padding:20px 36px">Добавить сообщество — ссылка в профиле</span></div>
-<div class="abs lead" style="left:72px;top:1090px;font-size:30px">Бесплатно · около 3 минут в Telegram</div>''', 7, swipe=False, foot="@co.tbilisi"),
+<div class="abs lead" style="left:72px;right:90px;top:1090px;font-size:30px">Бесплатно, около 3 минут. Знаешь лидера сообщества? Перешли ему</div>''', 7, swipe=False, foot="@co.tbilisi"),
 ]
 
 for tag, slides in (("A", A), ("B", B)):
