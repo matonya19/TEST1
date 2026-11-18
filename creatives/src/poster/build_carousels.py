@@ -18,7 +18,7 @@ body{font-family:'Onest',sans-serif;background:#0B0812;color:#fff;position:relat
 .num{font-size:22px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:.08em}
 .swipe{position:absolute;right:72px;bottom:64px;font-size:22px;font-weight:600;color:rgba(255,255,255,.55);letter-spacing:.06em}
 .foot{position:absolute;left:72px;bottom:64px;font-size:22px;font-weight:600;color:rgba(255,255,255,.55);letter-spacing:.06em}
-.ph{position:absolute;inset:0;background:url(../group.src.jpg) center/cover;filter:grayscale(1) brightness(.5);opacity:.55}
+.ph{position:absolute;inset:0;background:url(../audience.jpg) 50% 60%/cover;filter:grayscale(1) brightness(.62);opacity:.72}
 .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,8,18,.55),rgba(11,8,18,.25) 40%,rgba(11,8,18,.92) 75%)}
 .giant{position:absolute;font-weight:900;color:#A874FF;letter-spacing:-.05em;line-height:.8}
 h1{font-weight:900;letter-spacing:-.045em;line-height:.95}
@@ -145,7 +145,7 @@ def heroes(F=150, fy=520):
 
 EB = '<div class="eyebrow"><i></i>ДЛЯ ЛИДЕРОВ СООБЩЕСТВ</div>'
 B = [
-    page(EB + '''<div class="frame" style="left:72px;right:72px;top:240px;height:520px"><div style="background-image:url(../group.src.jpg);background-position:85% 40%"></div></div>
+    page(EB + '''<div class="frame" style="left:72px;right:72px;top:240px;height:520px"><div style="background-image:url(../stage.jpg);background-position:50% 38%"></div></div>
 <div class="bar" style="top:830px;height:300px"></div>
 <h1 class="abs" style="left:110px;right:60px;top:820px;font-size:96px">Ведёшь<br>сообщество<br>в Тбилиси?</h1>
 <h2 class="abs p" style="left:110px;top:1140px;font-size:52px">Тебя уже ищут. Правда</h2>''', 1),
@@ -172,13 +172,13 @@ B = [
 <div class="msg bot">Нет страницы? Поможем завести — около 3 минут.</div></div>
 <div class="bar" style="top:1060px;height:80px"></div>
 <div class="abs lead" style="left:110px;right:110px;top:1052px">Просто пришли боту ссылку на свой чат или канал — он всё подскажет.</div>''', 5),
-    page(EB + '''<div class="frame" style="left:72px;right:72px;top:240px;height:560px;background:#140F1E"></div>
-<div class="abs" style="left:72px;right:72px;top:240px;height:560px;overflow:hidden;border-radius:36px">''' + heroes(F=165, fy=230).replace('left:', 'left:').replace('../', '../') + '''</div>
+    page(EB + '''<div class="frame" style="left:72px;right:72px;top:240px;height:560px"><div style="background-image:url(../audience.jpg);background-position:50% 55%"></div></div>
+<div class="abs muted" style="left:100px;top:740px;font-size:22px;font-weight:700;letter-spacing:.1em;z-index:2">ВИД СО СЦЕНЫ</div>
 <div class="bar" style="top:860px;height:150px"></div>
 <h1 class="abs" style="left:110px;right:72px;top:850px;font-size:76px">Расскажи о своих<br><span class="p">со сцены</span></h1>
 <div class="abs lead" style="left:72px;right:90px;top:1040px;font-size:28px">На вечере «Сила сообществ» лидеры рассказывают, зачем создали своё сообщество и как в него попасть. На пилоте выступили 12 сообществ и пришли около 50 гостей.</div>
 <div class="abs" style="left:72px;top:1200px;font-size:24px;font-weight:700">27 ноября · Ginger Hotel · ведут Полина и Максим</div>''', 6, swipe=False),
-    page(EB + '''<div class="frame" style="left:72px;right:72px;top:240px;height:400px"><div style="background-image:url(../group.src.jpg);background-position:20% 45%"></div></div>
+    page(EB + '''<div class="frame" style="left:72px;right:72px;top:240px;height:400px"><div style="background-image:url(../stage.jpg);background-size:150%;background-position:40% 42%"></div></div>
 <div class="bar" style="top:700px;height:300px"></div>
 <h1 class="abs" style="left:110px;right:72px;top:690px;font-size:100px">Сообщество<br>сильнее<br><span class="p">одиночества</span></h1>
 <div class="abs" style="left:72px;top:1040px"><span class="pill" style="font-size:30px;padding:20px 34px">Добавить сообщество — ссылка в профиле</span></div>
