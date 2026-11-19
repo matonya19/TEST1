@@ -10,9 +10,13 @@ const path = require('path');
   await page.goto('file://' + path.join(__dirname, process.argv[3]||'carousel.html'));
   await page.evaluate(() => document.fonts.ready);
   await page.waitForLoadState('networkidle');
+  await page.waitForFunction(() => [...document.images].every(i => i.complete && i.naturalWidth > 0));
   const slides = await page.$$('section.slide');
   for (let i = 0; i < slides.length; i++) {
     const out = path.join(__dirname, 'out', `${process.argv[4]||'slide'}-${String(i + 1).padStart(2, '0')}.png`);
+    await slides[i].scrollIntoViewIfNeeded();
+    await page.evaluate(() => Promise.all([...document.images].map(i => i.decode().catch(() => {}))));
+    await page.waitForTimeout(250);
     await slides[i].screenshot({ path: out });
     console.log(out);
   }
