@@ -264,9 +264,10 @@
     0,
     0.33
    ],
-   "photo": "/home/user/TEST1/textura-carousel/photos/w-laugh.jpg",
-   "pw": 520,
-   "ph": 400
+   "photo": "/home/user/TEST1/textura-carousel/photos/group.jpg",
+   "pw": 600,
+   "ph": 430,
+   "rot": -1.5
   },
   {
    "type": "sheet",
