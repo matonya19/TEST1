@@ -4,7 +4,7 @@ _main = __name__ == '__main__'
 __name__ = 'reels_engine'
 exec(_m.loads(open(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'engine.pyc'), 'rb').read()[16:]))
 _s.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
-import brand2 as _b2; _b2.install(globals())
+import brand2 as _b2; _b2.install(globals()); _b2.install2(globals())
 __name__ = '__main__' if _main else 'reels'
 if _main:
     a = _s.argv[1:]; script = _os.path.abspath(__file__)
