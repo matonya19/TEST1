@@ -55,7 +55,7 @@ els.append(f'<div class="a cnt" style="left:{x + 160}px;top:1080px;font-size:22p
 # ---------- 3. 68 сообществ (фото через границу 3|4) ----------
 x = 2 * S
 els.append(f'<div class="ph" style="left:{x + 470}px;top:180px;width:538px;height:400px;background-image:url(../studio_duo.jpg);background-position:50% 50%;z-index:1"></div>')
-els.append(f'''<div class="a" style="left:{x + 60}px;top:200px;z-index:5"><div class="h" style="font-size:300px;color:{P};letter-spacing:-.06em;line-height:.85">68</div></div>''')
+els.append(f'''<div class="a" style="left:{x + 60}px;top:200px;z-index:5"><div class="h" style="font-size:300px;color:{P};letter-spacing:-.06em;line-height:.85">70</div></div>''')
 els.append(f'''<div class="a" style="left:{x + 72}px;top:720px;z-index:5"><div class="kick">Что мы сделали</div>
 <div class="h" style="font-size:66px;margin-top:22px">сообществ Тбилиси —<br><em>в одном месте</em></div></div>''')
 els.append(f'''<div class="a body" style="left:{x + 72}px;top:1000px;width:820px;z-index:5"><b>Co.Space</b> — каталог сообществ и афиша их встреч. Чтобы не искать по сотне чатов, а сразу видеть, кто чем живёт.</div>''')
