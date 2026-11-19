@@ -91,8 +91,8 @@ els.append(f'''<div class="a" style="left:120px;top:262px;width:500px;z-index:5;
 <div class="kick" style="color:{INK};opacity:.7">Для лидеров сообществ</div>
 <div class="h" style="font-size:70px;margin-top:22px">Ведёшь<br>сообщество<br>в Тбилиси?</div>
 <div style="font-size:28px;line-height:1.35;margin-top:26px;font-weight:500">Тебя уже ищут. Покажем,<br>как сделать, чтобы нашли.</div></div>''')
-els.append('<div class="cut" style="left:545px;top:430px;width:535px;height:750px;overflow:hidden;z-index:4;'
-           'clip-path:path(\'M80,0 H535 V686 A64,64 0 0 1 471,750 H80 Z\')"><img src="../polina2_cut.png" style="height:1238px"></div>')
+els.append('<div class="cut" style="left:0;top:0;width:1080px;height:1180px;overflow:hidden;z-index:4">'
+           '<img src="../polina3_cut.png" style="position:absolute;left:510px;top:470px;height:1150px"></div>')
 els.append(f'<div class="a" style="left:110px;top:1080px;z-index:6"><span class="pillw" style="font-size:22px;padding:12px 22px"><i></i>Полина · TEXTURA</span></div>')
 
 # ---------- 2. Проблема ----------
