@@ -63,7 +63,7 @@ def blob(rects, color=P, z=2):
     return f'<svg class="a" style="left:0;top:0;z-index:{z}" width="{W}" height="{H}"><defs>{GOO}</defs><g filter="url(#goo)">{r}</g></svg>'
 
 
-LINE = ("M1010,900 C1350,900 1380,1260 1780,1260 C2120,1260 2080,660 2420,640 C2900,610 3338,250 3338,560 "
+LINE = ("M1010,900 C1060,1200 1150,1270 1400,1270 L1780,1260 C2120,1260 2080,660 2420,640 C2900,610 3338,250 3338,560 "
         "L3338,1010 C3338,1230 3800,1250 4250,1230 C4700,1210 4800,250 5250,230 C5800,210 6300,120 7020,112")
 NODES = [(1010, 900), (1780, 1260), (2420, 640), (4250, 1230), (5250, 230), (7020, 112)]
 
@@ -99,11 +99,14 @@ els.append(f'<div class="a" style="left:110px;top:1080px;z-index:6"><span class=
 x = S
 els.append(f'''<div class="a" style="left:{x + 72}px;top:210px;z-index:5"><div class="kick">Что происходит</div>
 <div class="h" style="font-size:80px;margin-top:22px">Люди переезжают<br>и ищут <em>своих</em></div></div>''')
-els.append(f'''<div class="a glass" style="left:{x + 72}px;top:560px;width:{S - 144}px;padding:34px 40px;z-index:5">
-<div style="display:flex;align-items:center;gap:18px;font-size:32px;font-weight:600;padding-bottom:26px;border-bottom:1.5px solid rgba(255,255,255,.08)">
-<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="{P}" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>бег, походы, настолки тбилиси</div>
-<div style="font-size:28px;color:rgba(255,255,255,.45);padding-top:26px;line-height:1.5">Ничего не найдено.<br>Чат закрытый — снаружи его не видно.</div></div>''')
-els.append(f'''<div class="a body" style="left:{x + 72}px;top:930px;width:780px;z-index:5">В Тбилиси всё время приезжают люди, которым нужны <b>именно вы</b>. Но найти вас пока сложно.</div>''')
+els.append(f'''<div class="a glass" style="left:{x + 72}px;top:500px;width:{S - 144}px;padding:28px 32px 18px;z-index:5">
+<div style="display:flex;align-items:center;gap:16px;padding-bottom:20px;margin-bottom:22px;border-bottom:1.5px solid rgba(255,255,255,.08)">
+<div style="width:52px;height:52px;border-radius:50%;background:#2E2640;display:flex;align-items:center;justify-content:center;font-size:24px">👥</div>
+<div style="font-size:26px;font-weight:700">Общий чат «Тбилиси»</div></div>
+<div class="msg bot" style="max-width:94%;font-size:26px">Месяц в Тбилиси, никого не знаю 🙈 Где тут бегают по утрам, ходят в походы, играют в настолки?</div>
+<div class="msg bot" style="max-width:72%;font-size:24px;color:rgba(255,255,255,.75)">Был какой-то чат, не помню название</div>
+<div class="msg bot" style="max-width:46%;font-size:24px;color:rgba(255,255,255,.75)">Поищи в инсте</div></div>''')
+els.append(f'''<div class="a body" style="left:{x + 72}px;top:1000px;width:800px;z-index:5">Твой чат закрытый — снаружи его не видно. Люди, которым нужны <b>именно вы</b>, проходят мимо.</div>''')
 
 # ---------- 3. Решение (фото через границу 2|3) ----------
 x = 2 * S
