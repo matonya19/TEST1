@@ -20,6 +20,7 @@ import numpy as np
 
 AMBER = (242, 183, 107)
 INKC = (20, 18, 16)
+PILL_DOT = (255, 255, 255)
 CARD = dict(x=60, y=150, w=960, h=560, r=44)        # speaker card in sheet scene
 PANEL_Y = 1250                                       # top of the white sheet
 
@@ -53,7 +54,7 @@ def pill_spr(text, dark=True, size=30):
         d.rounded_rectangle((0, 0, w * s - 1, h * s - 1), h * s // 2, fill=(30, 26, 22, 200) if dark else (255, 255, 255, 235),
                             outline=(255, 255, 255, 110) if dark else None, width=2 * s)
         cx, cy, rr_ = int(size * 0.95) * s, h * s // 2, int(size * 0.22) * s
-        d.ellipse((cx - rr_, cy - rr_, cx + rr_, cy + rr_), fill=AMBER + (255,))
+        d.ellipse((cx - rr_, cy - rr_, cx + rr_, cy + rr_), fill=PILL_DOT + (255,))
     img = R.ss(dr, w, h); d = ImageDraw.Draw(img)
     d.text((int(size * 1.65), h // 2), text, font=f, fill=(255, 255, 255) if dark else INKC, anchor='lm')
     return img
@@ -78,7 +79,7 @@ class Ref(R.Renderer):
         self.groups = self.make_groups()
 
     def resolve(self, o):
-        if o['type'] in ('sheet', 'photo', 'hook', 'pill'):
+        if o['type'] in ('sheet', 'photo', 'hook', 'pill', 'pic'):
             o = dict(o); c = self.cue
             o['t0'] = c(o.get('at', 0)); o['t1'] = c(o['until']) if 'until' in o else o['t0'] + o.get('dur', 1.5)
             return o
@@ -166,7 +167,8 @@ class Ref(R.Renderer):
             if not (o['t0'] - 0.01 <= t < o['t1'] + 0.35): continue
             ty = o['type']
             if ty in ('sheet', 'photo', 'card'): continue
-            if ty == 'pill': self.ov_pill(cv, t, o)
+            if ty == 'pic': self.ov_pic(cv, t, o)
+            elif ty == 'pill': self.ov_pill(cv, t, o)
             elif ty == 'hook': self.ov_hook(cv, t, o)
             elif hasattr(self, 'ov_' + ty): getattr(self, 'ov_' + ty)(cv, t, o)
         if sh_: self.ov_sheet(cv, t, sh_)
@@ -175,6 +177,12 @@ class Ref(R.Renderer):
     def in_sheet(self, t):
         o = self.active(self.sheets, t, 0.35)
         return o is not None and t >= o['t0'] + 0.25
+
+    def ov_pic(self, cv, t, o):
+        p = prog(t, o['t0'], 0.35); a = clamp(p * 3) * (1 - ease_in(prog(t, o['t1'], 0.22)))
+        if a <= 0: return
+        spr = photo_spr(o['src'], o.get('w', 340), o.get('h', 604), o.get('r', 30))
+        paste(cv, spr, o.get('x', 220), o.get('y', 430) + 40 * (1 - ease_out(p)), 0.85 + 0.15 * back(p), a, rot=o.get('rot', -3))
 
     def ov_pill(self, cv, t, o):
         p = prog(t, o['t0'], 0.3); a = clamp(p * 3) * (1 - ease_in(prog(t, o['t1'], 0.2)))
@@ -189,7 +197,7 @@ class Ref(R.Renderer):
         for i, ln in enumerate(o['lines']):
             p = prog(t, o['t0'] + i * 0.18, 0.35)
             if p <= 0: continue
-            col = AMBER if i == len(o['lines']) - 1 and o.get('accent_last', True) else WHITE
+            col = tuple(o.get('accent_color', AMBER)) if i == len(o['lines']) - 1 and o.get('accent_last', True) else WHITE
             spr = text_spr(ln, 'sans_semi', size, col, -0.035, 0.8)
             paste(cv, spr, 70 + 40 * (1 - ease_out(p)), y + i * lh, 1, clamp(p * 2) * a, anchor='l')
         if o.get('pill'):
@@ -201,8 +209,8 @@ class Ref(R.Renderer):
         if k <= 0: return
         top = PANEL_Y + (FH - PANEL_Y + 40) * (1 - k)
         panel = Image.new('RGBA', (FW, FH), (0, 0, 0, 0)); d = ImageDraw.Draw(panel)
-        d.rounded_rectangle((0, top, FW, FH + 60), 56, fill=(252, 250, 247, 255))
-        d.rounded_rectangle((FW / 2 - 40, top + 18, FW / 2 + 40, top + 26), 4, fill=(205, 200, 194, 255))
+        d.rounded_rectangle((0, top, FW, FH + 60), 56, fill=(14, 13, 12, 248), outline=(255, 255, 255, 40), width=2)
+        d.rounded_rectangle((FW / 2 - 40, top + 18, FW / 2 + 40, top + 26), 4, fill=(90, 86, 82, 255))
         cv.alpha_composite(panel)
         # middle zone photo card
         if o.get('photo'):
@@ -216,17 +224,17 @@ class Ref(R.Renderer):
             txt = ' '.join(w['w'] for w in g).strip(' ,—')
             f = font('InterTight.ttf', 60, 'Medium'); lines = wrap(txt, f, 860)[:2]
             for i, ln in enumerate(lines):
-                spr = text_spr(ln, 'sans', 60, INKC, -0.02, 0)
+                spr = text_spr(ln, 'sans', 60, WHITE, -0.02, 0)
                 paste(cv, spr, FW / 2, top + 120 + i * 66 - (len(lines) - 1) * 10, 1, k)
         # chapter progress bar
         fsm = font('InterTight.ttf', 22, 'Medium'); bar = Image.new('RGBA', (FW, 60), (0, 0, 0, 0)); bd = ImageDraw.Draw(bar)
         lab = f"{o.get('chapter', '')}   {o.get('label', '').upper()}"
-        bd.text((250, 30), lab, font=fsm, fill=(120, 114, 108), anchor='lm')
+        bd.text((250, 30), lab, font=fsm, fill=(170, 165, 160), anchor='lm')
         lx0 = 250 + fsm.getlength(lab) + 24; lx1 = 830
-        bd.line((lx0, 30, lx1, 30), fill=(210, 205, 199), width=3)
+        bd.line((lx0, 30, lx1, 30), fill=(70, 66, 62), width=3)
         pr = clamp((t - o['t0']) / max(0.1, o['t1'] - o['t0']))
         st, en = o.get('bar', [0, 1]); px = lx0 + (lx1 - lx0) * (st + (en - st) * pr)
-        bd.line((lx0, 30, px, 30), fill=INKC, width=3); bd.ellipse((px - 8, 22, px + 8, 38), fill=INKC)
+        bd.line((lx0, 30, px, 30), fill=WHITE, width=3); bd.ellipse((px - 8, 22, px + 8, 38), fill=WHITE)
         paste(cv, bar, FW / 2, top + 290, 1, k)
 
     def subs_phrase(self, cv, t):

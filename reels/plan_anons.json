@@ -1,5 +1,5 @@
 {
- "src": "/home/claude/work/v2/src.mp4",
+ "src": "/home/claude/work/v2/src30.mp4",
  "out": "/home/user/TEST1/reels/Воркшоп_анонс_монтаж.mp4",
  "tail": 0.7,
  "subs": {
@@ -183,7 +183,12 @@
    "until": "тысячи-0.05",
    "y": 0.57,
    "size": 80,
-   "pill": "и это живые люди"
+   "pill": "и это живые люди",
+   "accent_color": [
+    255,
+    255,
+    255
+   ]
   },
   {
    "type": "accent",
@@ -192,9 +197,9 @@
    "dur": 0.85,
    "y": 0.47,
    "color": [
-    242,
-    183,
-    107
+    255,
+    255,
+    255
    ],
    "sfx": "click"
   },
@@ -223,17 +228,22 @@
    "dur": 0.9,
    "y": 0.47,
    "color": [
-    242,
-    183,
-    107
+    255,
+    255,
+    255
    ],
    "sfx": "click"
   },
   {
-   "type": "photo",
+   "type": "pic",
    "src": "/home/user/TEST1/textura-carousel/photos/reel-samoprez.jpg",
    "at": "одного",
-   "until": "Представляете+0.5"
+   "until": "Представляете+0.5",
+   "x": 225,
+   "y": 430,
+   "w": 330,
+   "h": 586,
+   "rot": -3
   },
   {
    "type": "pill",
@@ -241,8 +251,8 @@
    "text": "с одного рилса",
    "at": "рилса",
    "until": "Представляете+0.4",
-   "x": 0.5,
-   "y": 0.5
+   "x": 0.62,
+   "y": 0.62
   },
   {
    "type": "sheet",
@@ -268,9 +278,9 @@
     0.33,
     0.66
    ],
-   "photo": "/home/user/TEST1/textura-carousel/photos/mic.jpg",
-   "pw": 440,
-   "ph": 420
+   "photo": "/home/user/TEST1/textura-carousel/photos/three.png",
+   "pw": 500,
+   "ph": 400
   },
   {
    "type": "accent",
@@ -279,9 +289,9 @@
    "dur": 1.0,
    "y": 0.47,
    "color": [
-    242,
-    183,
-    107
+    255,
+    255,
+    255
    ],
    "sfx": "click"
   },
