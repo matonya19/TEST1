@@ -1,23 +1,27 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8">
-<link rel="stylesheet" href="local.css">
+<style>
+@font-face{font-family:'Gilroy';src:url(Gilroy-Regular.ttf) format('truetype');font-weight:400}
+@font-face{font-family:'Gilroy';src:url(Gilroy-Bold.ttf) format('truetype');font-weight:700}
+</style>
 <style>
 :root{
   --espresso:#3B2A20; --choco:#2A1E17; --sand:#EFE6D8; --sand2:#E2D3BE;
   --camel:#A68A6D; --caramel:#B86B3F; --cream:#F7F1E8;
-  --sans:'Inter',sans-serif; --serif:'Cormorant Garamond',serif;
+  --sans:'Gilroy',sans-serif; --serif:'Gilroy',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:4320px;height:1350px;background:transparent;overflow:hidden}
 body{position:relative;font-family:var(--sans);color:var(--choco);-webkit-font-smoothing:antialiased}
 .abs{position:absolute}
 .slide{position:absolute;top:0;width:1080px;height:1350px;overflow:hidden}
-.caps{text-transform:uppercase;letter-spacing:.02em;font-weight:400;line-height:1.02}
-.serif{font-family:var(--serif);font-style:italic;font-weight:500}
+.caps{text-transform:uppercase;letter-spacing:.01em;font-weight:700!important;line-height:1.02}
+.hl{font-weight:700!important;letter-spacing:-.01em}
+.serif{font-family:var(--serif);font-style:normal;font-weight:400}
 .small{font-size:19px;letter-spacing:.16em;text-transform:uppercase;font-weight:500}
 .pill{display:inline-flex;align-items:center;gap:14px;border-radius:999px;padding:14px 30px;font-size:27px;font-weight:400;white-space:nowrap}
 .dot{width:12px;height:12px;border-radius:50%;background:currentColor;display:inline-block}
-.star{color:var(--caramel);font-weight:300}
+.star{color:var(--caramel);font-weight:400}
 /* Bottom ribbon across all slides */
 .ribbon{position:absolute;left:0;top:1292px;width:4320px;height:58px;background:var(--caramel);color:var(--cream)}
 .ribbon span{position:absolute;top:19px;font-size:17px;letter-spacing:.18em;text-transform:uppercase;font-weight:500}
@@ -32,10 +36,10 @@ body{position:relative;font-family:var(--sans);color:var(--choco);-webkit-font-s
   <div class="abs star" style="right:70px;top:44px;font-size:84px;line-height:1">✱</div>
 
   <div class="abs" style="left:70px;top:735px;width:960px;color:var(--cream)">
-    <div class="caps" style="font-size:96px;font-weight:300">Колёрнинг<br>SHKOLA</div>
-    <div class="serif" style="font-size:104px;line-height:1;margin-top:4px;position:relative;display:inline-block">
+    <div class="caps" style="font-size:86px;font-weight:400">Колёрнинг<br>SHKOLA</div>
+    <div class="serif hl" style="font-size:86px;line-height:1;margin-top:4px;position:relative;display:inline-block">
       в&nbsp;<span style="position:relative;display:inline-block">вашем городе
-        <svg class="abs" style="left:-38px;top:-14px" width="560" height="140" viewBox="0 0 560 140" fill="none">
+        <svg class="abs" style="left:-12px;top:-20px;width:calc(100% + 40px);height:145%" viewBox="0 0 560 140" preserveAspectRatio="none" fill="none">
           <path d="M40 92 C 30 40, 200 14, 330 16 C 470 18, 545 40, 535 74 C 524 112, 380 128, 250 126 C 120 124, 22 108, 30 72 C 36 46, 110 26, 190 20" stroke="#C98250" stroke-width="3.5" stroke-linecap="round"/>
         </svg></span>
     </div>
@@ -63,8 +67,8 @@ body{position:relative;font-family:var(--sans);color:var(--choco);-webkit-font-s
 
   <div class="abs" style="left:570px;top:150px;width:450px">
     <div class="serif" style="font-size:52px;color:var(--sand2)">Привет, мы —</div>
-    <div class="caps" style="font-size:66px;font-weight:300;margin-top:10px">команда<br>трёх школ</div>
-    <div style="font-size:27px;line-height:1.45;margin-top:34px;color:var(--sand2);font-weight:300">Ульяна Павлова и&nbsp;команда SHKOLA. Две наши школы работают онлайн, третья — офлайн в&nbsp;Батуми.</div>
+    <div class="caps" style="font-size:58px;font-weight:400;margin-top:10px">команда<br>трёх школ</div>
+    <div style="font-size:27px;line-height:1.45;margin-top:34px;color:var(--sand2);font-weight:400">Ульяна Павлова и&nbsp;команда SHKOLA. Две наши школы работают онлайн, третья — офлайн в&nbsp;Батуми.</div>
   </div>
 
   <div class="abs" style="left:570px;top:600px;display:flex;flex-direction:column;gap:16px;align-items:flex-start">
@@ -75,7 +79,7 @@ body{position:relative;font-family:var(--sans);color:var(--choco);-webkit-font-s
 
   <div class="abs" style="left:70px;top:880px;width:940px;border-top:1.5px solid rgba(166,138,109,.45);padding-top:44px">
     <div class="abs serif" style="left:0;top:20px;font-size:120px;line-height:1;color:var(--caramel)">“</div>
-    <div class="caps" style="font-size:50px;font-weight:300;margin-left:90px;line-height:1.1">Именно в Батуми мы&nbsp;открыли <span class="serif" style="text-transform:none;font-size:62px;color:#D39469">колёрнинг</span></div>
+    <div class="caps" style="font-size:44px;font-weight:400;margin-left:90px;line-height:1.1">Именно в Батуми мы&nbsp;открыли <span class="serif hl" style="text-transform:none;font-size:50px;color:#D39469">колёрнинг</span></div>
   </div>
 </div>
 
@@ -85,8 +89,8 @@ body{position:relative;font-family:var(--sans);color:var(--choco);-webkit-font-s
   <div class="abs" style="inset:0;background:linear-gradient(180deg,rgba(42,30,23,.82) 0%,rgba(42,30,23,.55) 22%,rgba(42,30,23,0) 40%,rgba(42,30,23,0) 58%,rgba(42,30,23,.55) 100%)"></div>
   <div class="abs small" style="left:70px;top:132px;color:var(--sand2)">02 · Формат</div>
   <div class="abs" style="left:110px;top:180px;color:var(--cream)">
-    <div class="caps" style="font-size:64px;font-weight:300">Что такое</div>
-    <div class="serif" style="font-size:118px;line-height:.95;color:#E0A57C">колёрнинг?</div>
+    <div class="caps" style="font-size:60px;font-weight:400">Что такое</div>
+    <div class="serif hl" style="font-size:104px;line-height:.95;color:#E0A57C">колёрнинг?</div>
   </div>
   <div class="abs star" style="right:80px;top:190px;font-size:70px;color:#E0A57C">✱</div>
   <div class="abs pill" style="right:70px;top:760px;background:rgba(247,241,232,.92);color:var(--choco);font-size:22px;padding:11px 22px"><span class="dot" style="color:var(--caramel)"></span>живой день в Батуми</div>
@@ -96,7 +100,7 @@ body{position:relative;font-family:var(--sans);color:var(--choco);-webkit-font-s
     <div style="display:flex;gap:26px;align-items:flex-start;margin-bottom:30px">
       <span class="dot" style="width:24px;height:24px;color:var(--caramel);margin-top:8px;flex:none"></span>
       <div><div class="small" style="color:var(--camel);margin-bottom:6px">Утро</div>
-      <div style="font-size:28px;font-weight:300">Ребята приходят в&nbsp;школу в&nbsp;Батуми</div></div>
+      <div style="font-size:28px;font-weight:400">Ребята приходят в&nbsp;школу в&nbsp;Батуми</div></div>
     </div>
     <div style="display:flex;gap:26px;align-items:flex-start;margin-bottom:30px">
       <span class="dot" style="width:24px;height:24px;color:var(--camel);margin-top:8px;flex:none"></span>
@@ -122,13 +126,13 @@ body{position:relative;font-family:var(--sans);color:var(--choco);-webkit-font-s
   <div class="abs" style="inset:0;background:linear-gradient(180deg,rgba(42,30,23,.85) 0%,rgba(42,30,23,.6) 24%,rgba(42,30,23,0) 42%,rgba(42,30,23,0) 62%,rgba(42,30,23,.6) 100%)"></div>
   <div class="abs small" style="left:70px;top:132px;color:var(--sand2)">03 · Партнёрство</div>
   <div class="abs" style="left:70px;top:172px;width:940px;color:var(--cream)">
-    <div class="serif" style="font-size:72px;line-height:1;color:#E0A57C">Откроем</div>
-    <div class="caps" style="font-size:72px;font-weight:300;margin-top:6px">такой колёрнинг<br>вместе?</div>
+    <div class="serif hl" style="font-size:66px;line-height:1;color:#E0A57C">Откроем</div>
+    <div class="caps" style="font-size:66px;font-weight:400;margin-top:6px">такой колёрнинг<br>вместе?</div>
   </div>
   <div class="abs star" style="right:80px;top:190px;font-size:70px;color:#E0A57C">✱</div>
 
   <div class="abs" style="left:52px;top:930px;width:976px;height:330px;border-radius:32px;background:rgba(59,42,32,.94);color:var(--cream);padding:40px 48px">
-    <div style="font-size:25px;font-weight:300;line-height:1.4;color:var(--sand2);width:820px">Ищем партнёров, которые хотят открыть<br>колёрнинг по&nbsp;франшизе SHKOLA</div>
+    <div style="font-size:25px;font-weight:400;line-height:1.4;color:var(--sand2);width:820px">Ищем партнёров, которые хотят открыть<br>колёрнинг по&nbsp;франшизе SHKOLA</div>
     <div style="display:flex;gap:10px;margin-top:16px">
       <span class="pill" style="background:var(--cream);color:var(--choco);font-size:22px;padding:9px 20px">↗&nbsp;Тбилиси</span>
       <span class="pill" style="background:var(--sand2);color:var(--choco);font-size:22px;padding:9px 20px">↗&nbsp;Сербия</span>
@@ -136,8 +140,8 @@ body{position:relative;font-family:var(--sans);color:var(--choco);-webkit-font-s
     </div>
     <div style="display:flex;align-items:center;gap:18px;margin-top:26px">
       <span class="serif" style="font-size:36px;color:var(--sand2)">Пишите в директ</span>
-      <span class="pill" style="background:var(--caramel);color:var(--cream);font-size:34px;font-weight:500;letter-spacing:.06em;padding:12px 32px">«ФРАНШИЗА»</span>
-      <span style="font-size:28px;font-weight:300">+ город</span>
+      <span class="pill" style="background:var(--caramel);color:var(--cream);font-size:34px;font-weight:700;letter-spacing:.06em;padding:12px 32px">«ФРАНШИЗА»</span>
+      <span style="font-size:28px;font-weight:400">+ город</span>
     </div>
     <div class="abs star" style="right:44px;top:28px;font-size:60px;line-height:1">✱</div>
   </div>
