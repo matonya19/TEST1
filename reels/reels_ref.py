@@ -21,6 +21,7 @@ import numpy as np
 AMBER = (242, 183, 107)
 INKC = (20, 18, 16)
 PILL_DOT = (255, 255, 255)
+ORANGE = (236, 118, 40)
 CARD = dict(x=60, y=150, w=960, h=560, r=44)        # speaker card in sheet scene
 PANEL_Y = 1250                                       # top of the white sheet
 
@@ -30,7 +31,7 @@ def rr_mask(w, h, r, S=3):
     return R.ss(dr, w, h, S).getchannel('A')
 
 
-@lru_cache(16)
+@lru_cache(8)
 def photo_spr(path, w, h, r=36):
     im = Image.open(path).convert('RGB')
     s = max(w / im.width, h / im.height); im = im.resize((int(im.width * s) + 1, int(im.height * s) + 1), Image.LANCZOS)
@@ -51,12 +52,11 @@ def pill_spr(text, dark=True, size=30):
     f = font('InterTight.ttf', size, 'Medium')
     tw = int(f.getlength(text)); h = int(size * 2.0); w = tw + int(size * 2.6)
     def dr(d, s):
-        d.rounded_rectangle((0, 0, w * s - 1, h * s - 1), h * s // 2, fill=(30, 26, 22, 200) if dark else (255, 255, 255, 235),
-                            outline=(255, 255, 255, 110) if dark else None, width=2 * s)
+        d.rounded_rectangle((0, 0, w * s - 1, h * s - 1), h * s // 2, fill=ORANGE + (245,))
         cx, cy, rr_ = int(size * 0.95) * s, h * s // 2, int(size * 0.22) * s
         d.ellipse((cx - rr_, cy - rr_, cx + rr_, cy + rr_), fill=PILL_DOT + (255,))
     img = R.ss(dr, w, h); d = ImageDraw.Draw(img)
-    d.text((int(size * 1.65), h // 2), text, font=f, fill=(255, 255, 255) if dark else INKC, anchor='lm')
+    d.text((int(size * 1.65), h // 2), text, font=f, fill=(255, 255, 255), anchor='lm')
     return img
 
 
@@ -213,7 +213,13 @@ class Ref(R.Renderer):
         d.rounded_rectangle((FW / 2 - 40, top + 18, FW / 2 + 40, top + 26), 4, fill=(90, 86, 82, 255))
         cv.alpha_composite(panel)
         # middle zone photo card
-        if o.get('photo'):
+        if o.get('video'):
+            p = prog(t, o['t0'] + 0.3, 0.4); a = clamp(p * 2) * k
+            n = len(os.listdir(o['video'])); i = int(clamp((t - o['t0']) * 30, 0, n - 1)) + 1
+            spr = photo_spr(os.path.join(o['video'], f'{i:04d}.jpg'), o.get('pw', 600), o.get('ph', 430))
+            mid = (CARD['y'] + CARD['h'] + PANEL_Y) / 2 + 10
+            paste(cv, spr, FW / 2, mid + 40 * (1 - ease_out(p)), 0.9 + 0.1 * back(p), a, rot=o.get('rot', -1.5))
+        elif o.get('photo'):
             p = prog(t, o['t0'] + 0.3, 0.4); a = clamp(p * 2) * k
             spr = photo_spr(o['photo'], o.get('pw', 520), o.get('ph', 400))
             mid = (CARD['y'] + CARD['h'] + PANEL_Y) / 2 + 10
