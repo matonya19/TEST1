@@ -246,3 +246,206 @@ def install2(G):
             d.line([(ax, ay), (ax, ay + 70)], fill=YEL, width=14)
             d.polygon([(ax - 34, ay + 50), (ax + 34, ay + 50), (ax, ay + 96)], fill=YEL)
     SCENES['cta2'] = cta2
+
+
+def install3(G):
+    Renderer = G['Renderer']; prog = G['prog']; ease_out = G['ease_out']; ease_in = G['ease_in']; back = G['back']; clamp = G['clamp']
+    font = G['font']; SCENES = G['SCENES']; FW, FH = G['FW'], G['FH']; paste = G['paste']; norm = G['norm']; Cues = G['Cues']
+    import re
+    B = (36, 87, 237); WH = (255, 255, 255); K = (17, 17, 20); YEL = (253, 203, 10)
+    F = lambda s, w='ExtraBold': font('Montserrat.ttf', s, w)
+
+    # ---------- animated deep-blue gradient background
+    yy, xx = np.mgrid[0:FH, 0:FW].astype(np.float32)
+    top, bot = np.array([14, 30, 118], np.float32), np.array([38, 92, 240], np.float32)
+    k = (yy / FH)[..., None] ** 0.9
+    BASE = top * (1 - k) + bot * k
+    dots = ((np.mod(xx, 46) < 3) & (np.mod(yy, 46) < 3)).astype(np.float32)[..., None]
+    BASE = BASE + dots * 14
+    def blob(r):
+        g = np.exp(-(((np.arange(2 * r) - r) / (r * 0.45)) ** 2)).astype(np.float32); return np.outer(g, g)[..., None]
+    BL = [(blob(520), np.array([253, 203, 10], np.float32), 0.20, (0.85, 0.12), (0.10, 0.05), 0.11),
+          (blob(600), np.array([110, 170, 255], np.float32), 0.35, (0.10, 0.40), (0.12, 0.06), 0.08),
+          (blob(460), np.array([140, 110, 255], np.float32), 0.22, (0.60, 0.85), (0.15, 0.05), 0.09)]
+    cache = {}
+    def grad_frame(t):
+        fi = int(t * 15)
+        if fi in cache: return cache[fi]
+        if len(cache) > 4: cache.clear()
+        out = BASE.copy(); tt = fi / 15
+        for g, col, a, (cx, cy), (ax, ay), sp in BL:
+            r = g.shape[0] // 2
+            x = int(FW * (cx + ax * math.sin(tt * sp * 2 * math.pi))); y = int(FH * (cy + ay * math.cos(tt * sp * 1.6 * math.pi)))
+            x0, y0 = x - r, y - r; X0, Y0 = max(0, x0), max(0, y0); X1, Y1 = min(FW, x0 + 2 * r), min(FH, y0 + 2 * r)
+            if X1 <= X0 or Y1 <= Y0: continue
+            m = g[Y0 - y0:Y1 - y0, X0 - x0:X1 - x0] * a
+            out[Y0:Y1, X0:X1] = out[Y0:Y1, X0:X1] * (1 - m) + col * m
+        cache[fi] = out; return out
+    G['grad_frame'] = grad_frame
+
+    orig_card = Renderer.card_scene
+    def card_scene(self, base, t, c):
+        if c.get('bg') != 'grad': return orig_card(self, base, t, c)
+        c2 = dict(c); c2['bg'] = [0, 0, 0]
+        out = orig_card(self, base, t, c2)
+        # replace pure-black bg pixels (outside window & shadow) by gradient: recompute with gradient instead
+        return out
+    # simpler & exact: patch orig to accept array bg
+    def card_scene2(self, base, t, c):
+        cv2 = self.cv2
+        w = int(FW * c.get('size', 0.95)); h = int(w * c.get('aspect', 0.9)); cy = int(FH * c.get('y', 0.745))
+        sz = int(FW * c.get('crop', 0.96)); ch = int(sz * h / w); sy = int(FH * c.get('crop_y', 0.5))
+        x0 = (FW - sz) // 2; y0 = max(0, sy - ch // 2)
+        win = cv2.resize(base[y0:y0 + ch, x0:x0 + sz], (w, h), interpolation=cv2.INTER_AREA)
+        out = grad_frame(t).copy()
+        from brand2 import _rmask
+        m, sh = _rmask(w, h, c.get('radius', 48))
+        X = (FW - w) // 2; Y = cy - h // 2
+        ys, xs = Y - 60, X - 60
+        sy0, sx0 = max(0, ys), max(0, xs); sy1, sx1 = min(FH, ys + sh.shape[0]), min(FW, xs + sh.shape[1])
+        out[sy0:sy1, sx0:sx1] *= 1 - 0.8 * sh[sy0 - ys:sy1 - ys, sx0 - xs:sx1 - xs]
+        y1 = min(FH, Y + h); hh = y1 - Y
+        out[Y:y1, X:X + w] = out[Y:y1, X:X + w] * (1 - m[:hh]) + win[:hh] * m[:hh]
+        return out
+    def card_dispatch(self, base, t, c):
+        return card_scene2(self, base, t, c) if c.get('bg') == 'grad' else orig_card(self, base, t, c)
+    Renderer.card_scene = card_dispatch
+
+    # ---------- title: upright Montserrat, words rise in as spoken, *word* = yellow
+    def resolve_title(self, o):
+        c = self.cue; o['lines'] = [dict(l) for l in o['lines']]; allt = []
+        for l in o['lines']:
+            l['t'] = c(l['at']) if 'at' in l else o['t0']
+            toks = l['text'].split()
+            if isinstance(l.get('at'), str) and not l['at'].startswith('seg:') and l.get('sync', True):
+                base = re.sub(r'[+-]\d+(\.\d+)?$', '', l['at'])
+                try:
+                    ts = c.follow(base, l['text'].replace('*', '')); ts = [x + l['t'] - ts[0] for x in ts]
+                except KeyError: ts = None
+            else: ts = None
+            l['times'] = ts or [l['t'] + i * 0.12 for i in range(len(toks))]; allt += l['times']
+        o['times'] = allt; return o
+    orig_resolve = Renderer.resolve
+    def resolve(self, o):
+        o = orig_resolve(self, o)
+        if o['type'] == 'title': o = resolve_title(self, o)
+        return o
+    Renderer.resolve = resolve
+
+    wcache = {}
+    def word_spr(txt, size, weight, col):
+        k = (txt, size, weight, col)
+        if k not in wcache:
+            f = F(size, weight); w = int(f.getlength(txt)) + 8; asc, desc = f.getmetrics()
+            im = Image.new('RGBA', (w + 30, asc + desc + 30), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+            sh = Image.new('L', im.size, 0); ImageDraw.Draw(sh).text((15, 19), txt, font=f, fill=110)
+            s = Image.new('RGBA', im.size, (8, 16, 70, 255)); s.putalpha(sh.filter(ImageFilter.GaussianBlur(size * 0.08)))
+            im = Image.alpha_composite(im, s); ImageDraw.Draw(im).text((15, 15), txt, font=f, fill=col + (255,))
+            wcache[k] = im
+        return wcache[k]
+
+    def ov_title(self, cv, t, o):
+        if t >= o['t1'] + 0.3: return
+        aout = 1 - ease_in(prog(t, o['t1'], 0.25)); y = FH * o.get('y', 0.07)
+        for l in o['lines']:
+            size = l.get('size', 64); wt = l.get('weight', 'Bold'); toks = l['text'].split(); gap = size * 0.26
+            sprs = []; inside = False
+            for tok in toks:
+                st = tok.startswith('*'); en = tok.rstrip(',.:;!?—').endswith('*')
+                hl = inside or st; inside = (inside or st) and not en
+                txt = tok.replace('*', '')
+                sprs.append(word_spr(txt, size, wt, tuple(l.get('hl', YEL)) if hl else tuple(l.get('color', WH))))
+            tw = sum(s.width - 30 for s in sprs) + gap * (len(sprs) - 1)
+            x = FW / 2 - tw / 2
+            for s, tt in zip(sprs, l['times']):
+                p = ease_out(prog(t, tt, 0.28))
+                if p > 0: paste(cv, s, x + (s.width - 30) / 2, y + size * 0.6 + 22 * (1 - p), 1, p * aout)
+                x += s.width - 30 + gap
+            y += size * l.get('lead', 1.18)
+    Renderer.ov_title = ov_title
+
+    # ---------- clean subtitles (no plate)
+    orig_subs = Renderer.subs
+    def subs(self, cv, t):
+        S = self.plan['subs']
+        if S.get('mode') != 'clean': return orig_subs(self, cv, t)
+        if t >= self.BODY: return
+        if not hasattr(self, '_groups'):
+            gs, cur = [], []
+            for i, w in enumerate(self.W):
+                cur.append(w); nxt = self.W[i + 1] if i + 1 < len(self.W) else None
+                ch = sum(len(x['w']) for x in cur)
+                if nxt is None or nxt['seg'] != w['seg'] or len(cur) >= 5 or ch >= 26 or w['w'][-1] in ',.:!?—': gs.append(cur); cur = []
+            self._groups = gs
+        g = next((g for g in self._groups if g[0]['s'] <= t < g[-1]['e'] + 0.15), None)
+        if not g: return
+        size = S.get('size', 40); gap = size * 0.28
+        words = [w['w'].lower().strip('…,.:;—?!«»') for w in g]
+        sprs = [word_spr(wd, size, 'SemiBold', YEL if w['s'] <= t < w['e'] else WH) for wd, w in zip(words, g)]
+        tw = sum(s.width - 30 for s in sprs) + gap * (len(sprs) - 1); x = FW / 2 - tw / 2
+        a = ease_out(prog(t, g[0]['s'], 0.15))
+        for s in sprs:
+            paste(cv, s, x + (s.width - 30) / 2, FH * S.get('y', 0.47) + 10 * (1 - a), 1, a); x += s.width - 30 + gap
+    Renderer.subs = subs
+
+    # ---------- panels/scenes on transparent bg
+    def ov_panel(self, cv, t, o):
+        if not (o['t0'] <= t < o['t1']): return
+        p = ease_out(prog(t, o['t0'], 0.35)); q = ease_in(prog(t, o['t1'] - 0.25, 0.25)); a = p * (1 - q)
+        if a <= 0.01: return
+        img = Image.new('RGBA', (FW, FH), (0, 0, 0, 0)); d = ImageDraw.Draw(img)
+        SCENES[o['kind']](d, img, t - o['t0'], o, tuple(o.get('fg', WH)))
+        sx0, sx1 = o.get('sx', [60, 1020]); sy0, sy1 = o['sy']; dy0, dy1 = o.get('dy', [300, 820])
+        crop = img.crop((sx0, sy0, sx1, sy1))
+        sc = min((dy1 - dy0) / (sy1 - sy0), 1000 / (sx1 - sx0), 1.0) * (0.94 + 0.06 * p)
+        crop = crop.resize((max(1, int(crop.width * sc)), max(1, int(crop.height * sc))), Image.LANCZOS)
+        paste(cv, crop, FW / 2, (dy0 + dy1) / 2 + 26 * (1 - p), 1, a)
+    Renderer.ov_panel = ov_panel
+
+    def ov_scene(self, cv, t, o):
+        if not (o['t0'] <= t < o['t1']): return
+        a = ease_out(prog(t, o['t0'], 0.35))
+        bgimg = Image.fromarray(np.clip(grad_frame(t), 0, 255).astype(np.uint8)).convert('RGBA')
+        d = ImageDraw.Draw(bgimg); SCENES[o['kind']](d, bgimg, t - o['t0'], o, WH)
+        if a < 0.999: bgimg.putalpha(int(255 * a))
+        cv.alpha_composite(bgimg)
+    Renderer.ov_scene = ov_scene
+
+    T1 = (255, 255, 255, 46); T2 = (255, 255, 255, 90)
+    def topics_d(d, img, u, o, fg):
+        names = ['дроби', 'падежи', 'уравнения', 'словарные слова', 'таблица умножения', 'части речи', 'периметр', 'деление столбиком', 'суффиксы', 'площадь', 'корни', 'задачи']
+        y = FH * 0.23; x = 80
+        for k, nm in enumerate(names):
+            p = back(prog(u, 0.1 + k * 0.16, 0.3), 1.8); f = F(44, 'SemiBold'); w = f.getlength(nm) + 70
+            if x + w > FW - 70: x = 80; y += 114
+            if p > 0:
+                cx, cy = x + w / 2, y + 44; ww, hh = w * p / 2, 44 * p
+                key = k % 4 == 0
+                d.rounded_rectangle((cx - ww, cy - hh, cx + ww, cy + hh), int(hh), fill=YEL + (255,) if key else T1, outline=None if key else T2, width=3)
+                if p > 0.7: d.text((cx, cy), nm, font=f, fill=K if key else WH, anchor='mm')
+            x += w + 22
+    def calendar_d(d, img, u, o, fg):
+        x0, y0 = 120, FH * 0.30; cs, gap = 108, 18; n = 20; f = F(36, 'Bold')
+        for i in range(n):
+            r, c = divmod(i, 5); x, y = x0 + c * (cs + gap) + 30, y0 + r * (cs + gap)
+            q = prog(u, 0.2 + i * 0.09, 0.2)
+            d.rounded_rectangle((x, y, x + cs, y + cs), 28, fill=WH + (255,) if q > 0 else T1, outline=None if q > 0 else T2, width=3)
+            d.text((x + cs / 2, y + cs / 2), str(i + 1), font=f, fill=B if q > 0 else WH, anchor='mm')
+        q = back(prog(u, 0.2 + n * 0.09, 0.4), 2)
+        if q > 0:
+            fx, fy = x0 + 4 * (cs + gap) + 30 + cs + 24, y0 + 3 * (cs + gap)
+            d.line([(fx, fy + cs), (fx, fy + cs - 150 * q)], fill=YEL, width=10)
+            d.polygon([(fx, fy + cs - 150 * q), (fx + 80 * q, fy + cs - 120 * q), (fx, fy + cs - 90 * q)], fill=YEL)
+    SCENES.update(topics_d=topics_d, calendar_d=calendar_d)
+
+
+_RM = {}
+def _rmask(w, h, r):
+    k = (w, h, r)
+    if k not in _RM:
+        m = Image.new('L', (w * 2, h * 2), 0); ImageDraw.Draw(m).rounded_rectangle((0, 0, w * 2 - 1, h * 2 - 1), r * 2, fill=255)
+        m = np.asarray(m.resize((w, h), Image.LANCZOS), np.float32)[..., None] / 255
+        sh = Image.new('L', (w + 120, h + 120), 0); ImageDraw.Draw(sh).rounded_rectangle((60, 80, 60 + w, 80 + h), r, fill=110)
+        sh = np.asarray(sh.filter(ImageFilter.GaussianBlur(26)), np.float32)[..., None] / 255
+        _RM[k] = (m, sh)
+    return _RM[k]
