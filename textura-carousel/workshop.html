@@ -124,13 +124,14 @@
   .m .mlogo div { position:relative; display:inline-block; left:-11px; }
   .m .mlogo img { width:160px; display:block; }
   .m .mlogo span { position:absolute; right:-29px; top:13px; font-family:Caveat, cursive; font-weight:700; font-size:30px; color:#F2B76B; transform:rotate(-7deg); line-height:1; }
-  .m .body { position:absolute; left:70px; right:70px; top:210px; z-index:3; text-align:center; }
+  .m .body { position:absolute; left:100px; right:100px; top:210px; z-index:3; text-align:center; }
   .m .lbl { font-weight:500; font-size:30px; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.85); }
   .m .h { margin-top:18px; font-weight:800; line-height:.9; letter-spacing:-.045em; }
   .m .h .g, .m .g { color:var(--accent); }
   .m .t { margin-top:30px; font-weight:500; font-size:34px; line-height:1.35; color:rgba(255,255,255,.8); }
   .m .ph { position:absolute; left:0; right:0; bottom:0; background-size:cover; z-index:1; }
-  .m .ph::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, #181514 0%, rgba(24,21,20,.4) 16%, rgba(24,21,20,0) 34%, rgba(24,21,20,0) 62%, rgba(14,12,10,.85) 88%, rgba(14,12,10,.95) 100%); }
+  .m .ph { -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 22%); mask-image:linear-gradient(180deg, transparent 0%, #000 22%); }
+  .m .ph::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(24,21,20,.7) 0%, rgba(24,21,20,.45) 35%, rgba(24,21,20,.1) 60%, rgba(14,12,10,.15) 72%, rgba(14,12,10,.8) 92%, rgba(14,12,10,.92) 100%); }
   .m .foot { position:absolute; left:60px; right:60px; bottom:72px; z-index:3; text-align:center; font-weight:700; font-size:36px; line-height:1.3; }
   .m .list { margin-top:44px; text-align:left; }
   .m .list div { display:flex; gap:28px; align-items:baseline; padding:20px 0; border-top:1px solid rgba(255,255,255,.14); }
@@ -140,6 +141,13 @@
   .m .stats div { flex:1; }
   .m .stats b { display:block; font-weight:800; font-size:84px; line-height:1; letter-spacing:-.045em; color:var(--accent); }
   .m .stats span { display:block; margin-top:10px; font-weight:500; font-size:24px; line-height:1.3; color:rgba(255,255,255,.8); }
+  .m .ex { margin-top:46px; text-align:left; }
+  .m .ex .cap { display:flex; align-items:center; gap:14px; font-weight:600; font-size:24px; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); margin-bottom:14px; }
+  .m .ex .cap i { font-style:normal; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; font-size:24px; letter-spacing:0; }
+  .m .bb { display:table; max-width:84%; padding:18px 28px; border-radius:30px; font-weight:600; font-size:31px; line-height:1.28; margin-top:12px; }
+  .m .bb.l { background:rgba(255,255,255,.1); border-bottom-left-radius:8px; }
+  .m .bb.r { margin-left:auto; background:rgba(255,255,255,.18); border-bottom-right-radius:8px; }
+  .m .bb.a { margin-left:auto; background:var(--accent); color:#141210; border-bottom-right-radius:8px; }
 </style>
 </head>
 <body>
@@ -154,38 +162,47 @@
   <div style="position:absolute; left:0; right:0; bottom:170px; z-index:3; text-align:center; font-weight:800; font-size:72px; line-height:.98; letter-spacing:-.045em; text-shadow:0 2px 20px rgba(0,0,0,.5);">чтобы слушали<br><span style="color:var(--accent);">и&nbsp;покупали</span></div>
   <div style="position:absolute; left:0; right:0; bottom:72px; z-index:3; text-align:center; font-weight:700; font-size:36px; color:#fff;">Суббота, 21 ноября · <span style="color:var(--accent);">12:00 МСК</span></div>
 </section>
-<section class="slide m"><div class="ph" style="top:820px; background-image:url(photos/w-listen.jpg); background-position:50% 45%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
+<section class="slide m"><div class="ph" style="top:600px; background-image:url(photos/w-listen.jpg); background-position:50% 45%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
 <div class="body"><div class="lbl">Знакомо?</div>
-<div class="h" style="font-size:78px;">можно быть сильным специалистом —<br><span class="g">и&nbsp;теряться, когда нужно рассказать о&nbsp;себе</span></div>
+<div class="h" style="font-size:64px;">можно быть сильным специалистом —<br><span class="g">и&nbsp;теряться, когда нужно рассказать о&nbsp;себе</span></div>
 <div class="t">С чего начать?<br>Что сказать о&nbsp;своём опыте?<br>Как объяснить ценность своей работы?</div></div>
 <div class="foot">…чтобы не&nbsp;звучало скучно, длинно<br>или слишком <span class="g">«продающе»</span></div></section>
-<section class="slide m"><div class="ph" style="top:700px; background-image:url(photos/w-pink.jpg); background-position:50% 30%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
+<section class="slide m"><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
+<div class="body" style="top:200px;"><div class="lbl">Как это звучит</div>
+<div class="h" style="font-size:70px;">одна фраза меняет<br><span class="g">весь разговор</span></div>
+<div class="ex"><div class="cap"><i style="border:2px solid rgba(255,255,255,.4);">✕</i>Так разговор заканчивается</div>
+<div class="bb l">А вы чем занимаетесь?</div><div class="bb r">Я видеограф.</div><div class="bb l">Понятно.</div></div>
+<div class="ex" style="margin-top:40px;"><div class="cap" style="color:var(--accent);"><i style="border:2px solid var(--accent);">✓</i>Так он начинается</div>
+<div class="bb l">А вы чем занимаетесь?</div><div class="bb a">Я снимаю предпринимателей, которые перед камерой забывают все слова.</div><div class="bb l">О, это про меня! А&nbsp;как вы их разговорите?</div></div>
+</div>
+<div class="foot" style="font-weight:600; font-size:32px;">Важно не&nbsp;назвать профессию, а&nbsp;чтобы человек <span class="g">узнал в&nbsp;вашем рассказе себя</span></div></section>
+<section class="slide m"><div class="ph" style="top:480px; background-image:url(photos/w-pink.jpg); background-position:50% 30%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
 <div class="body"><div class="lbl">Для кого</div>
-<div class="h" style="font-size:108px;">предпринимателей<br><span class="g">и&nbsp;экспертов</span></div>
+<div class="h" style="font-size:84px;">предпринимателей<br><span class="g">и&nbsp;экспертов</span></div>
 <div class="t">которым важно проявляться, говорить о&nbsp;себе публично и&nbsp;через речь привлекать</div></div>
 <div class="foot">клиентов · партнёров · <span class="g">новые возможности</span></div></section>
 <section class="slide m"><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
 <div class="body"><div class="lbl">Программа</div>
-<div class="h" style="font-size:120px;">на воркшопе <span class="g">мы:</span></div>
+<div class="h" style="font-size:78px;">на воркшопе <span class="g">мы:</span></div>
 <div class="list"><div><b>01</b><span>разберём три варианта самопрезентации</span></div><div><b>02</b><span>соберём понятную и&nbsp;сильную версию рассказа о&nbsp;себе</span></div><div><b>03</b><span>изучим обороты, которые привлекают внимание, и&nbsp;те, что убивают интерес и&nbsp;доверие</span></div><div><b>04</b><span>поговорим, почему умение представлять себя нельзя делегировать</span></div><div><b>05</b><span>отработаем самопрезентацию на&nbsp;практике</span></div><div><b>06</b><span>познакомимся со&nbsp;всеми участниками</span></div></div></div></section>
-<section class="slide m"><div class="ph" style="top:760px; background-image:url(photos/w-point.jpg); background-position:50% 50%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
+<section class="slide m"><div class="ph" style="top:540px; background-image:url(photos/w-point.jpg); background-position:50% 50%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
 <div class="body"><div class="lbl">Вы уйдёте с</div>
-<div class="h" style="font-size:96px;">готовыми вариантами<br><span class="g">самопрезентации</span></div>
+<div class="h" style="font-size:78px;">готовыми вариантами<br><span class="g">самопрезентации</span></div>
 <div class="t">которые сможете использовать на&nbsp;мероприятиях, в&nbsp;переговорах, интервью, соцсетях и&nbsp;общении с&nbsp;клиентами</div></div></section>
-<section class="slide m"><div class="ph" style="top:900px; background-image:url(photos/guest.jpg); background-position:50% 30%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
+<section class="slide m"><div class="ph" style="top:680px; background-image:url(photos/guest.jpg); background-position:50% 30%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
 <div class="body"><div class="lbl">Кто ведёт</div>
-<div class="h" style="font-size:120px;">Полина <span class="g">Язвенко</span></div>
+<div class="h" style="font-size:78px;">Полина <span class="g">Язвенко</span></div>
 <div class="t" style="font-size:31px;">Предприниматель, тренер по&nbsp;публичным выступлениям, эксперт по&nbsp;публичности и&nbsp;медийности. Основатель онлайн-школы TEXTURA с&nbsp;образовательной лицензией</div>
 <div class="stats"><div><b>500+</b><span>спикеров обучено<br>за&nbsp;5&nbsp;лет</span></div><div><b>30+</b><span>тренингов<br>и&nbsp;программ</span></div><div><b>3&nbsp;года</b><span>в&nbsp;прямом эфире<br>на&nbsp;ТВ</span></div></div></div></section>
-<section class="slide m"><div class="ph" style="top:900px; background-image:url(photos/w-notes.jpg); background-position:50% 40%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
+<section class="slide m"><div class="ph" style="top:680px; background-image:url(photos/w-notes.jpg); background-position:50% 40%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
 <div class="body"><div class="lbl">Когда встречаемся</div>
-<div class="h" style="font-size:128px;">суббота,<br><span class="g">21&nbsp;ноября</span></div>
+<div class="h" style="font-size:104px;">суббота,<br><span class="g">21&nbsp;ноября</span></div>
 <div class="t" style="font-size:40px; color:#fff; font-weight:700;">12:00 по&nbsp;Москве · 1,5&nbsp;часа</div>
 <div class="t" style="margin-top:8px;">онлайн · участие бесплатно</div></div>
 <div class="foot">Регистрация — <span class="g">в&nbsp;шапке профиля</span></div></section>
-<section class="slide m"><div class="ph" style="top:860px; background-image:url(photos/w-laugh.jpg); background-position:50% 45%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
+<section class="slide m"><div class="ph" style="top:640px; background-image:url(photos/w-laugh.jpg); background-position:50% 45%;"></div><div class="mlogo"><div><img src="photos/textura-logo.png" alt="TEXTURA"><span>Talks</span></div></div>
 <div class="body"><div class="t" style="margin-top:0; font-size:38px; color:#fff;">Если после вашего рассказа о&nbsp;себе люди вежливо кивают, но&nbsp;не&nbsp;задают вопросов и&nbsp;не&nbsp;покупают —</div>
-<div class="h" style="font-size:150px; margin-top:34px;">приходите.</div>
-<div class="h" style="font-size:80px; margin-top:28px;"><span class="g">будем это менять</span></div></div>
+<div class="h" style="font-size:124px; margin-top:34px;">приходите.</div>
+<div class="h" style="font-size:66px; margin-top:24px;"><span class="g">будем это менять</span></div></div>
 <div class="foot">Суббота, 21 ноября · <span class="g">12:00 МСК</span><br><span style="font-weight:500; font-size:30px; color:rgba(255,255,255,.8);">Регистрация — в&nbsp;шапке профиля</span></div></section>
 </body></html>
