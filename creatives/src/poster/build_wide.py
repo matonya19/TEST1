@@ -92,8 +92,8 @@ els.append(f'''<div class="a" style="left:120px;top:262px;width:500px;z-index:5;
 <div class="h" style="font-size:70px;margin-top:22px">Ведёшь<br>сообщество<br>в Тбилиси?</div>
 <div style="font-size:28px;line-height:1.35;margin-top:26px;font-weight:500">Тебя уже ищут. Покажем,<br>как сделать, чтобы нашли.</div></div>''')
 els.append('<div class="cut" style="left:545px;top:430px;width:535px;height:750px;overflow:hidden;z-index:4;'
-           'clip-path:path(\'M80,0 H535 V686 A64,64 0 0 1 471,750 H80 Z\')"><img src="../max_stage_cut.png" style="height:1560px"></div>')
-els.append(f'<div class="a" style="left:110px;top:1080px;z-index:6"><span class="pillw" style="font-size:22px;padding:12px 22px"><i></i>Максим · Co.Space</span></div>')
+           'clip-path:path(\'M80,0 H535 V686 A64,64 0 0 1 471,750 H80 Z\')"><img src="../polina2_cut.png" style="height:1238px"></div>')
+els.append(f'<div class="a" style="left:110px;top:1080px;z-index:6"><span class="pillw" style="font-size:22px;padding:12px 22px"><i></i>Полина · TEXTURA</span></div>')
 
 # ---------- 2. Проблема ----------
 x = S
@@ -150,13 +150,13 @@ x = 5 * S
 els.append(f'<div class="ph" style="left:{x}px;top:0;width:{S}px;height:{H}px;border-radius:0;background-image:url(../audience.jpg);background-position:45% 50%;filter:brightness(.7) saturate(.85);z-index:1"></div>')
 els.append(f'<div class="a" style="left:{x}px;top:0;width:{S}px;height:{H}px;background:linear-gradient(180deg,rgba(11,8,18,.65),rgba(11,8,18,.1) 30%,rgba(11,8,18,.2) 60%,rgba(11,8,18,.85));z-index:2"></div>')
 els.append(f'<div class="a" style="left:{x + 40}px;top:40px;width:{S - 80}px;height:{H - 80}px;border:2px solid rgba(255,255,255,.7);border-radius:60px;z-index:4"></div>')
-els.append(f'<div class="cut" style="left:{x + 470}px;top:190px;height:920px;width:610px;overflow:hidden;z-index:4"><img src="../polina2_cut.png" style="height:1000px"></div>')
-els.append(blob([(x + 90, 190, 560, 290), (x + 90, 800, 820, 330)], z=5))
-els.append(f'''<div class="a" style="left:{x + 130}px;top:225px;z-index:6;color:{INK};font-size:26px;line-height:1.5;font-weight:600">
+els.append(blob([(x + 400, 560, 590, 330), (x + 90, 800, 820, 330)], z=5))
+els.append(f'''<div class="a" style="left:{x + 445}px;top:600px;z-index:6;color:{INK};font-size:26px;line-height:1.5;font-weight:600">
 <div>› 27 ноября, пятница</div><div>› Ginger Hotel, 49 Kakabadze St</div><div>› сбор 19:00 · начало 19:30</div><div>› вход свободный, нужна регистрация</div></div>''')
 els.append(f'''<div class="a" style="left:{x + 140}px;top:870px;z-index:6;color:{INK}"><div class="kick" style="color:{INK};opacity:.65">Сила сообществ · 27 ноября</div>
 <div class="h" style="font-size:56px;margin-top:16px">Покажем твоё сообщество<br><em style="color:#fff">на вечере</em></div></div>''')
 els.append(f'''<div class="a" style="left:{x + 96}px;top:1170px;z-index:6;display:flex;align-items:center;gap:16px">
+<div class="ava" style="background-image:url(../polina2_cut.png);background-size:260%;background-position:30% 12%"></div>
 <div style="font-size:24px;line-height:1.25"><b>Ведёт Полина Язвенко</b><br><span style="color:rgba(255,255,255,.75)">лидер сообщества TEXTURA</span></div></div>''')
 
 # ---------- 7. Финал ----------
