@@ -42,13 +42,13 @@ els.append(f'''<svg class="a" style="left:0;top:0;z-index:2" width="{W}" height=
 <mask id="m1"><g filter="url(#goo)">{mask_r}</g></mask></defs>
 <image href="../conf.jpg" x="-250" y="300" width="1560" height="1040" preserveAspectRatio="xMidYMid slice" mask="url(#m1)"/></svg>''')
 els.append(f'''<div class="a" style="left:72px;top:200px;z-index:5"><div class="kick">Для тех, кто ищет своих</div>
-<div class="h" style="font-size:86px;margin-top:24px">Переехал в Тбилиси,<br>а своих людей<br><em>пока нет?</em></div></div>''')
+<div class="h" style="font-size:86px;margin-top:24px">Недавно в Тбилиси,<br>а своих людей<br><em>пока нет?</em></div></div>''')
 els.append(f'<div class="a" style="left:110px;top:1120px;z-index:6"><span class="pillw" style="font-size:24px;padding:14px 24px"><i></i>Знакомо. Расскажем, где их искать</span></div>')
 
 # ---------- 2. Одиночество ----------
 x = S
 els.append(f'''<div class="a" style="left:{x + 72}px;top:210px;z-index:5"><div class="kick">Знакомо?</div>
-<div class="h" style="font-size:76px;margin-top:24px">Квартиру нашёл,<br>кофейню любимую тоже.<br><em>А поговорить не с кем.</em></div></div>''')
+<div class="h" style="font-size:76px;margin-top:24px">Квартира есть,<br>любимая кофейня тоже.<br><em>А поговорить не с кем.</em></div></div>''')
 els.append(f'''<div class="a body" style="left:{x + 72}px;top:620px;width:860px;z-index:5">Это нормально. В новом городе люди есть везде — просто непонятно, где <b>твои</b>.</div>''')
 els.append(f'<div class="a cnt" style="left:{x + 160}px;top:1080px;font-size:22px;letter-spacing:.12em;z-index:5">ЭТО ТЫ. ПОКА.</div>')
 
@@ -64,10 +64,7 @@ els.append(f'''<div class="a body" style="left:{x + 72}px;top:1000px;width:820px
 x = 3 * S
 els.append(f'''<div class="a" style="left:{x + 72}px;top:200px;z-index:5"><div class="kick">Выбирай по душе</div>
 <div class="h" style="font-size:80px;margin-top:22px">Тут есть<br><em>свои для всех</em></div></div>''')
-chips = [("Предприниматели", 72, 470, True), ("IT", 490, 680, False), ("Женские сообщества", 560, 470, False),
-         ("Спорт и бег", 72, 680, False), ("Проявленность", 640, 680, True), ("Книжные клубы", 380, 820, False),
-         ("Саморазвитие", 72, 960, False), ("Творчество", 560, 960, True), ("Языковые клубы", 72, 1100, False),
-         ("Кино и шахматы", 520, 1100, False)]
+chips = [('Походы', 72, 470, True), ('Настолки и квизы', 310, 470, True), ('Бег и спорт', 150, 600, False), ('IT', 483, 600, False), ('Мамы с детьми', 645, 600, False), ('Творчество и импров', 72, 730, True), ('Волонтёрство', 557, 730, False), ('Языковые клубы', 150, 860, False), ('Книжные клубы', 540, 860, False), ('Кино и шахматы', 72, 990, False), ('Предприниматели', 462, 990, False)]
 for t, cx, cy, on in chips:
     els.append(f'<div class="chip{" on" if on else ""}" style="left:{x + cx}px;top:{cy}px"><i></i>{t}</div>')
 
@@ -75,20 +72,20 @@ for t, cx, cy, on in chips:
 x = 4 * S
 els.append(f'''<div class="a" style="left:{x + 72}px;top:200px;z-index:5"><div class="kick">Как это работает</div>
 <div class="h" style="font-size:72px;margin-top:22px">Пара минут —<br><em>и ты среди своих</em></div></div>''')
-steps = [("Выбираешь сообщество", "на сайте Co.Space"), ("Жмёшь «Вступить»", "бот в Telegram подскажет, как попасть внутрь"),
-         ("Записываешься на встречу", "в пару нажатий — бот напомнит")]
+steps = [("Выбираешь сообщество", "на сайте Co.Space"), ("Жмёшь «Вступить»", "бот даст ссылку на чат или поможет подать заявку"),
+         ("Записываешься на встречу", "бот напомнит за сутки и за 3 часа")]
 for k, (t, sub) in enumerate(steps):
     els.append(f'<div class="step" style="left:{x + 52}px;top:{472 + k * 240}px;width:920px"><div class="c">{k + 1}</div><div class="t">{t}<span>{sub}</span></div></div>')
 
 # ---------- 6. Афиша: карточка встречи ----------
 x = 5 * S
 els.append(f'''<div class="a" style="left:{x + 72}px;top:200px;z-index:5"><div class="kick">Афиша недели</div>
-<div class="h" style="font-size:72px;margin-top:22px">Все встречи —<br><em>в одной афише</em></div></div>''')
+<div class="h" style="font-size:72px;margin-top:22px">Встречи сообществ —<br><em>в одной афише</em></div></div>''')
 els.append(f'''<div class="a glass" style="left:{x + 120}px;top:500px;width:840px;z-index:5;overflow:hidden;transform:rotate(-3deg);box-shadow:0 40px 90px rgba(0,0,0,.55)">
 <div style="height:300px;background:url(../outdoor.jpg) -616px -246px/1760px auto"></div>
 <div style="padding:34px 40px 40px"><div class="kick" style="color:rgba(255,255,255,.55)">Пт · 27 ноября · 19:00</div>
 <div style="font-size:54px;font-weight:700;letter-spacing:-.03em;margin:14px 0 8px">Сила сообществ</div>
-<div style="font-size:26px;color:rgba(255,255,255,.6);margin-bottom:28px">Ginger Hotel · вход свободный</div>
+<div style="font-size:26px;color:rgba(255,255,255,.6);margin-bottom:28px">Ginger Hotel · вход свободный, по регистрации</div>
 <span class="pillw" style="background:{P};font-size:26px;padding:16px 30px">Регистрация</span></div></div>''')
 els.append(f'<div class="a body" style="left:{x + 72}px;top:1180px;width:900px;font-size:26px;z-index:5">Заглядывай в начале недели — и сразу видно, куда сходить.</div>')
 
@@ -99,7 +96,7 @@ els.append(f'''<div class="a" style="left:{x + 110}px;top:310px;z-index:6;color:
 <div class="kick" style="color:{INK};opacity:.65">Co.Space · Тбилиси</div>
 <div class="h" style="font-size:118px;margin-top:28px;font-weight:800">Найди своих —<br>найдёшь<br>своё</div>
 <div style="margin-top:56px"><span class="pillw" style="background:{INK};color:#fff;font-size:32px;padding:24px 38px"><i></i>Сообщества Тбилиси — ссылка в профиле</span></div>
-<div style="font-size:28px;margin-top:28px;font-weight:500">Сохрани, чтобы не потерять.<br>И отправь тому, кто тоже недавно переехал.</div></div>''')
+<div style="font-size:28px;margin-top:28px;font-weight:500">Сохрани, чтобы не потерять.<br>И отправь тому, кто тоже недавно в Тбилиси.</div></div>''')
 els.append(f'<div class="a" style="left:{x + 110}px;top:1140px;z-index:6">{logo(110, INK)}</div>')
 els.append(f'<div class="a" style="left:{x + 760}px;top:1170px;z-index:6;color:{INK};font-size:24px;font-weight:700">@co.tbilisi</div>')
 
