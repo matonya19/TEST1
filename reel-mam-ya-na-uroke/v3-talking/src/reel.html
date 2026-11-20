@@ -8,8 +8,8 @@ const c=document.getElementById('c'),x=c.getContext('2d'),W=1080,H=1920,TAU=Math
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),prog=(t,s,d)=>clamp((t-s)/d),easeOut=p=>1-Math.pow(1-p,3),easeIO=p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
 const F=(w,s)=>`${w} ${s}px Manrope`,NAVY='#1B2440',ORG='#E8870E';
 function rr(px,py,w,h,r){x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath();}
-const T={s1:[0,3.9],s2:[3.9,6.8],a:[6.8,10.8],s3:[10.8,13.8],b:[13.8,18.4],s5:[18.4,21.4],s6:[21.4,24.4],end:[24.4,28.9]};
-const SUBS=[[.3,3.5,'Если я сейчас уйду работать, он вообще будет слушать?'],[4.1,5.7,'Мам, я на уроке!'],[14.05,16.6,'Миша, а расскажи, как ты это посчитал?'],[18.45,21.2,'Эм… сейчас объясню!'],[21.65,23.4,'Кажется, всё под контролем.']];
+const T={s1:[0,4.1],s2:[4.1,7.0],a:[7.0,11.0],s3:[11.0,14.0],b:[14.0,18.6],s5:[18.6,21.6],s6:[21.6,25.8],end:[25.8,30.3]};
+const SUBS=[[.3,3.65,'Если я сейчас уйду работать, он вообще будет слушать урок?'],[4.3,5.9,'Мам, я на уроке!'],[14.25,16.8,'Миша, а расскажи, как ты это посчитал?'],[18.65,21.4,'Эм… сейчас объясню!']];
 function wrap(s,maxW){const ws=s.split(' '),ls=[];let l='';for(const w of ws){const t=l?l+' '+w:w;if(x.measureText(t).width>maxW&&l){ls.push(l);l=w;}else l=t;}ls.push(l);return ls;}
 function subtitle(t){for(const [a,b,s] of SUBS){if(t<a||t>b)continue;const f=Math.min(prog(t,a,.18),1-prog(t,b-.18,.18));
   const g=x.createLinearGradient(0,1250,0,1920);g.addColorStop(0,'rgba(20,10,0,0)');g.addColorStop(1,'rgba(20,10,0,'+(.5*f)+')');x.fillStyle=g;x.fillRect(0,1250,W,670);
