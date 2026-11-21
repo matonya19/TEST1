@@ -1,7 +1,7 @@
 {
  "src": "/home/claude/work/v3/cut.mp4",
  "out": "/home/user/TEST1/reels/Схема_самопрезентации_монтаж.mp4",
- "tail": 0.6,
+ "tail": 3.0,
  "subs": {
   "mode": "phrase",
   "y": 0.78,
@@ -307,12 +307,58 @@
   },
   {
    "type": "pill",
-   "size": 47,
+   "size": 48,
    "text": "город",
    "at": "город",
-   "until": "end+0.6",
+   "until": "end",
    "x": 0.5,
    "y": 0.19
+  },
+  {
+   "type": "photo",
+   "src": "/home/claude/work/v3w/endbg.jpg",
+   "at": "end",
+   "until": "end+3.0"
+  },
+  {
+   "type": "text",
+   "text": "напишите «ДИАЛОГ»",
+   "face": "sans_semi",
+   "size": 92,
+   "x": 0.5,
+   "y": 0.52,
+   "at": "end+0.1",
+   "until": "end+3.0",
+   "color": [
+    255,
+    255,
+    255
+   ]
+  },
+  {
+   "type": "text",
+   "text": "в комментариях —",
+   "face": "sans",
+   "size": 54,
+   "x": 0.5,
+   "y": 0.59,
+   "at": "end+0.35",
+   "until": "end+3.0"
+  },
+  {
+   "type": "text",
+   "text": "пришлю полную запись эфира",
+   "face": "sans",
+   "size": 54,
+   "x": 0.5,
+   "y": 0.63,
+   "at": "end+0.5",
+   "until": "end+3.0",
+   "color": [
+    236,
+    118,
+    40
+   ]
   }
  ]
 }
