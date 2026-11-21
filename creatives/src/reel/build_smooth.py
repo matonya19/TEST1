@@ -15,12 +15,13 @@ for i in range(7):
 X = 0.35   # длительность перехода
 parts = []
 p = SEG / "over.mp4"
-ff("-ss", "0.4", "-i", "proxy2/IMG_2967.mp4", "-i", "cards/w_over.png", "-t", "1.5",
+ff("-ss", "0.2", "-i", "proxy2/IMG_3091.mp4", "-i", "cards/w_over.png", "-t", "1.5",
    "-filter_complex", "[0][1]overlay=0:0", *ENC, str(p)); parts.append((p, 1.5))
-CUTS = [("IMG_3091", 0.2), ("IMG_2875", 1.0), ("IMG_2975", 1.2), ("IMG_2983", 0.4), ("IMG_2985", 0.6),
-        ("IMG_6566", 0.6), ("IMG_2995", 1.6), ("IMG_2975", 4.4), ("IMG_2995", 4.4)]
+CUTS = [("IMG_2967", 0.4), ("IMG_2975", 1.2), ("IMG_2983", 0.4), ("IMG_2985", 0.6),
+        ("IMG_6566", 0.6), ("IMG_2995", 1.6), ("IMG_2975", 4.4), ("IMG_3091", 1.4)]
 for k, (f, t) in enumerate(CUTS):
     p = SEG / f"v{k}.mp4"; ff("-ss", str(t), "-i", f"proxy2/{f}.mp4", "-t", "1.3", *ENC, str(p)); parts.append((p, 1.3))
+p = SEG / "pool.mp4"; ff("-ss", "1.0", "-i", "proxy2/IMG_3064.mp4", "-t", "3.0", *ENC, str(p)); parts.append((p, 3.0))
 p = SEG / "end.mp4"; ff("-loop", "1", "-i", "cards/end.png", "-t", "3.4", *ENC, str(p)); parts.append((p, 3.4))
 
 inp, flt, prev, off = [], [], "0:v", 0.0
