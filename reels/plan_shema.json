@@ -253,10 +253,10 @@
     0,
     0.5
    ],
-   "photo": "/home/user/TEST1/textura-carousel/photos/stage.jpg",
-   "pw": 360,
-   "ph": 470,
-   "rot": 2
+   "pw": 380,
+   "ph": 496,
+   "rot": 0,
+   "video": "/home/claude/work/v3w/stagevid2"
   },
   {
    "type": "accent",
@@ -290,9 +290,10 @@
     0.5,
     1.0
    ],
-   "photo": "/home/user/TEST1/textura-carousel/photos/w-laugh.jpg",
-   "pw": 520,
-   "ph": 400
+   "photo": "/home/user/TEST1/textura-carousel/photos/tv-buzova.jpg",
+   "pw": 560,
+   "ph": 420,
+   "rot": -1.5
   },
   {
    "type": "pill",
