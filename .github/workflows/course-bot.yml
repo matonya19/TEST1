@@ -66,8 +66,8 @@ jobs:
         run: |
           git config user.name "course-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/sent.json
+          git add data/
           git diff --cached --quiet && exit 0
-          git commit -m "Course bot: sent log [skip ci]"
+          git commit -m "Course bot: sent log and video library [skip ci]"
           for i in 1 2 3 4; do git pull --rebase -q && git push -q && exit 0; sleep $((i * 5)); done
           exit 1
