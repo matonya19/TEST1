@@ -1,5 +1,5 @@
 {
-  "offset": 519451574,
+  "offset": 519451584,
   "media": {
     "1.1": {
       "kind": "video",
@@ -91,6 +91,76 @@
       "duration": 131,
       "name": "Часть 1, урок 12.mov",
       "saved": "2026-11-22T13:45"
+    },
+    "2.1": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAAM-awLyQQTdm1SLoeAroDNU4Hewcb0AAiWuAAL7TxlIOOjfdYkfxeI9BA",
+      "duration": 523,
+      "name": "2 часть 1 урок.mov",
+      "saved": "2026-11-22T14:00"
+    },
+    "2.2": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAAM_awLyidc8U1ll7tEP87Qtyz9j7i4AAieuAAL7TxlIzkx50kKkXuo9BA",
+      "duration": 97,
+      "name": "2 часть 2 урок.mov",
+      "saved": "2026-11-22T14:00"
+    },
+    "2.3": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAANAawLyo3dv9UKjxhU7SDdwfEI3RdoAAiiuAAL7TxlIy5scXbe153s9BA",
+      "duration": 40,
+      "name": "2 часть 3 урок.mov",
+      "saved": "2026-11-22T14:00"
+    },
+    "2.4": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAANBawLy1Bz-I6-nLT0xglKp6A1knIkAAimuAAL7TxlIkHIaEbcD1Go9BA",
+      "duration": 66,
+      "name": "2 часть 4 урок.mov",
+      "saved": "2026-11-22T14:00"
+    },
+    "2.5": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAANCawLzLpsiBZSsz5yhc7BxKh2s9NIAAiuuAAL7TxlIe9Nvllz6l-09BA",
+      "duration": 115,
+      "name": "2 часть 5 урок.mov",
+      "saved": "2026-11-22T14:00"
+    },
+    "2.6": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAANDawLzZZrh_nrf1OKECPEc4_CP_s8AAi6uAAL7TxlIn0-KAUz3yL49BA",
+      "duration": 65,
+      "name": "2 часть 6 урок.mov",
+      "saved": "2026-11-22T14:00"
+    },
+    "2.7": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAANEawLzuSZy1qRJ7migZk7qLqH6ZJUAAjCuAAL7TxlIFHBRRRe5xAQ9BA",
+      "duration": 167,
+      "name": "2 часть 7 урок.mov",
+      "saved": "2026-11-22T14:00"
+    },
+    "2.8": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAANFawL0EyfGkuDdU0dVhDoT__AAAf84AAI1rgAC-08ZSOmsDIBlAp9VPQQ",
+      "duration": 100,
+      "name": "2 часть 8 урок.mov",
+      "saved": "2026-11-22T14:00"
+    },
+    "2.9": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAANGawL0O2Lp5NYkkuIYJnHb3-tyNLQAAjiuAAL7TxlIMJZnfspDEGY9BA",
+      "duration": 108,
+      "name": "2 часть 9 урок.mov",
+      "saved": "2026-11-22T14:00"
+    },
+    "2.10": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAANHawL0fdmTAQli7sv1KLE23YDVHsAAAkWuAAL7TxlIEDavXDL6dbI9BA",
+      "duration": 108,
+      "name": "2 часть 10 урок.mov",
+      "saved": "2026-11-22T14:00"
     }
   }
 }
