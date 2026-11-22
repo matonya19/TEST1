@@ -26,6 +26,7 @@ import yaml
 HERE = Path(__file__).parent
 CONFIG = HERE / "course.yaml"
 STATE = HERE / "data" / "sent.json"
+LIBRARY = HERE / "data" / "videos.json"  # видео, присланные боту в личку: код → file_id
 CAPTION_LIMIT = 1024
 TEXT_LIMIT = 4096
 PLACEHOLDER = "ЗАМЕНИТЕ"
@@ -119,6 +120,8 @@ class Item:
     text: str
     media: tuple[str, str] | None = None  # (тип, путь / ссылка / file_id)
     deadline: datetime | None = None      # после этого момента уже не отправлять
+    day: str | None = None                # номер дня курса (для test)
+    problem: str | None = None            # почему пост пока нельзя отправить
 
 
 def parse_time(value, field: str) -> tuple[int, int]:
@@ -192,13 +195,46 @@ def load_config() -> dict:
                  "Возьмите такое значение в кавычки или используйте text: | с новой строки.")
 
 
-def build_schedule(cfg: dict) -> list[Item]:
+def media_code(value) -> str:
+    """Код видео из подписи или course.yaml: «1.1», «День 1.2 » → «1.1», «день 1.2»."""
+    if isinstance(value, float):  # YAML читает 1.1 без кавычек как число
+        value = repr(value)
+    return " ".join(str(value).split()).lower().replace(",", ".")
+
+
+def load_library() -> dict:
+    try:
+        return json.loads(LIBRARY.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {"offset": None, "media": {}}
+
+
+def save_library(lib: dict) -> None:
+    LIBRARY.parent.mkdir(exist_ok=True)
+    LIBRARY.write_text(json.dumps(lib, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def resolve_media(kind: str, value, library: dict) -> tuple[str, str, str | None]:
+    """→ (тип, file_id/ссылка/путь, ошибка). Короткое значение — код видео из библиотеки бота."""
+    src = media_code(value) if isinstance(value, float) else str(value).strip()
+    saved = library.get("media", {}).get(media_code(src))
+    if saved:
+        return saved["kind"], saved["file_id"], None
+    if src.startswith(("http://", "https://")) or (HERE / src).is_file() or len(src) > 30:
+        return kind, src, None
+    return kind, src, f"видео «{src}» ещё не прислано боту"
+
+
+def build_schedule(cfg: dict, library: dict | None = None) -> list[Item]:
+    library = library if library is not None else load_library()
     tz = ZoneInfo(cfg.get("timezone", "Europe/Moscow"))
     start = parse_date(cfg["start_date"], "start_date")
     default_time = cfg.get("post_time", "10:00")
+    day_times = cfg.get("post_times") or []  # время 1-го, 2-го, 3-го… поста дня
     catch_up = timedelta(hours=float(cfg.get("catch_up_hours", 12)))
     items: list[Item] = []
     seen: dict[str, int] = {}
+    per_day: dict[date, int] = {}
 
     for i, post in enumerate(cfg.get("posts") or [], 1):
         where = f"posts[{i}]"
@@ -208,17 +244,27 @@ def build_schedule(cfg: dict) -> list[Item]:
             d = start + timedelta(days=int(post["day"]) - 1)
         else:
             raise ValueError(f"{where}: укажите day (номер дня курса) или date")
-        h, m = parse_time(post.get("time", default_time), where + ".time")
+        n = per_day[d] = per_day.get(d, 0) + 1
+        auto_time = day_times[n - 1] if n <= len(day_times) else default_time
+        h, m = parse_time(post.get("time", auto_time), where + ".time")
         when = datetime(d.year, d.month, d.day, h, m, tzinfo=tz)
-        media = [(k, str(post[k])) for k in MEDIA_KINDS if post.get(k)]
+        media = [(k, post[k]) for k in MEDIA_KINDS if post.get(k)]
         if len(media) > 1:
             raise ValueError(f"{where}: в одном посте может быть только одно вложение")
+        kind, src, problem = resolve_media(*media[0], library) if media else (None, None, None)
         base = f"post:{when:%Y-%m-%dT%H:%M}"
         seen[base] = seen.get(base, 0) + 1
         label = f"День {post['day']}" if "day" in post else f"Пост {d}"
-        items.append(Item(key=f"{base}#{seen[base]}", when=when, title=label,
-                          text=str(post.get("text") or "").strip(), media=media[0] if media else None,
-                          deadline=when + catch_up))
+        if media:
+            names = {"video": "видео", "photo": "фото", "document": "файл", "animation": "gif"}
+            code = media_code(media[0][1]) if len(str(media[0][1])) <= 30 else ""
+            label += f" · {names.get(kind, kind)} {code}".rstrip()
+        text = str(post.get("text") or "").strip()
+        if post.get("practice"):
+            text += f"\n\n📝 <b>{cfg.get('practice_title', 'Практика')}</b>\n{str(post['practice']).strip()}"
+        items.append(Item(key=f"{base}#{seen[base]}", when=when, title=label, text=text.strip(),
+                          media=(kind, src) if media else None, deadline=when + catch_up,
+                          day=str(post.get("day", d)), problem=problem))
 
     default_reminders = cfg.get("default_reminders", ["1d", "1h"])
     for i, ev in enumerate(cfg.get("events") or [], 1):
@@ -281,11 +327,73 @@ def env(name: str, required: bool = True) -> str | None:
     return value or None
 
 
-def cmd_run(cfg: dict) -> None:
-    if not cfg.get("enabled"):
-        print("Бот выключен: в course.yaml стоит enabled: false. Ничего не отправляю.")
+HELP = ("Присылайте сюда видео курса <b>по одному</b>, обычным видео (не файлом), "
+        "и в подписи пишите код: <b>1.1</b> = день 1, видео 1; <b>1.2</b> = день 1, видео 2.\n\n"
+        "Я отвечу «✅ сохранено» в течение 15–30 минут. Прислать видео с тем же кодом ещё раз = заменить.\n"
+        "/list — какие видео уже сохранены")
+
+
+def collect_media(tg: Telegram, owner: str | None) -> None:
+    """Забирает видео, которые владелец прислал боту в личку, и запоминает их по коду из подписи."""
+    if not owner:
+        print("COURSE_TEST_CHAT_ID не задан — приём видео в личке выключен")
         return
+    lib = load_library()
+    try:
+        updates = tg.call("getUpdates", {"offset": lib.get("offset"), "timeout": 0,
+                                         "allowed_updates": json.dumps(["message"])})
+    except Exception as e:
+        print(f"! Не удалось проверить личку бота: {e}")
+        return
+    replies: list[str] = []
+    for upd in updates:
+        lib["offset"] = upd["update_id"] + 1
+        msg = upd.get("message") or {}
+        chat = msg.get("chat") or {}
+        if chat.get("type") != "private" or str(chat.get("id")) != str(owner):
+            continue  # чужие сообщения и сообщения из групп игнорируем
+        kind = next((k for k in ("video", "animation", "document") if msg.get(k)), None)
+        text = (msg.get("text") or "").strip().lower()
+        if kind:
+            code = media_code((msg.get("caption") or "").split("\n")[0])
+            if not code:
+                replies.append("⚠️ Пришло видео без подписи, я его не сохранила. "
+                               "Пришлите его ещё раз с кодом в подписи, например <b>1.1</b>")
+                continue
+            if kind == "document":
+                replies.append(f"⚠️ «{code}» пришло файлом, а не видео — в группе оно будет выглядеть как "
+                               "файл для скачивания. Лучше пришлите его обычным видео. Пока сохранила как есть.")
+            existed = code in lib["media"]
+            media = msg[kind]
+            lib["media"][code] = {"kind": kind, "file_id": media["file_id"],
+                                  "duration": media.get("duration"), "name": media.get("file_name"),
+                                  "saved": datetime.now().isoformat(timespec="minutes")}
+            replies.append(f"✅ {'Заменила' if existed else 'Сохранила'} видео <b>{code}</b>")
+        elif text.startswith("/list"):
+            codes = sorted(lib["media"], key=natural_key)
+            replies.append(f"Сохранено видео: {len(codes)}\n" + (", ".join(codes) or "пока нет"))
+        elif text.startswith(("/start", "/help")) or text:
+            replies.append(HELP)
+    save_library(lib)  # сначала сохраняем, потом отвечаем: ответ не так важен, как видео
+    if replies:
+        print(f"Личка: обработано сообщений — {len(replies)}")
+        total = f"\n\nВсего видео в библиотеке: {len(lib['media'])}"
+        try:
+            tg.send_text(owner, None, "\n".join(replies) + total, "HTML")
+        except Exception as e:
+            print(f"! Не удалось ответить в личку: {e}")
+
+
+def natural_key(code: str) -> list:
+    return [int(p) if p.isdigit() else p for p in re.split(r"(\d+)", code)]
+
+
+def cmd_run(cfg: dict) -> None:
     tg = Telegram(env("COURSE_BOT_TOKEN"))
+    collect_media(tg, env("COURSE_TEST_CHAT_ID", required=False))
+    if not cfg.get("enabled"):
+        print("Бот выключен: в course.yaml стоит enabled: false. В группу ничего не отправляю.")
+        return
     chat, thread = env("COURSE_CHAT_ID"), env("COURSE_THREAD_ID", required=False)
     parse_mode = cfg.get("parse_mode", "HTML") or None
     now = datetime.now(ZoneInfo(cfg.get("timezone", "Europe/Moscow")))
@@ -298,9 +406,10 @@ def cmd_run(cfg: dict) -> None:
             print(f"- Пропускаю (опоздание): {item.title}, {item.when:%d.%m %H:%M}")
             state[item.key] = {"skipped": True, "at": now.isoformat(timespec="minutes")}
             continue
-        if PLACEHOLDER in item.text:
-            print(f"! Не отправляю {item.title}: в тексте остался шаблон «{PLACEHOLDER}»")
-            errors.append(f"{item.title}: не заполнен текст")
+        if PLACEHOLDER in item.text or item.problem:
+            reason = item.problem or f"в тексте остался шаблон «{PLACEHOLDER}»"
+            print(f"! Не отправляю {item.title}: {reason}")
+            errors.append(f"{item.title}: {reason}")
             continue
         try:
             deliver(tg, chat, thread, item, parse_mode)
@@ -317,14 +426,17 @@ def cmd_run(cfg: dict) -> None:
 
 
 def cmd_preview(cfg: dict) -> None:
-    state = load_state()
+    state, lib = load_state(), load_library()
     print(f"Бот {'ВКЛЮЧЁН' if cfg.get('enabled') else 'выключен (enabled: false)'}, "
-          f"старт курса {cfg['start_date']}, часовой пояс {cfg.get('timezone', 'Europe/Moscow')}\n")
-    for it in build_schedule(cfg):
+          f"старт курса {cfg['start_date']}, часовой пояс {cfg.get('timezone', 'Europe/Moscow')}")
+    print(f"Видео в библиотеке бота: {len(lib['media'])} — "
+          f"{', '.join(sorted(lib['media'], key=natural_key)) or 'пока нет'}\n")
+    days = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
+    for it in build_schedule(cfg, lib):
         mark = "✅" if "sent" in state.get(it.key, {}) else "⏭" if it.key in state else "⏳"
         warn = "  ⚠️ шаблонный текст" if PLACEHOLDER in it.text else ""
-        media = f"  [{it.media[0]}]" if it.media else ""
-        print(f"{mark} {WEEKDAYS[it.when.weekday()][:2]} {it.when:%d.%m %H:%M}  {it.title}{media}{warn}")
+        warn += f"  ⚠️ {it.problem}" if it.problem else ""
+        print(f"{mark} {days[it.when.weekday()]} {it.when:%d.%m %H:%M}  {it.title}{warn}")
 
 
 def cmd_test(cfg: dict, day: str | None) -> None:
@@ -336,10 +448,14 @@ def cmd_test(cfg: dict, day: str | None) -> None:
         print(f"Проверочное сообщение отправлено в чат {chat}, ветку {thread or '— (общий чат)'}")
         return
     chat = env("COURSE_TEST_CHAT_ID")
-    items = [it for it in build_schedule(cfg) if it.title in (f"День {day}", f"Пост {day}")]
+    items = [it for it in build_schedule(cfg) if it.day == str(day).strip()]
     if not items:
-        sys.exit(f"В course.yaml нет поста для дня {day}")
+        sys.exit(f"В course.yaml нет постов для дня {day}")
     for it in items:
+        if it.problem:
+            print(f"! Пропускаю «{it.title}»: {it.problem}")
+            continue
+        tg.send_text(chat, None, f"👀 Предпросмотр: {it.title}, выйдет {human_dt(it.when)}", None)
         deliver(tg, chat, None, it, parse_mode)
         print(f"Пост «{it.title}» отправлен в тестовый чат {chat}")
 
