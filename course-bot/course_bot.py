@@ -448,15 +448,16 @@ def cmd_test(cfg: dict, day: str | None) -> None:
         print(f"Проверочное сообщение отправлено в чат {chat}, ветку {thread or '— (общий чат)'}")
         return
     chat = env("COURSE_TEST_CHAT_ID")
-    items = [it for it in build_schedule(cfg) if it.day == str(day).strip()]
+    items = [it for it in build_schedule(cfg) if it.day == str(day).strip() and PLACEHOLDER not in it.text]
     if not items:
         sys.exit(f"В course.yaml нет постов для дня {day}")
     for it in items:
+        note = f"\n⚠️ {it.problem} — показываю только текст" if it.problem else ""
+        tg.send_text(chat, None, f"👀 Предпросмотр: {it.title}, выйдет {human_dt(it.when)}{note}", None)
         if it.problem:
-            print(f"! Пропускаю «{it.title}»: {it.problem}")
-            continue
-        tg.send_text(chat, None, f"👀 Предпросмотр: {it.title}, выйдет {human_dt(it.when)}", None)
-        deliver(tg, chat, None, it, parse_mode)
+            tg.send_text(chat, None, it.text, parse_mode)
+        else:
+            deliver(tg, chat, None, it, parse_mode)
         print(f"Пост «{it.title}» отправлен в тестовый чат {chat}")
 
 
