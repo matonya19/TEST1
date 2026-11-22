@@ -1,5 +1,5 @@
 {
-  "offset": 519451564,
+  "offset": 519451569,
   "media": {
     "1.1": {
       "kind": "video",
@@ -21,6 +21,41 @@
       "duration": 350,
       "name": "Часть 1, урок 2.mov",
       "saved": "2026-11-22T12:45"
+    },
+    "1.4": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAAMaawLrAlgCHbqdbMvJ9A1xNJCPEvMAAu-tAAL7TxlI0Kvjrr4kutM9BA",
+      "duration": 143,
+      "name": "Часть 1, урок 3.mov",
+      "saved": "2026-11-22T13:30"
+    },
+    "1.5": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAAMbawLsTGjInRXC-KRRzjH2iqzJfr0AAvitAAL7TxlIvJIOdy2qKzg9BA",
+      "duration": 146,
+      "name": "Часть 1,урок 4.mov",
+      "saved": "2026-11-22T13:30"
+    },
+    "1.6": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAAMgawLtxYuVzxYPPvwH74JZpbf7MMUAAgiuAAL7TxlIo5qfOIv_SCw9BA",
+      "duration": 65,
+      "name": "Часть 1,урок 5.mov",
+      "saved": "2026-11-22T13:30"
+    },
+    "1.7": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAAMjawLuE0u2nZrtq2A9Tyfm60KHk3IAAgquAAL7TxlIE2MKQHCiW9A9BA",
+      "duration": 73,
+      "name": "Часть1,урок 6.mov",
+      "saved": "2026-11-22T13:30"
+    },
+    "1.8": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAAMoawLuVSGmpeBv367Su2cLdnmzW3QAAguuAAL7TxlIyQABaIJcM0rxPQQ",
+      "duration": 81,
+      "name": "Часть 1, урок 7.mov",
+      "saved": "2026-11-22T13:30"
     }
   }
 }
