@@ -1,4 +1,19 @@
 {
-  "offset": 519451561,
-  "media": {}
+  "offset": 519451563,
+  "media": {
+    "1.1": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAAMHawLagIIjS0fL1sv1XnKl8Q86SCoAAlitAAL7TxlIPmG6_rL4Irk9BA",
+      "duration": 105,
+      "name": "Вступление.mov",
+      "saved": "2026-11-22T12:15"
+    },
+    "1.2": {
+      "kind": "video",
+      "file_id": "BAACAgIAAxkBAAMIawLck0h1zJOPqit23iURQLJilJUAAmytAAL7TxlIaSFAg00Paw49BA",
+      "duration": 139,
+      "name": "Часть 1,урок 1.mov",
+      "saved": "2026-11-22T12:15"
+    }
+  }
 }
