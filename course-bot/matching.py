@@ -214,12 +214,14 @@ def make_draft(tg: cb.Telegram, owner: str, cfg: dict, store: ChatStore | None =
     tg.send_text(owner, None, text, "HTML")
 
 
-def publish(tg: cb.Telegram, owner: str) -> None:
+def publish(tg: cb.Telegram, owner: str, cfg: dict) -> None:
     draft = load_secret(DRAFT, None)
     if not draft:
         tg.send_text(owner, None, "Черновика пока нет. Отправьте /match, чтобы подобрать пары.", None)
         return
-    chat, thread = cb.env("COURSE_CHAT_ID"), cb.env("COURSE_THREAD_ID", required=False)
+    chat = cb.env("COURSE_CHAT_ID")
+    # Ветка для пар (например «Знакомства»); если не указана — ветка постов курса
+    thread = str((cfg.get("matching") or {}).get("thread") or "") or cb.env("COURSE_THREAD_ID", required=False)
     tg.send_text(chat, thread, draft["text"], "HTML")
     DRAFT.unlink()
     tg.send_text(owner, None, "✅ Пары опубликованы в группе.", None)
@@ -234,7 +236,7 @@ def handle_command(command: str, tg: cb.Telegram, owner: str, cfg: dict, store: 
         tg.send_text(owner, None, "⏳ Подбираю пары, это займёт пару минут…", None)
         make_draft(tg, owner, cfg, store)
     elif command == "/publish":
-        publish(tg, owner)
+        publish(tg, owner, cfg)
 
 
 def run_scheduled(tg: cb.Telegram, owner: str | None, cfg: dict) -> None:
