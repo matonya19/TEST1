@@ -79,7 +79,7 @@ class Ref(R.Renderer):
         self.groups = self.make_groups()
 
     def resolve(self, o):
-        if o['type'] in ('sheet', 'photo', 'hook', 'pill', 'pic'):
+        if o['type'] in ('sheet', 'photo', 'hook', 'pill', 'pic', 'wave'):
             o = dict(o); c = self.cue
             o['t0'] = c(o.get('at', 0)); o['t1'] = c(o['until']) if 'until' in o else o['t0'] + o.get('dur', 1.5)
             return o
@@ -167,7 +167,8 @@ class Ref(R.Renderer):
             if not (o['t0'] - 0.01 <= t < o['t1'] + 0.35): continue
             ty = o['type']
             if ty in ('sheet', 'photo', 'card'): continue
-            if ty == 'pic': self.ov_pic(cv, t, o)
+            if ty == 'wave': self.ov_wave(cv, t, o)
+            elif ty == 'pic': self.ov_pic(cv, t, o)
             elif ty == 'pill': self.ov_pill(cv, t, o)
             elif ty == 'hook': self.ov_hook(cv, t, o)
             elif hasattr(self, 'ov_' + ty): getattr(self, 'ov_' + ty)(cv, t, o)
@@ -177,6 +178,25 @@ class Ref(R.Renderer):
     def in_sheet(self, t):
         o = self.active(self.sheets, t, 0.35)
         return o is not None and t >= o['t0'] + 0.25
+
+    def ov_wave(self, cv, t, o):
+        if not hasattr(self, '_env'): self._env = R.env_db(self.plan['work'])
+        if t >= self.BODY: return
+        sg = self.seg_at(t); st = sg['a'] + (t - sg['o'])
+        n = o.get('bars', 36); w = o.get('w', 640); bw = w / n; h = o.get('h', 120); cy = FH * o.get('y', 0.86)
+        img = Image.new('RGBA', (FW, int(h) + 20), (0, 0, 0, 0)); d = ImageDraw.Draw(img)
+        x0 = FW / 2 - w / 2; mid = (h + 20) / 2
+        for k in range(n):
+            # mirror around centre: centre bars = now, edges = slightly earlier
+            off = abs(k - (n - 1) / 2) / ((n - 1) / 2)
+            i = int((st - off * 0.35) * 100)
+            v = self._env[max(0, min(i, len(self._env) - 1))]
+            a = clamp((v + 50) / 32) * (1 - 0.45 * off) * (0.75 + 0.25 * math.sin(k * 1.7 + t * 9))
+            bh = max(6, a * h)
+            col = tuple(o.get('color', AMBER)) + (255,)
+            xx = x0 + k * bw + bw * 0.2
+            d.rounded_rectangle((xx, mid - bh / 2, xx + bw * 0.6, mid + bh / 2), int(bw * 0.3), fill=col)
+        cv.alpha_composite(img, (0, int(cy - mid)))
 
     def ov_pic(self, cv, t, o):
         p = prog(t, o['t0'], 0.35); a = clamp(p * 3) * (1 - ease_in(prog(t, o['t1'], 0.22)))

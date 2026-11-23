@@ -385,6 +385,16 @@
    ],
    "tracking": 0.08,
    "sfx": "none"
+  },
+  {
+   "type": "wave",
+   "at": 0.0,
+   "until": "end",
+   "y": 0.875,
+   "w": 620,
+   "h": 150,
+   "bars": 34,
+   "sfx": "none"
   }
  ]
 }
