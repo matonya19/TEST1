@@ -79,3 +79,13 @@ python course_bot.py preview
 COURSE_BOT_TOKEN=… python course_bot.py discover
 COURSE_BOT_TOKEN=… COURSE_CHAT_ID=… COURSE_THREAD_ID=… python course_bot.py test
 ```
+
+## Пары для совместных эфиров
+
+Бот читает сообщения участников во всей группе (он администратор) и сохраняет их **в зашифрованном виде** в `data/chat.enc`: репозиторий публичный, поэтому без шифрования хранить их нельзя. Сообщения ведущей, ботов и команды не сохраняются.
+
+В момент из `matching.drafts` в `course.yaml` (и в любой момент по команде `/match` в личке бота) Claude анализирует, что люди писали о себе, и предлагает пары с темой эфира. Черновик приходит ведущей в личку, в группу он уходит только после команды `/publish`. `/stats` — сколько сообщений и участников собрано.
+
+Нужны два секрета в GitHub (Settings → Secrets and variables → Actions):
+- `COURSE_DATA_KEY` — любая длинная случайная строка, ключ шифрования. Если его поменять, старые сообщения расшифровать не получится.
+- `ANTHROPIC_API_KEY` — ключ Claude API (console.anthropic.com).

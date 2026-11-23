@@ -329,29 +329,50 @@ def env(name: str, required: bool = True) -> str | None:
 
 HELP = ("Присылайте сюда видео курса <b>по одному</b>, обычным видео (не файлом), "
         "и в подписи пишите код: <b>1.1</b> = день 1, видео 1; <b>1.2</b> = день 1, видео 2.\n\n"
-        "Я отвечу «✅ сохранено» в течение 15–30 минут. Прислать видео с тем же кодом ещё раз = заменить.\n"
-        "/list — какие видео уже сохранены")
+        "Я отвечу «✅ сохранено» в течение 15–30 минут. Прислать видео с тем же кодом ещё раз = заменить.\n\n"
+        "/list — какие видео уже сохранены\n"
+        "/stats — сколько сообщений участников собрано\n"
+        "/match — подобрать пары для совместных эфиров (пришлю вам черновик)\n"
+        "/publish — опубликовать последний черновик пар в группе")
 
 
-def collect_media(tg: Telegram, owner: str | None) -> None:
-    """Забирает видео, которые владелец прислал боту в личку, и запоминает их по коду из подписи."""
+def collect_updates(tg: Telegram, owner: str | None, cfg: dict) -> None:
+    """Читает новые сообщения бота: видео и команды владельца в личке, сообщения участников в группе."""
+    import matching  # локально: модулю нужны anthropic и cryptography только при запуске run
+
     if not owner:
-        print("COURSE_TEST_CHAT_ID не задан — приём видео в личке выключен")
+        print("COURSE_TEST_CHAT_ID не задан — приём видео и команд в личке выключен")
         return
     lib = load_library()
+    group = str(env("COURSE_CHAT_ID", required=False) or "")
+    updates: list[dict] = []
     try:
-        updates = tg.call("getUpdates", {"offset": lib.get("offset"), "timeout": 0,
-                                         "allowed_updates": json.dumps(["message"])})
+        for _ in range(20):  # Telegram отдаёт максимум 100 обновлений за раз
+            batch = tg.call("getUpdates", {"offset": lib.get("offset"), "timeout": 0, "limit": 100,
+                                           "allowed_updates": json.dumps(["message"])})
+            updates += batch
+            if batch:
+                lib["offset"] = batch[-1]["update_id"] + 1
+            if len(batch) < 100:
+                break
     except Exception as e:
-        print(f"! Не удалось проверить личку бота: {e}")
-        return
+        print(f"! Не удалось получить сообщения бота: {e}")
+        if not updates:
+            return
+
+    store = matching.ChatStore()
     replies: list[str] = []
+    commands: list[str] = []
     for upd in updates:
-        lib["offset"] = upd["update_id"] + 1
         msg = upd.get("message") or {}
         chat = msg.get("chat") or {}
+        sender = msg.get("from") or {}
+        if group and str(chat.get("id")) == group:
+            if str(sender.get("id")) != str(owner):
+                store.add(msg)
+            continue
         if chat.get("type") != "private" or str(chat.get("id")) != str(owner):
-            continue  # чужие сообщения и сообщения из групп игнорируем
+            continue  # чужие личные сообщения игнорируем
         kind = next((k for k in ("video", "animation", "document") if msg.get(k)), None)
         text = (msg.get("text") or "").strip().lower()
         if kind:
@@ -372,16 +393,34 @@ def collect_media(tg: Telegram, owner: str | None) -> None:
         elif text.startswith("/list"):
             codes = sorted(lib["media"], key=natural_key)
             replies.append(f"Сохранено видео: {len(codes)}\n" + (", ".join(codes) or "пока нет"))
-        elif text.startswith(("/start", "/help")) or text:
+        elif text.startswith(("/stats", "/match", "/publish")):
+            commands.append(text.split()[0].split("@")[0])
+        elif text:
             replies.append(HELP)
-    save_library(lib)  # сначала сохраняем, потом отвечаем: ответ не так важен, как видео
+    store.save()
+    save_library(lib)  # сначала сохраняем, потом отвечаем: ответ не так важен, как данные
+    if store.added:
+        print(f"Группа: сохранено новых сообщений участников — {store.added}")
+    if store.skipped:
+        print(f"! Группа: {store.skipped} сообщений НЕ сохранено — не задан секрет COURSE_DATA_KEY")
+        if not lib.get("key_warned"):
+            lib["key_warned"] = True
+            save_library(lib)
+            replies.append("⚠️ Я не могу сохранять сообщения участников: в GitHub не задан секрет "
+                           "<b>COURSE_DATA_KEY</b>. Без него не получится подобрать пары для эфиров.")
     if replies:
         print(f"Личка: обработано сообщений — {len(replies)}")
         total = f"\n\nВсего видео в библиотеке: {len(lib['media'])}"
         try:
-            tg.send_text(owner, None, "\n".join(replies) + total, "HTML")
+            tg.send_text(owner, None, "\n\n".join(replies) + total, "HTML")
         except Exception as e:
             print(f"! Не удалось ответить в личку: {e}")
+    for command in dict.fromkeys(commands):  # каждую команду — один раз
+        try:
+            matching.handle_command(command, tg, owner, cfg, store)
+        except Exception as e:
+            print(f"! Команда {command}: {e}")
+            tg.send_text(owner, None, f"⚠️ Не получилось выполнить {command}: {e}", None)
 
 
 def natural_key(code: str) -> list:
@@ -390,7 +429,10 @@ def natural_key(code: str) -> list:
 
 def cmd_run(cfg: dict) -> None:
     tg = Telegram(env("COURSE_BOT_TOKEN"))
-    collect_media(tg, env("COURSE_TEST_CHAT_ID", required=False))
+    owner = env("COURSE_TEST_CHAT_ID", required=False)
+    collect_updates(tg, owner, cfg)
+    import matching
+    matching.run_scheduled(tg, owner, cfg)
     if not cfg.get("enabled"):
         print("Бот выключен: в course.yaml стоит enabled: false. В группу ничего не отправляю.")
         return
