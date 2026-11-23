@@ -167,12 +167,15 @@ class Ref(R.Renderer):
             if not (o['t0'] - 0.01 <= t < o['t1'] + 0.35): continue
             ty = o['type']
             if ty in ('sheet', 'photo', 'card'): continue
-            if ty == 'wave': self.ov_wave(cv, t, o)
+            if ty == 'wave' or o.get('top'): continue
             elif ty == 'pic': self.ov_pic(cv, t, o)
             elif ty == 'pill': self.ov_pill(cv, t, o)
             elif ty == 'hook': self.ov_hook(cv, t, o)
             elif hasattr(self, 'ov_' + ty): getattr(self, 'ov_' + ty)(cv, t, o)
         if sh_: self.ov_sheet(cv, t, sh_)
+        for o in self.ov:
+            if o['t0'] - 0.01 <= t < o['t1'] + 0.35 and (o['type'] == 'wave' or o.get('top')):
+                (self.ov_wave if o['type'] == 'wave' else getattr(self, 'ov_' + o['type']))(cv, t, o)
         if t < self.BODY + 0.3 and not self.in_sheet(t): self.subs_phrase(cv, t)
 
     def in_sheet(self, t):

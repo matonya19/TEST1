@@ -1,19 +1,19 @@
 {
- "src": "/home/claude/work/v4/src.mp4",
+ "src": "/home/claude/work/v4/src_full.mp4",
  "out": "/home/user/TEST1/reels/Отзыв_курс_интервью_монтаж.mp4",
  "tail": 1.2,
  "subs": {
   "mode": "phrase",
-  "y": 0.66,
-  "size": 60
+  "y": 0.76,
+  "size": 56
  },
- "text_shadow": 0.6,
+ "text_shadow": 1.0,
  "grade": {
   "auto_light": false,
   "warm": 0.0,
-  "contrast": 1.0,
+  "contrast": 1.03,
   "sat": 1.0,
-  "vignette": 0.0
+  "vignette": 0.12
  },
  "music": {
   "level": 0.16,
@@ -206,19 +206,16 @@
  ],
  "overlays": [
   {
-   "type": "text",
-   "text": "отзыв о курсе интервью",
-   "face": "sans_semi",
-   "size": 64,
-   "x": 0.5,
-   "y": 0.575,
+   "type": "hook",
+   "lines": [
+    "ОТЗЫВ",
+    "О КУРСЕ ИНТЕРВЬЮ"
+   ],
    "at": 0.0,
-   "until": "seg:1",
-   "color": [
-    242,
-    183,
-    107
-   ]
+   "until": "Полину+0.6",
+   "y": 0.6,
+   "size": 90,
+   "pill": "TEXTURA"
   },
   {
    "type": "pill",
@@ -227,56 +224,56 @@
    "at": "курс",
    "dur": 2.2,
    "x": 0.5,
-   "y": 0.47
+   "y": 0.14
   },
   {
    "type": "pill",
    "size": 40,
    "text": "вести блог",
    "at": "блог",
-   "dur": 1.6,
-   "x": 0.26,
-   "y": 0.43
+   "dur": 1.8,
+   "x": 0.3,
+   "y": 0.14
   },
   {
    "type": "pill",
    "size": 40,
    "text": "брать и давать интервью",
    "at": "брать",
-   "dur": 2.0,
+   "dur": 1.9,
    "x": 0.6,
-   "y": 0.47
+   "y": 0.2
   },
   {
-   "type": "accent",
-   "text": "проявляться",
-   "size": 150,
-   "at": "проявляться",
-   "dur": 1.0,
-   "y": 0.8,
-   "color": [
-    255,
-    255,
-    255
+   "type": "sheet",
+   "at": "seg:1",
+   "until": "seg:3-0.05",
+   "chapter": "01/03",
+   "label": "для кого",
+   "bar": [
+    0,
+    0.33
    ],
-   "sfx": "click"
+   "photo": "/home/claude/work/v4/guest1.jpg",
+   "pw": 520,
+   "ph": 400
   },
   {
    "type": "pill",
    "size": 40,
-   "text": "не терять суть",
-   "at": "терять",
-   "dur": 2.4,
+   "text": "хаотичная речь",
+   "at": "хаотичный",
+   "dur": 2.2,
    "x": 0.5,
-   "y": 0.47
+   "y": 0.14
   },
   {
    "type": "accent",
    "text": "поддержка",
-   "size": 150,
+   "size": 170,
    "at": "поддержки",
    "dur": 1.2,
-   "y": 0.8,
+   "y": 0.17,
    "color": [
     255,
     255,
@@ -285,26 +282,18 @@
    "sfx": "click"
   },
   {
-   "type": "pill",
-   "size": 40,
-   "text": "безопасность",
-   "at": "безопасности",
-   "dur": 1.8,
-   "x": 0.5,
-   "y": 0.47
-  },
-  {
-   "type": "accent",
-   "text": "ценно",
-   "size": 170,
-   "at": "ценно",
-   "dur": 1.0,
-   "y": 0.8,
-   "color": [
-    242,
-    183,
-    107
-   ]
+   "type": "sheet",
+   "at": "seg:5",
+   "until": "seg:6-0.05",
+   "chapter": "02/03",
+   "label": "атмосфера",
+   "bar": [
+    0.33,
+    0.66
+   ],
+   "photo": "/home/claude/work/v4/guest2.jpg",
+   "pw": 520,
+   "ph": 400
   },
   {
    "type": "pill",
@@ -313,7 +302,7 @@
    "at": "экспертизу",
    "dur": 1.6,
    "x": 0.3,
-   "y": 0.44
+   "y": 0.14
   },
   {
    "type": "pill",
@@ -322,46 +311,39 @@
    "at": "знания",
    "dur": 1.6,
    "x": 0.7,
-   "y": 0.44
+   "y": 0.14
   },
   {
    "type": "pill",
    "size": 40,
    "text": "новые люди",
    "at": "людей",
-   "dur": 1.6,
+   "dur": 1.8,
    "x": 0.5,
-   "y": 0.49
+   "y": 0.2
   },
   {
-   "type": "accent",
-   "text": "ценно",
-   "size": 170,
-   "at": "ценно#1",
-   "dur": 1.0,
-   "y": 0.8,
-   "color": [
-    242,
-    183,
-    107
-   ]
-  },
-  {
-   "type": "pill",
-   "size": 40,
-   "text": "не бояться камеры",
-   "at": "бояться",
-   "dur": 2.6,
-   "x": 0.5,
-   "y": 0.47
+   "type": "sheet",
+   "at": "seg:7",
+   "until": "seg:11-0.05",
+   "chapter": "03/03",
+   "label": "результат",
+   "bar": [
+    0.66,
+    1.0
+   ],
+   "photo": "/home/user/TEST1/textura-carousel/photos/group.jpg",
+   "pw": 560,
+   "ph": 400,
+   "rot": -1.5
   },
   {
    "type": "accent",
    "text": "всем советую",
-   "size": 120,
-   "at": "советую",
+   "size": 150,
+   "at": "Слава",
    "until": "end+1.2",
-   "y": 0.8,
+   "y": 0.17,
    "color": [
     242,
     183,
@@ -370,31 +352,36 @@
    "sfx": "click"
   },
   {
+   "type": "wave",
+   "at": 0.0,
+   "until": "end",
+   "y": 0.88,
+   "w": 620,
+   "h": 130,
+   "bars": 34,
+   "sfx": "none"
+  },
+  {
    "type": "text",
    "text": "TEXTURA · курс интервью",
    "face": "sans",
    "size": 30,
    "x": 0.5,
-   "y": 0.93,
+   "y": 0.94,
    "at": 0.0,
    "until": "end+1.2",
    "color": [
-    150,
-    145,
-    140
+    200,
+    195,
+    190
    ],
    "tracking": 0.08,
-   "sfx": "none"
-  },
-  {
-   "type": "wave",
-   "at": 0.0,
-   "until": "end",
-   "y": 0.875,
-   "w": 620,
-   "h": 150,
-   "bars": 34,
-   "sfx": "none"
+   "sfx": "none",
+   "top": true
   }
+ ],
+ "card_focus": [
+  540,
+  1000
  ]
 }
