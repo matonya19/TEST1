@@ -15,9 +15,9 @@ const c1=`<img class=bg src="c1_bg.jpg"><div class=logo><img src="logo.png"></di
 <div class="st y" style="left:60px;top:560px;transform:rotate(-4deg)">Онлайн-школа без оценок</div>
 <div class="ck" style="left:540px;top:440px;transform:rotate(8deg)">✓</div>`;
 const c2=`<img class=bg src="c2_bg.jpg"><div class=logo><img src="logo.png"></div>
-<h1 style="top:170px;width:590px;font-size:70px">Кто объяснит, если ребёнок <em>не понял?</em></h1>
+<h1 style="top:160px;width:520px;font-size:64px">Кто объяснит, если ребёнок <em>не понял?</em></h1>
 <div class="st y" style="left:60px;top:560px;transform:rotate(-4deg)">Онлайн-школа</div>
-<div class="st w" style="left:60px;top:630px;transform:rotate(3deg);font-size:30px">Учитель объяснит ещё раз</div>`;
+<div class="st w" style="left:60px;top:630px;transform:rotate(3deg);font-size:28px">Учитель объяснит ещё раз</div>`;
 (async()=>{const b=await chromium.launch();const pg=await b.newPage({viewport:{width:1280,height:720}});
 for(const [n,h] of [['c1',c1],['c2',c2]]){const p=process.cwd()+`/${n}.html`;fs.writeFileSync(p,`<!doctype html><meta charset=utf-8><style>${base}</style>${h}`);await pg.goto('file://'+p);await pg.waitForTimeout(800);await pg.screenshot({path:`thumb_${n}.png`});}
 await b.close();})();
