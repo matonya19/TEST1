@@ -20,19 +20,19 @@ const S={
 <div class=card style="top:210px;padding:40px 46px"><div class=big style="font-size:58px;line-height:1.16">Сколько раз вы слышали от&nbsp;ребёнка: <span class=hl>«Можно я сегодня останусь дома?»</span></div></div>`,
 
 1:`<body class=blue><div class=logo><img src="logo_w.png"></div>
-<div class=card style="top:210px;padding:30px 44px"><div class=big style="font-size:44px;line-height:1.25">Обычно это выглядит так: в&nbsp;воскресенье вечером ребёнок заглядывает в&nbsp;расписание</div></div>
-<div class=row style="top:440px;left:70px;right:170px"><div class=av>🧒</div><div class=bub>«Мам, завтра <span class=hl>опять физра?</span>»</div></div>
+<div class=card style="top:210px;padding:30px 44px"><div class=big style="font-size:44px;line-height:1.25">Обычно это выглядит так: в&nbsp;воскресенье вечером ребёнок мрачнеет</div></div>
+<div class=row style="top:440px;left:70px;right:170px"><div class=av>🧒</div><div class=bub>«Мам, а&nbsp;завтра <span class=hl>обязательно идти?</span>»</div></div>
 <div class=card style="top:700px;padding:18px 40px;left:340px;right:340px;text-align:center"><div style="font:700 40px Manrope">А утром…</div></div>
 <div class=row style="top:810px;left:70px;right:150px"><div class=av>🧒</div><div class=bub>«Можно я сегодня <span class=hl>останусь дома?</span>»</div></div>`,
 2:`<body style="background:#ffd24a"><div class=logo><img src="logo.png"></div>
-<style>.grid{position:absolute;left:70px;right:70px;top:330px}.d{display:flex;align-items:center;gap:24px;background:#fff;border-radius:36px;padding:28px 36px;margin-bottom:18px;box-shadow:0 12px 34px rgba(40,80,150,.16);font:700 44px Manrope}.d i{font-style:normal;width:150px;color:#7a8aa5;font-size:34px}.d.f{background:#2457c4;color:#fff}.d.f i{color:#cfe0ff}.d.f b{margin-left:auto;font-size:40px}</style>
-<div class=big style="position:absolute;left:80px;right:80px;top:170px;font-size:64px">В четверг всё повторяется</div>
-<div class=grid style="top:360px"><div class="d f"><i>Пн</i>Физра 🏃<b>«Останусь дома»</b></div><div class=d><i>Вт</i>Математика · Русский</div><div class=d><i>Ср</i>Литература · Английский</div><div class="d f"><i>Чт</i>Физра 🏃<b>«Останусь дома»</b></div><div class=d><i>Пт</i>История · Музыка</div></div>
-<div class=card style="top:1230px;background:#2457c4;color:#fff;font:800 56px/1.2 Manrope"><span class=hl>Именно в дни, когда в расписании физра</span><div style="font:500 38px/1.35 Manrope;margin-top:24px">Вы замечаете, что он просится остаться дома</div></div>`,
+<style>.it{display:flex;align-items:center;gap:26px;background:#fff;border-radius:36px;padding:34px 40px;margin-bottom:22px;box-shadow:0 12px 34px rgba(120,80,0,.18);font:700 46px/1.2 Manrope}.it b{flex:none;width:76px;height:76px;border-radius:50%;background:#2457c4;color:#fff;font:800 40px/76px Manrope;text-align:center}</style>
+<div class=big style="position:absolute;left:80px;right:80px;top:200px;font-size:70px">Приглядитесь, когда это случается</div>
+<div style="position:absolute;left:70px;right:70px;top:520px"><div class=it><b>1</b>В какие дни</div><div class=it><b>2</b>Перед каким уроком или событием</div><div class=it><b>3</b>После чего: перемена, группа, конкретный человек</div></div>
+<div class=card style="top:1230px;background:#2457c4;color:#fff;font:800 56px/1.2 Manrope"><span class=hl>Часто за этим стоит не лень, а конкретная ситуация</span></div>`,
 3:`<body class=blue><div class=logo><img src="logo_w.png"></div>
 <div class=card style="top:210px;padding:30px 44px"><div class=big style="font-size:46px">Попробуйте начать с&nbsp;того, что <span class=hl>заметили</span></div></div>
-<div class=row style="top:1010px;left:60px;right:200px"><div class=av style="font-size:36px">👩</div><div class=bub style="font-size:38px">«Слушай, ты чаще просишь остаться дома, когда у&nbsp;тебя физра. Как у&nbsp;тебя там дела?»</div></div>
-<div class=row r style="top:1260px;left:160px;right:50px"><div class=av>🧒</div><div class=bub style="font-size:42px">«Сама физра нормальная. Я&nbsp;<span style="background:#fff;padding:0 10px;border-radius:12px">в раздевалку идти не хочу</span>»</div></div>
+<div class=row style="top:1010px;left:60px;right:200px"><div class=av style="font-size:36px">👩</div><div class=bub style="font-size:38px">«Слушай, ты чаще просишь остаться дома по&nbsp;четвергам. Как у&nbsp;тебя там дела?»</div></div>
+<div class=row r style="top:1260px;left:160px;right:50px"><div class=av>🧒</div><div class=bub style="font-size:42px">«Там <span style="background:#fff;padding:0 10px;border-radius:12px">со&nbsp;мной не очень общаются</span>»</div></div>
 <div class=card style="top:1560px;padding:22px 40px;text-align:center"><div style="font:800 44px/1.25 Manrope">Теперь есть о&nbsp;чём поговорить конкретнее</div></div>`,
 4:`<body class=blue><div class=logo><img src="logo_w.png"></div>
 <div class=card style="top:250px;padding:40px 46px"><div class=big style="font-size:52px">Что делать, если <span class=hl>«можно я не пойду?»</span> звучит всё чаще?</div></div>
