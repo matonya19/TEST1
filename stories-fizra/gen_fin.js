@@ -39,8 +39,9 @@ const S={
 <div class=card style="top:1480px;padding:28px 40px;text-align:center;font:600 34px/1.4 Manrope">В рилсе разбираем, на что обратить внимание и&nbsp;в какой момент стоит подумать о&nbsp;смене класса или школы</div>
 `,
 5:`<body class=blue><div class=logo><img src="logo_w.png"></div>
-<div class=card style="top:210px;padding:36px 44px"><div class=big style="font-size:48px">Присматриваетесь к&nbsp;онлайн-школе?</div><div style="font:500 36px/1.38 Manrope;margin-top:20px;color:#33425f">Попробуйте <b class=hl style="font-weight:800">3 бесплатных дня</b> в&nbsp;SHKOLA. Ребёнок подключится к&nbsp;урокам по&nbsp;расписанию и&nbsp;познакомится с&nbsp;классом.</div></div>
-<div class=row r style="top:1180px;left:60px;right:60px"><div class=av style="font-size:36px">💬</div><div class=bub style="font-size:44px;background:#fff">Напишите <span class=hl>«3 дня»</span> в&nbsp;ответ на&nbsp;сторис 💛</div></div>`};
+<div style="position:absolute;left:70px;right:70px;top:300px"><div style="font:800 84px/1.08 Manrope;letter-spacing:-2px">Присматриваетесь к&nbsp;онлайн-школе?</div></div>
+<div class=card style="top:720px;padding:56px 56px"><div style="font:800 76px/1.1 Manrope;letter-spacing:-1.5px"><span class=hl>3 бесплатных дня</span> в&nbsp;SHKOLA</div><div style="font:500 44px/1.38 Manrope;margin-top:32px;color:#33425f">Ребёнок подключится к&nbsp;урокам по&nbsp;расписанию и&nbsp;познакомится с&nbsp;классом.</div></div>
+<div class=row r style="top:1360px;left:90px;right:70px"><div class=av style="font-size:40px">💬</div><div class=bub style="font-size:52px;background:#fff">Напишите <span class=hl>«3 дня»</span> в&nbsp;ответ на&nbsp;сторис 💛</div></div>`};
 (async()=>{const b=await chromium.launch();const pg=await b.newPage({viewport:{width:1080,height:1920}});
 for(const k in S){const p=process.cwd()+`/s${k}.html`;let h=S[k];if(PH[k])h=h.replace(/<body class=blue>/,`<body style="background:#223 url(${PH[k]}) 0 0/1080px 1920px">`);fs.writeFileSync(p,`<!doctype html><meta charset=utf-8><style>${base}</style>${h}`);await pg.goto('file://'+p);await pg.waitForTimeout(800);await pg.screenshot({path:`fs${k}.png`});}
 await b.close();})();
