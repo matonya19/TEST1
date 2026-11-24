@@ -10,7 +10,7 @@
  "text_shadow": 1.0,
  "card_focus": [
   520,
-  1000
+  960
  ],
  "grade": {
   "auto_light": true,
@@ -178,7 +178,6 @@
     0,
     0.33
    ],
-   "photo": "/home/user/TEST1/textura-carousel/photos/sp12.jpg",
    "pw": 380,
    "ph": 480,
    "rot": 1.5
@@ -202,7 +201,6 @@
     0.33,
     0.66
    ],
-   "photo": "/home/user/TEST1/textura-carousel/photos/sp05.jpg",
    "pw": 520,
    "ph": 400
   },
@@ -225,7 +223,6 @@
     0.66,
     1.0
    ],
-   "photo": "/home/user/TEST1/textura-carousel/photos/pol-sit.jpg",
    "pw": 380,
    "ph": 480,
    "rot": -1.5
@@ -244,5 +241,12 @@
    ],
    "sfx": "click"
   }
- ]
+ ],
+ "card": {
+  "x": 40,
+  "y": 70,
+  "w": 1000,
+  "h": 1140,
+  "r": 44
+ }
 }

@@ -72,6 +72,7 @@ def wrap(text, f, maxw):
 
 class Ref(R.Renderer):
     def __init__(self, plan):
+        CARD.update(plan.get('card', {}))
         super().__init__(plan)
         self.sheets = [o for o in self.ov if o['type'] == 'sheet']
         self.photos = [o for o in self.ov if o['type'] == 'photo']
