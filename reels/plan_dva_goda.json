@@ -134,16 +134,79 @@
  ],
  "overlays": [
   {
-   "type": "hook",
-   "lines": [
-    "ЧТО ТАКОЕ",
-    "КУРС ИНТЕРВЬЮ?"
-   ],
+   "type": "text",
+   "text": "ДВА ГОДА НАЗАД",
+   "face": "sans_semi",
+   "size": 40,
+   "tracking": 0.12,
+   "x": 0.5,
+   "y": 0.105,
    "at": 0.0,
-   "until": "Это",
-   "y": 0.58,
+   "until": "два-0.15",
+   "color": [
+    242,
+    183,
+    107
+   ],
+   "sfx": "none"
+  },
+  {
+   "type": "text",
+   "text": "пришла просто",
+   "face": "sans_semi",
+   "size": 104,
+   "tracking": -0.035,
+   "x": 0.5,
+   "y": 0.155,
+   "at": 0.15,
+   "until": "два-0.15",
+   "sfx": "none"
+  },
+  {
+   "type": "text",
+   "text": "посмотреть",
+   "face": "sans_semi",
+   "size": 104,
+   "tracking": -0.035,
+   "x": 0.5,
+   "y": 0.205,
+   "at": 0.3,
+   "until": "два-0.15",
+   "sfx": "none"
+  },
+  {
+   "type": "text",
+   "text": "СЕЙЧАС",
+   "face": "sans_semi",
+   "size": 40,
+   "tracking": 0.12,
+   "x": 0.5,
+   "y": 0.27,
+   "at": 0.9,
+   "until": "два-0.15",
+   "color": [
+    242,
+    183,
+    107
+   ],
+   "sfx": "click"
+  },
+  {
+   "type": "text",
+   "text": "веду свои подкасты",
+   "face": "sans_semi",
    "size": 96,
-   "pill": "TEXTURA"
+   "tracking": -0.035,
+   "x": 0.5,
+   "y": 0.315,
+   "at": 1.05,
+   "until": "два-0.15",
+   "color": [
+    242,
+    183,
+    107
+   ],
+   "sfx": "none"
   },
   {
    "type": "accent",
@@ -158,15 +221,6 @@
     255
    ],
    "sfx": "click"
-  },
-  {
-   "type": "pill",
-   "size": 40,
-   "text": "пришла просто посмотреть",
-   "at": "пришла",
-   "until": "seg:1-0.1",
-   "x": 0.5,
-   "y": 0.15
   },
   {
    "type": "sheet",
