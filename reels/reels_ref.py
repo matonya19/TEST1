@@ -79,7 +79,7 @@ class Ref(R.Renderer):
         self.groups = self.make_groups()
 
     def resolve(self, o):
-        if o['type'] in ('sheet', 'photo', 'hook', 'pill', 'pic', 'wave'):
+        if o['type'] in ('sheet', 'photo', 'hook', 'pill', 'pic', 'wave', 'img'):
             o = dict(o); c = self.cue
             o['t0'] = c(o.get('at', 0)); o['t1'] = c(o['until']) if 'until' in o else o['t0'] + o.get('dur', 1.5)
             return o
@@ -168,6 +168,7 @@ class Ref(R.Renderer):
             ty = o['type']
             if ty in ('sheet', 'photo', 'card'): continue
             if ty == 'wave' or o.get('top'): continue
+            elif ty == 'img': self.ov_img(cv, t, o)
             elif ty == 'pic': self.ov_pic(cv, t, o)
             elif ty == 'pill': self.ov_pill(cv, t, o)
             elif ty == 'hook': self.ov_hook(cv, t, o)
@@ -175,7 +176,7 @@ class Ref(R.Renderer):
         if sh_: self.ov_sheet(cv, t, sh_)
         for o in self.ov:
             if o['t0'] - 0.01 <= t < o['t1'] + 0.35 and (o['type'] == 'wave' or o.get('top')):
-                (self.ov_wave if o['type'] == 'wave' else getattr(self, 'ov_' + o['type']))(cv, t, o)
+                (self.ov_wave if o['type'] == 'wave' else self.ov_img if o['type'] == 'img' else getattr(self, 'ov_' + o['type']))(cv, t, o)
         if t < self.BODY + 0.3 and not self.in_sheet(t): self.subs_phrase(cv, t)
 
     def in_sheet(self, t):
@@ -200,6 +201,14 @@ class Ref(R.Renderer):
             xx = x0 + k * bw + bw * 0.2
             d.rounded_rectangle((xx, mid - bh / 2, xx + bw * 0.6, mid + bh / 2), int(bw * 0.3), fill=col)
         cv.alpha_composite(img, (0, int(cy - mid)))
+
+    def ov_img(self, cv, t, o):
+        if not hasattr(self, '_imgs'): self._imgs = {}
+        if o['src'] not in self._imgs: self._imgs[o['src']] = Image.open(o['src']).convert('RGBA').resize((FW, FH))
+        a = ease_out(prog(t, o['t0'], o.get('fade', 0.5)))
+        if a <= 0: return
+        z = 1.0 + 0.03 * prog(t, o['t0'], max(0.1, o['t1'] - o['t0']))
+        paste(cv, self._imgs[o['src']], FW / 2, FH / 2, z, a)
 
     def ov_pic(self, cv, t, o):
         p = prog(t, o['t0'], 0.35); a = clamp(p * 3) * (1 - ease_in(prog(t, o['t1'], 0.22)))

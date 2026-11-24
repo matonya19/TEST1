@@ -1,7 +1,7 @@
 {
  "src": "/home/claude/work/v4/src_full.mp4",
  "out": "/home/user/TEST1/reels/Отзыв_курс_интервью_монтаж.mp4",
- "tail": 1.2,
+ "tail": 4.5,
  "subs": {
   "mode": "phrase",
   "y": 0.76,
@@ -342,7 +342,7 @@
    "text": "всем советую",
    "size": 150,
    "at": "Слава",
-   "until": "end+1.2",
+   "until": "end+0.4",
    "y": 0.17,
    "color": [
     242,
@@ -369,7 +369,7 @@
    "x": 0.5,
    "y": 0.94,
    "at": 0.0,
-   "until": "end+1.2",
+   "until": "end+0.3",
    "color": [
     200,
     195,
@@ -378,6 +378,15 @@
    "tracking": 0.08,
    "sfx": "none",
    "top": true
+  },
+  {
+   "type": "img",
+   "src": "/home/user/TEST1/textura-carousel/out/endcard.png",
+   "at": "end+0.3",
+   "until": "end+4.5",
+   "fade": 0.6,
+   "top": true,
+   "sfx": "whoosh"
   }
  ],
  "card_focus": [
