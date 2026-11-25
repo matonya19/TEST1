@@ -47,7 +47,9 @@ def poster_a(fmt):
     letters = (f'<div class="L" style="left:-60px;top:{o + (40 if story else 100)}px;font-size:{620 if story else 520}px">B</div>'
                f'<div class="L" style="right:-90px;top:{o + (420 if story else 330)}px;font-size:{620 if story else 520}px">$</div>')
     fade = fy + (600 if story else 560)
-    body = f"""{letters}
+    body = f"""<div class="abs" style="inset:0;background:url(conf.jpg) 50% 40%/auto {H}px;filter:grayscale(1) brightness(.55);opacity:.55"></div>
+<div class="abs" style="inset:0;background:linear-gradient(180deg,rgba(11,8,18,.75),rgba(11,8,18,.25) 30%,rgba(11,8,18,.35) 55%,rgba(11,8,18,.9) 75%)"></div>
+{letters}
 {place(CUT, F, 540, fy)}
 <div class="abs" style="left:0;right:0;top:{fade - 420}px;bottom:0;background:linear-gradient(180deg,rgba(11,8,18,0),rgba(11,8,18,.85) 300px,{DARK} 420px)"></div>
 <div class="abs" style="left:0;right:0;top:{o + (40 if not story else -170)}px;text-align:center">{LOGO.replace('width="77"', 'width="110"').replace('height="38"', 'height="54"')}
@@ -65,18 +67,18 @@ def poster_b(fmt):
     story = fmt == "9x16"
     H = 1920 if story else 1350
     o = 270 if story else 0
-    F, fy = (165, 760) if story else (140, 520)
-    css = BASE % dict(H=H, bgc="#0B1F63", k=24 if story else 22)
+    F, fy = (175, 640) if story else (150, 420)
+    css = BASE % dict(H=H, bgc="#0B1F63", k=24 if story else 22) + """
+.ghost{position:absolute;left:-30px;right:-30px;text-align:center;font-weight:900;letter-spacing:-.045em;line-height:.8;color:rgba(130,195,255,.28);text-transform:uppercase}
+"""
+    gs = 250 if story else 215
     body = f"""{blue_bg(1080, H)}
+<div class="ghost" style="top:{o + (40 if story else 175)}px;font-size:{gs}px">Expats<br>Banking</div>
 <div class="abs" style="left:0;right:0;top:{o + (-180 if story else 50)}px;text-align:center;z-index:5">{LOGO.replace('width="77"', 'width="110"').replace('height="38"', 'height="54"')}
 <div class="kick" style="margin-top:14px">The Power of Communities · Tbilisi</div></div>
-<div class="abs" style="left:50px;right:50px;top:{o + (-30 if story else 170)}px;text-align:center;z-index:5;font-weight:900;text-transform:uppercase;letter-spacing:-.035em;line-height:.9;font-size:{96 if story else 82}px;text-shadow:0 6px 30px rgba(0,15,60,.4)">Banking opportunities<br><span style="color:#9CCBFF">for expats</span></div>
-<div style="position:absolute;inset:0;z-index:3;-webkit-mask-image:linear-gradient(180deg,#000 {66 if story else 82}%,transparent {75 if story else 93}%)">{place(STK, F, 540, fy, "filter:drop-shadow(0 30px 50px rgba(0,10,40,.5))")}</div>
-<div class="abs" style="left:0;right:0;top:{fy + (330 if story else 280)}px;text-align:center;z-index:6">
-<div style="display:inline-block;position:relative;background:#fff;color:{DARK};padding:22px 44px 26px;border-radius:22px;box-shadow:0 20px 50px rgba(0,10,40,.45)">
-<div style="font-size:{62 if story else 54}px;font-weight:900;letter-spacing:-.02em;line-height:1">Lasha Chkhenkeli</div>
-<div style="font-size:{44 if story else 38}px;font-weight:800;line-height:1.1;margin-top:6px">TBC Bank</div>
-<div style="position:absolute;right:-22px;bottom:-26px;background:{BLUE};color:#fff;padding:8px 18px;border-radius:10px;font-size:{26 if story else 22}px;font-weight:800;transform:rotate(-4deg)">Speaker</div></div></div>
+<div style="position:absolute;inset:0;z-index:3;-webkit-mask-image:linear-gradient(180deg,#000 {58 if story else 60}%,transparent {72 if story else 76}%)">{place(CUT, F, 540, fy, "filter:drop-shadow(0 30px 50px rgba(0,10,40,.5))")}</div>
+<div class="abs" style="left:40px;right:40px;top:{fy + (430 if story else 360)}px;text-align:center;z-index:6;font-weight:900;text-transform:uppercase;letter-spacing:-.035em;line-height:.9;font-size:{104 if story else 90}px;text-shadow:0 6px 30px rgba(0,15,60,.45)">Banking<br>opportunities<br><span style="color:#9CCBFF">for expats</span></div>
+<div class="abs" style="left:0;right:0;top:{fy + (790 if story else 660)}px;text-align:center;z-index:6;font-size:{28 if story else 24}px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Speaker: Lasha Chkhenkeli · TBC Bank</div>
 <div class="abs" style="left:56px;right:56px;bottom:{(270 if story else 56)}px;z-index:6">{info_block(story, accent="#9CCBFF")}</div>"""
     return f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>{body}</body></html>'
 
