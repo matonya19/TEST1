@@ -82,6 +82,7 @@ body{{font-family:'Onest',sans-serif;color:#fff;position:relative}}
     return f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>{body}</body></html>'
 
 
-for fmt in ("4x5", "9x16"):
+if __name__ == "__main__":
+  for fmt in ("4x5", "9x16"):
     (HERE / f"blue-{fmt}.html").write_text(build(fmt))
-print("ok")
+  print("ok")
