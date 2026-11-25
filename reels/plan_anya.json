@@ -27,8 +27,8 @@
   "vignette": 0.12
  },
  "music": {
-  "level": 0.16,
-  "bpm": 92
+  "level": 0.0,
+  "synth": false
  },
  "sfx": "min",
  "segments": [
