@@ -90,7 +90,7 @@ function slide1(L, v, rnd) {         // обложка
   return `<body style="background:${bg}">${css(ink)}
   ${stars}
   ${logo(ink, 'left:426px;top:68px')}
-  <div class="h" style="left:90px;right:90px;top:165px;text-align:center;font-size:66px;font-weight:700;color:${ink}">${esc(title)}</div>
+  <div class="h" style="left:90px;right:90px;top:165px;text-align:center;font-size:${L.cover_title_size || 66}px;font-weight:700;color:${ink}">${esc(title)}</div>
   ${pill(L.community, '', `left:50%;transform:translateX(-50%) rotate(${v.cover.pillRot}deg);top:342px;height:88px;padding:0 44px;font-size:50px;font-weight:500;background:${C[v.cover.pill]}`)}
   ${photoBlob(b64(L.photos.cover), [45, frameY, 990, frameH], { split: v.cover.split, r: 64, pos: L.cover_pos || 'xMidYMin' }, rnd)}
   ${pill(L.leader, '', `left:50%;transform:translateX(-50%);top:1185px;height:104px;padding:0 46px;font-size:56px;font-weight:500;border-radius:24px`)}
@@ -107,7 +107,8 @@ function slide2(L, v, rnd) {         // о сообществе
       pill(L.about_label || 'О СЕБЕ', '', `right:235px;top:728px;height:72px;padding:0 30px;font-size:46px;border-radius:30px`)
     : pill(name, '', `left:65px;top:630px;height:96px;padding:0 36px;font-size:68px;border-radius:30px`) +
       pill(L.about_label || 'О СЕБЕ', '', `left:235px;top:728px;height:72px;padding:0 30px;font-size:46px;border-radius:30px`);
-  const lg = L.photos.logo ? `<div class="abs" style="${m ? 'left:60px' : 'right:60px'};top:585px;width:218px;height:218px;border:3px solid #000;border-radius:34px;background:#fff;transform:rotate(${m ? -3 : 3}deg);overflow:hidden;display:flex;align-items:center;justify-content:center">
+  const wide = L.logo_wide;
+  const lg = L.photos.logo ? `<div class="abs" style="${m ? 'left:60px' : 'right:60px'};top:${wide ? 640 : 585}px;width:${wide ? 340 : 218}px;height:${wide ? 150 : 218}px;border:3px solid #000;border-radius:34px;background:#fff;transform:rotate(${m ? -3 : 3}deg);overflow:hidden;display:flex;align-items:center;justify-content:center">
       <img src="${b64(L.photos.logo)}" style="width:86%;height:86%;object-fit:contain"></div>` : '';
   const stars = v.comm.stars.map(([x, y, s, r]) => star(x, y, s, dark ? '#fff' : '#000', r)).join('');
   return `<body style="background:${bg}">${css(ink)}
@@ -115,7 +116,7 @@ function slide2(L, v, rnd) {         // о сообществе
   ${logo(ink, 'left:65px;top:52px')}
   ${photoBlob(b64(L.photos.community), [40, 135, 1000, 590], { split: v.comm.split, r: 62, pos: L.community_pos || 'xMidYMid' }, rnd)}
   ${pills}${lg}
-  <div class="h" style="left:65px;right:150px;top:880px;font-size:46px;font-weight:700;line-height:1.12">${esc(L.community_title)}</div>
+  <div class="h" style="left:65px;right:150px;top:880px;font-size:46px;font-weight:700;line-height:1.12">${esc(L.community_title).replace(/(\S+-\S+)/g, '<span style="white-space:nowrap">$1</span>')}</div>
   <div class="h" style="left:65px;right:110px;top:${L.community_title.length > 42 ? 1010 : 960}px;font-size:31px;line-height:1.36">${esc(L.community_text)}</div>
   ${pill(L.cta || '27 ноября их основатель выступит у нас →', '', `left:65px;top:1170px;height:68px;padding:0 30px;font-size:29px;font-weight:500;background:${dark ? '#fff' : '#111'};color:${dark ? '#000' : '#fff'};border-color:${dark ? '#fff' : '#111'};border-radius:22px`)}
   ${footer(2, ink)}</body>`;
