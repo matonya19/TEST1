@@ -116,8 +116,8 @@ function slide2(L, v, rnd) {         // о сообществе
   ${logo(ink, 'left:65px;top:52px')}
   ${photoBlob(b64(L.photos.community), [40, 135, 1000, 590], { split: v.comm.split, r: 62, pos: L.community_pos || 'xMidYMid' }, rnd)}
   ${pills}${lg}
-  <div class="h" style="left:65px;right:150px;top:880px;font-size:46px;font-weight:700;line-height:1.12">${esc(L.community_title).replace(/(\S+-\S+)/g, '<span style="white-space:nowrap">$1</span>')}</div>
-  <div class="h" style="left:65px;right:110px;top:${L.community_title.length > 42 ? 1010 : 960}px;font-size:31px;line-height:1.36">${esc(L.community_text)}</div>
+  <div class="abs" style="left:65px;right:110px;top:${L.community_title.length > 60 ? 850 : 880}px"><div style="margin-right:40px;font-size:46px;font-weight:700;line-height:1.12">${esc(L.community_title).replace(/(^|\s)(о|в|и|на|с|к|у|по|для|из|от|об) /gi, '$1$2\u00a0').replace(/(\S+-\S+)/g, '<span style="white-space:nowrap">$1</span>')}</div>
+  <div style="margin-top:22px;font-size:31px;line-height:1.36">${esc(L.community_text)}</div></div>
   ${pill(L.cta || '27 ноября их основатель выступит у нас →', '', `left:65px;top:1170px;height:68px;padding:0 30px;font-size:29px;font-weight:500;background:${dark ? '#fff' : '#111'};color:${dark ? '#000' : '#fff'};border-color:${dark ? '#fff' : '#111'};border-radius:22px`)}
   ${footer(2, ink)}</body>`;
 }
