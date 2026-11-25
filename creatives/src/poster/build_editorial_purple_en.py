@@ -63,7 +63,7 @@ def poster_purple(fmt):
     F = int(F * .88)
     s.append(place(MCUT, F, 190, fy, "max_cut.png", fade))
     s.append(place(PCUT, F, 890, fy, "polina_cut.png", fade))
-    s.append(place((950, 1789, 0.4589, 0.1314, 0.1705), F, 540, fy + 20, "lasha_cut.png", fade).replace('class="person"', 'class="person" style="z-index:1"', 1) if False else place((950, 1789, 0.4589, 0.1314, 0.1705), F, 540, fy + 20, "lasha_cut.png", fade).replace('<img src="../lasha_cut.png"', '<img src="../lasha_cut.png" style="filter:brightness(1.35) contrast(1.05) saturate(1.05)"').replace('<img src="lasha_cut.png"', '<img src="lasha_cut.png" style="filter:brightness(1.35) contrast(1.05) saturate(1.05)"'))
+    s.append(place((950, 1789, 0.4589, 0.1314, 0.1705), F, 540, fy + 20, "lasha_cut.png", fade).replace('class="person"', 'class="person" style="z-index:1"', 1) if False else place((950, 1789, 0.4589, 0.1314, 0.1705), F, 540, fy + 20, "lasha_cut.png", fade))
     # передние нижние буквы
     if story:
         s.append('<div class="L" style="z-index:2;left:-40px;top:1760px;font-size:760px">PE</div>')
@@ -76,7 +76,7 @@ def poster_purple(fmt):
     s.append(f'<div class="abs t" style="left:28px;top:{ty - 34}px;font-size:22px">27.11</div>')
     cs = 88 if story else 72
     ds = 60 if story else 48
-    s.append(f'<div class="dark" style="top:{ty - 160}px;background:linear-gradient(180deg,rgba(11,8,18,0),rgba(11,8,18,.45) 120px,rgba(11,8,18,.7) 240px,rgba(11,8,18,.72) 70%,rgba(11,8,18,.85))"></div>')
+    s.append(f'<div class="dark" style="top:{ty - 320}px;background:linear-gradient(180deg,rgba(11,8,18,0),rgba(11,8,18,.35) 160px,rgba(11,8,18,.62) 320px,rgba(11,8,18,.72) 70%,rgba(11,8,18,.85))"></div>')
     s.append(f'''<div class="flow" style="top:{ty}px">
 <span class="fit">FIND YOUR</span><span class="fit">PEOPLE</span>
 <div style="text-align:center;font-weight:900;font-size:{cs}px;letter-spacing:-.04em;line-height:1;color:#fff;margin-top:14px">IN TBILISI</div>
