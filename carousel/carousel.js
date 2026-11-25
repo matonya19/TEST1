@@ -61,7 +61,8 @@ function card(pts, fill, stroke, r = 46) {
 
 const pill = (txt, cls, style) => `<div class="pill ${cls || ''}" style="${style || ''}">${esc(txt)}</div>`;
 const logo = (color, style) => `<div class="logo" style="background:${color};${style}"></div>`;
-const footer = (n, ink) => `<div class="foot" style="color:${ink}"><span>@co.tbilisi</span><span>${n}/4</span></div>`;
+const TOTAL = [4];
+const footer = (n, ink) => `<div class="foot" style="color:${ink}"><span>@co.tbilisi</span><span>${n}/${TOTAL[0]}</span></div>`;
 
 function css(ink) {
   const f = p => `url(${b64(path.join(HERE, 'assets/fonts', p), 'font/woff')})`;
@@ -92,8 +93,8 @@ function slide1(L, v, rnd) {         // обложка
   ${logo(ink, 'left:426px;top:68px')}
   <div class="h" style="left:90px;right:90px;top:165px;text-align:center;font-size:${L.cover_title_size || 66}px;font-weight:700;color:${ink}">${esc(title)}</div>
   ${pill(L.community, '', `left:50%;transform:translateX(-50%) rotate(${v.cover.pillRot}deg);top:342px;height:88px;padding:0 44px;font-size:50px;font-weight:500;background:${C[v.cover.pill]}`)}
-  ${photoBlob(b64(L.photos.cover), [45, frameY, 990, frameH], { split: v.cover.split, r: 64, pos: L.cover_pos || 'xMidYMin' }, rnd)}
-  ${pill(L.leader, '', `left:50%;transform:translateX(-50%);top:1185px;height:104px;padding:0 46px;font-size:56px;font-weight:500;border-radius:24px`)}
+  ${photoBlob(b64(L.photos.cover), [45, frameY, 990, frameH], { split: L.cover_split || v.cover.split, r: 64, pos: L.cover_pos || 'xMidYMin' }, rnd)}
+  ${pill(L.cover_name || L.leader, '', `left:50%;transform:translateX(-50%);top:1185px;height:104px;padding:0 ${L.cover_name_size ? 36 : 46}px;font-size:${L.cover_name_size || 56}px;font-weight:500;border-radius:24px`)}
   </body>`;
 }
 
@@ -122,8 +123,8 @@ function slide2(L, v, rnd) {         // о сообществе
   ${footer(2, ink)}</body>`;
 }
 
-function slide3(L, v, rnd) {         // лидер
-  const key = v.colors[2], bg = C[key], dark = DARK_BG.has(key), ink = dark ? '#fff' : '#000';
+function slide3(L, v, rnd, page = 3, ckey) {         // лидер
+  const key = ckey || v.colors[2], bg = C[key], dark = DARK_BG.has(key), ink = dark ? '#fff' : '#000';
   const m = v.lead.mirror;
   const [first, ...rest] = L.leader.toUpperCase().split(' ');
   const last = rest.join(' ');
@@ -148,11 +149,11 @@ function slide3(L, v, rnd) {         // лидер
   <div class="h" style="left:${tx}px;width:${cx1 - cx0 - 110}px;top:${948}px;font-size:36px;font-weight:500;color:#000">${esc(L.role)}</div>
   ${pill(L.community, '', `left:${tx}px;top:1003px;height:60px;padding:0 24px;font-size:31px;font-weight:500;background:${C[v.lead.pill]}`)}
   <div class="h" style="left:${tx}px;width:${cx1 - cx0 - 105}px;top:1083px;font-size:28px;line-height:1.36;color:#222">${esc(L.bio)}</div>
-  ${footer(3, ink)}</body>`;
+  ${footer(page, ink)}</body>`;
 }
 
 function slide4(L, v, ev) {          // вечер
-  const key = v.colors[3], bg = C[key], dark = DARK_BG.has(key), ink = dark ? '#fff' : '#000';
+  const key = v.colors[v.colors.length - 1], bg = C[key], dark = DARK_BG.has(key), ink = dark ? '#fff' : '#000';
   const sc = dark ? '#fff' : '#000';
   const stars = v.ev.stars.map(([x, y, s, r]) => star(x, y, s, sc, r)).join('');
   return `<body style="background:${bg}">${css(ink)}
@@ -169,7 +170,7 @@ function slide4(L, v, ev) {          // вечер
   ${pill(ev.entry, '', `left:50%;transform:translateX(-50%);top:918px;height:112px;padding:0 48px;font-size:56px;font-weight:700;background:#111;border-color:#111;color:#fff`)}
   <div class="h" style="left:0;right:0;top:1048px;text-align:center;font-size:30px">${esc(ev.entry_note)}</div>
   ${pill(ev.button, '', `left:50%;transform:translateX(-50%);top:1112px;height:72px;padding:0 28px;font-family:Oswald;font-weight:300;font-size:36px;border:none;border-radius:12px;background:${key === 'white' ? '#f1f1f1' : 'rgba(255,255,255,.55)'};color:#000`)}
-  ${footer(4, ink)}</body>`;
+  ${footer(TOTAL[0], ink)}</body>`;
 }
 
 // ---------- variants: цвета и раскладка свои для каждого лидера
@@ -209,8 +210,16 @@ function variant(n, over = {}) {
   const rnd = rng((L.n || 1) * 31 + 7);
   const out = path.join(dir, 'out'); fs.mkdirSync(out, { recursive: true });
   const br = await chromium.launch(); const pg = await br.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
-  const slides = [slide1(L, v, rnd), slide2(L, v, rnd), slide3(L, v, rnd), slide4(L, v, ev)];
-  for (let i = 0; i < 4; i++) {
+  // несколько основателей: L.more = [{leader, role, bio, photo}] → по слайду на каждого
+  const extra = (L.more || []).map(x => ({ ...L, ...x, photos: { ...L.photos, leader: path.join(dir, x.photo) } }));
+  TOTAL[0] = 4 + extra.length;
+  const slides = [slide1(L, v, rnd), slide2(L, v, rnd), slide3(L, v, rnd)];
+  extra.forEach((X, i) => {
+    const vi = { ...v, lead: { ...v.lead, mirror: (i % 2 === 0) ? !v.lead.mirror : v.lead.mirror, split: SPLITS[(SPLITS.indexOf(v.lead.split) + 2 + i) % SPLITS.length] } };
+    slides.push(slide3(X, vi, rnd, 4 + i, v.colors[3 + i] && 3 + i < v.colors.length - 1 ? v.colors[3 + i] : v.colors[2]));
+  });
+  slides.push(slide4(L, v, ev));
+  for (let i = 0; i < slides.length; i++) {
     await pg.setContent('<!doctype html><html><head><meta charset="utf-8"></head>' + slides[i] + '</html>');
     await pg.evaluate(() => document.fonts.ready);
     await pg.screenshot({ path: path.join(out, `${i + 1}.png`) });
