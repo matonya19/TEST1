@@ -91,7 +91,7 @@ function slide1(L, v, rnd) {         // обложка
   return `<body style="background:${bg}">${css(ink)}
   ${stars}
   ${logo(ink, 'left:426px;top:68px')}
-  <div class="h" style="left:90px;right:90px;top:165px;text-align:center;font-size:${L.cover_title_size || 66}px;font-weight:700;color:${ink}">${esc(title)}</div>
+  <div class="h" style="left:90px;right:90px;top:165px;text-align:center;font-size:${L.cover_title_size || 66}px;font-weight:700;color:${ink}">${esc(title).replace(/\n/g, '<br>')}</div>
   ${pill(L.community, '', `left:50%;transform:translateX(-50%) rotate(${v.cover.pillRot}deg);top:342px;height:88px;padding:0 44px;font-size:50px;font-weight:500;background:${C[v.cover.pill]}`)}
   ${photoBlob(b64(L.photos.cover), [45, frameY, 990, frameH], { split: L.cover_split || v.cover.split, r: 64, pos: L.cover_pos || 'xMidYMin' }, rnd)}
   ${pill(L.cover_name || L.leader, '', `left:50%;transform:translateX(-50%);top:1185px;height:104px;padding:0 ${L.cover_name_size ? 36 : 46}px;font-size:${L.cover_name_size || 56}px;font-weight:500;border-radius:24px`)}
@@ -104,9 +104,9 @@ function slide2(L, v, rnd) {         // о сообществе
   const px = m ? null : 65;
   const name = L.community.toUpperCase();
   const pills = m
-    ? pill(name, '', `right:65px;top:630px;height:96px;padding:0 36px;font-size:68px;border-radius:30px`) +
+    ? pill(name, '', `right:65px;top:630px;height:96px;padding:0 36px;font-size:${L.comm_pill_size || 68}px;border-radius:30px`) +
       pill(L.about_label || 'О СЕБЕ', '', `right:235px;top:728px;height:72px;padding:0 30px;font-size:46px;border-radius:30px`)
-    : pill(name, '', `left:65px;top:630px;height:96px;padding:0 36px;font-size:68px;border-radius:30px`) +
+    : pill(name, '', `left:65px;top:630px;height:96px;padding:0 36px;font-size:${L.comm_pill_size || 68}px;border-radius:30px`) +
       pill(L.about_label || 'О СЕБЕ', '', `left:235px;top:728px;height:72px;padding:0 30px;font-size:46px;border-radius:30px`);
   const wide = L.logo_wide;
   const lg = L.photos.logo ? `<div class="abs" style="${m ? 'left:60px' : 'right:60px'};top:${wide ? 640 : 585}px;width:${wide ? 340 : 218}px;height:${wide ? 150 : 218}px;border:3px solid #000;border-radius:34px;background:#fff;transform:rotate(${m ? -3 : 3}deg);overflow:hidden;display:flex;align-items:center;justify-content:center">
