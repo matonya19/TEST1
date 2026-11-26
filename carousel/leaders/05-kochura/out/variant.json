@@ -59,14 +59,14 @@
  "lead": {
   "split": {
    "x": [
-    0.4
+    0.5
    ],
    "y": [
-    0.3
+    0.45
    ]
   },
-  "mirror": true,
-  "step": 158,
+  "mirror": false,
+  "step": 150,
   "pill": "lime"
  },
  "ev": {

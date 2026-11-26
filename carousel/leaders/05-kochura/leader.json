@@ -22,6 +22,19 @@
    "sky",
    "green",
    "blue"
-  ]
+  ],
+  "lead": {
+   "split": {
+    "x": [
+     0.5
+    ],
+    "y": [
+     0.45
+    ]
+   },
+   "mirror": false,
+   "step": 150,
+   "pill": "lime"
+  }
  }
 }
