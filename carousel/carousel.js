@@ -8,6 +8,7 @@ const HERE = __dirname;
 const C = { blue: '#5d77fb', sky: '#95bbf8', green: '#8cf8a7', mint: '#a6f5ae', lime: '#daff8b', white: '#ffffff', black: '#000000', red: '#ea475c' };
 const DARK_BG = new Set(['blue', 'red', 'black']);           // на них текст и звёзды белые
 const W = 1080, H = 1350;
+const LOGO_AR = { tbilisi: 690 / 153, batumi: 776 / 153 };
 
 // ---------- helpers
 const b64 = (p, mime) => `data:${mime || (p.endsWith('.png') ? 'image/png' : 'image/jpeg')};base64,${fs.readFileSync(p).toString('base64')}`;
@@ -61,8 +62,8 @@ function card(pts, fill, stroke, r = 46) {
 
 const pill = (txt, cls, style) => `<div class="pill ${cls || ''}" style="${style || ''}">${esc(txt)}</div>`;
 const logo = (color, style) => `<div class="logo" style="background:${color};${style}"></div>`;
-const TOTAL = [4];
-const footer = (n, ink) => `<div class="foot" style="color:${ink}"><span>@co.tbilisi</span><span>${n}/${TOTAL[0]}</span></div>`;
+const TOTAL = [4], CITY = ['tbilisi'];
+const footer = (n, ink) => `<div class="foot" style="color:${ink}"><span>@co.${CITY[0]}</span><span>${n}/${TOTAL[0]}</span></div>`;
 
 function css(ink) {
   const f = p => `url(${b64(path.join(HERE, 'assets/fonts', p), 'font/woff')})`;
@@ -74,7 +75,7 @@ function css(ink) {
   *{margin:0;padding:0;box-sizing:border-box}
   body{width:${W}px;height:${H}px;position:relative;overflow:hidden;font-family:Mabry;color:${ink};-webkit-font-smoothing:antialiased}
   .abs{position:absolute}
-  .logo{position:absolute;width:228px;height:51px;-webkit-mask:url(${b64(path.join(HERE, 'assets/co-tbilisi-mask.png'))}) center/contain no-repeat}
+  .logo{position:absolute;width:${CITY[0] === 'tbilisi' ? 228 : Math.round(51 * LOGO_AR[CITY[0]])}px;height:51px;-webkit-mask:url(${b64(path.join(HERE, `assets/co-${CITY[0]}-mask.png`))}) left center/contain no-repeat}
   .pill{position:absolute;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border:3px solid #000;border-radius:999px;background:#fff;color:#000;line-height:1}
   .foot{position:absolute;left:160px;right:160px;bottom:38px;display:flex;justify-content:space-between;font-size:23px}
   .h{position:absolute;line-height:1.03;letter-spacing:-0.01em}
@@ -90,7 +91,7 @@ function slide1(L, v, rnd) {         // обложка
   const frameY = 465, frameH = 765;
   return `<body style="background:${bg}">${css(ink)}
   ${stars}
-  ${logo(ink, 'left:426px;top:68px')}
+  ${logo(ink, 'left:50%;transform:translateX(-50%);top:68px')}
   <div class="h" style="left:90px;right:90px;top:165px;text-align:center;font-size:${L.cover_title_size || 66}px;font-weight:700;color:${ink}">${esc(title).replace(/\n/g, '<br>')}</div>
   ${pill(L.community, '', `left:50%;transform:translateX(-50%) rotate(${v.cover.pillRot}deg);top:342px;height:88px;padding:0 44px;font-size:50px;font-weight:500;background:${C[v.cover.pill]}`)}
   ${photoBlob(b64(L.photos.cover), [45, frameY, 990, frameH], { split: L.cover_split || v.cover.split, r: 64, pos: L.cover_pos || 'xMidYMin' }, rnd)}
@@ -158,7 +159,7 @@ function slide4(L, v, ev) {          // вечер
   const stars = v.ev.stars.map(([x, y, s, r]) => star(x, y, s, sc, r)).join('');
   return `<body style="background:${bg}">${css(ink)}
   ${stars}
-  ${logo(ink, 'left:426px;top:78px')}
+  ${logo(ink, 'left:50%;transform:translateX(-50%);top:78px')}
   ${pill(ev.label, '', `left:50%;transform:translateX(-50%);top:184px;height:64px;padding:0 30px;font-size:34px;background:transparent;border-color:${ink};color:${ink}`)}
   <div class="h" style="left:0;right:0;top:268px;text-align:center;font-size:150px;font-weight:700;letter-spacing:-0.04em;line-height:1">${esc(ev.date)}</div>
   <div class="h" style="left:0;right:0;top:440px;text-align:center;font-size:38px;font-weight:500">${esc(ev.time)}</div>
@@ -205,7 +206,8 @@ function variant(n, over = {}) {
   const dir = path.resolve(process.argv[2]);
   const L = JSON.parse(fs.readFileSync(path.join(dir, 'leader.json'), 'utf8'));
   for (const k in L.photos) L.photos[k] = path.join(dir, L.photos[k]);
-  const ev = JSON.parse(fs.readFileSync(path.join(HERE, 'event.json'), 'utf8'));
+  CITY[0] = L.city || 'tbilisi';
+  const ev = JSON.parse(fs.readFileSync(path.join(HERE, CITY[0] === 'tbilisi' ? 'event.json' : `event-${CITY[0]}.json`), 'utf8'));
   const v = variant(L.n || 1, L.variant || {});
   const rnd = rng((L.n || 1) * 31 + 7);
   const out = path.join(dir, 'out'); fs.mkdirSync(out, { recursive: true });
