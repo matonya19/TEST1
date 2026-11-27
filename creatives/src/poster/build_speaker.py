@@ -54,11 +54,11 @@ def poster_a(fmt):
 <div class="abs" style="left:0;right:0;top:{fade - 420}px;bottom:0;background:linear-gradient(180deg,rgba(11,8,18,0),rgba(11,8,18,.85) 300px,{DARK} 420px)"></div>
 <div class="abs" style="left:0;right:0;top:{o + (40 if not story else -170)}px;text-align:center">{LOGO.replace('width="77"', 'width="110"').replace('height="38"', 'height="54"')}
 <div class="kick" style="margin-top:14px;opacity:.75">The Power of Communities · Tbilisi</div></div>
-<div class="abs" style="left:60px;top:{fy + (300 if story else 250)}px"><div style="background:#fff;color:{DARK};padding:16px 24px 14px;border-radius:18px;box-shadow:0 20px 40px rgba(0,0,0,.4)">
+<div class="abs" style="left:60px;top:{fy + (230 if story else 250)}px"><div style="background:#fff;color:{DARK};padding:16px 24px 14px;border-radius:18px;box-shadow:0 20px 40px rgba(0,0,0,.4)">
 <div style="font-size:{40 if story else 34}px;font-weight:800;line-height:1.05">Lasha Chkhenkeli</div>
 <div style="font-size:{26 if story else 23}px;font-weight:600;opacity:.7;margin-top:4px">TBC Bank</div></div>
 <div style="display:inline-block;margin:-10px 0 0 18px;background:{BLUE};padding:8px 18px;border-radius:10px;font-size:{22 if story else 20}px;font-weight:800;letter-spacing:.08em;position:relative">SPEAKER</div></div>
-<div class="t" style="top:{fade - (40 if story else 30)}px;font-size:{112 if story else 98}px">Banking<br>opportunities<br><span style="color:#fff">for expats</span></div>
+<div class="t" style="top:{fade - (120 if story else 110)}px;font-size:{108 if story else 86}px">Banking<br>opportunities<br><span style="color:#fff">for expats</span><br><span style="color:#fff;font-size:.85em;letter-spacing:-.03em">in Tbilisi</span></div>
 <div class="abs" style="left:60px;right:60px;bottom:{(270 if story else 60)}px">{info_block(story)}</div>"""
     return f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>{body}</body></html>'
 
@@ -77,8 +77,8 @@ def poster_b(fmt):
 <div class="abs" style="left:0;right:0;top:{o + (-180 if story else 50)}px;text-align:center;z-index:5">{LOGO.replace('width="77"', 'width="110"').replace('height="38"', 'height="54"')}
 <div class="kick" style="margin-top:14px">The Power of Communities · Tbilisi</div></div>
 <div style="position:absolute;inset:0;z-index:3;-webkit-mask-image:linear-gradient(180deg,#000 {58 if story else 60}%,transparent {72 if story else 76}%)">{place(CUT, F, 540, fy, "filter:drop-shadow(0 30px 50px rgba(0,10,40,.5))")}</div>
-<div class="abs" style="left:40px;right:40px;top:{fy + (430 if story else 360)}px;text-align:center;z-index:6;font-weight:900;text-transform:uppercase;letter-spacing:-.035em;line-height:.9;font-size:{104 if story else 90}px;text-shadow:0 6px 30px rgba(0,15,60,.45)">Banking<br>opportunities<br><span style="color:#9CCBFF">for expats</span></div>
-<div class="abs" style="left:0;right:0;top:{fy + (790 if story else 660)}px;text-align:center;z-index:6;font-size:{28 if story else 24}px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Speaker: Lasha Chkhenkeli · TBC Bank</div>
+<div class="abs" style="left:40px;right:40px;top:{fy + (360 if story else 290)}px;text-align:center;z-index:6;font-weight:900;text-transform:uppercase;letter-spacing:-.035em;line-height:.9;font-size:{104 if story else 90}px;text-shadow:0 6px 30px rgba(0,15,60,.45)">Banking<br>opportunities<br><span style="color:#9CCBFF">for expats</span><br><span style="font-size:.85em;letter-spacing:-.03em">in Tbilisi</span></div>
+<div class="abs" style="left:0;right:0;top:{fy + (800 if story else 690)}px;text-align:center;z-index:6;font-size:{28 if story else 24}px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Speaker: Lasha Chkhenkeli · TBC Bank</div>
 <div class="abs" style="left:56px;right:56px;bottom:{(270 if story else 56)}px;z-index:6">{info_block(story, accent="#9CCBFF")}</div>"""
     return f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>{body}</body></html>'
 
