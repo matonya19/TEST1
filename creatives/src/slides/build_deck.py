@@ -195,6 +195,59 @@ def power(A):
 <div class="a" style="left:96px;top:800px;z-index:5"><span class="pill f" style="font-size:40px;padding:22px 44px">Не конкурировать. Объединяться.</span></div>""", motif)
 
 
+
+def statement(A, l1, l2, kick=""):
+    motif = '<div class="giant" style="right:-30px;bottom:-70px;font-size:430px">Co.</div>'
+    k = f'<div class="kick">{kick}</div>' if kick else ""
+    return page(A, f"""
+<div class="col" style="left:96px;right:96px;top:0;bottom:0;justify-content:center">{k}
+<div class="h" style="font-size:150px;margin-top:26px;line-height:.9">{l1}</div>
+<div class="h" style="font-size:150px;line-height:.9;color:{A}">{l2}</div></div>""", motif)
+
+
+def speaker(A, first, last, org, topic, photo, pos="50% 20%"):
+    return page(A, f"""
+<div class="ph" style="left:96px;top:176px;width:760px;height:800px"><img src="../img/{photo}" style="object-position:{pos}"></div>
+<div class="col" style="left:920px;right:96px;top:176px;height:800px;justify-content:space-between">
+<div><div class="kick">Спикер</div>
+<div class="h" style="font-size:124px;margin-top:22px">{first}<br><span style="color:{A}">{last}</span></div>
+<div style="margin-top:28px"><span class="pill f" style="font-size:28px;padding:14px 30px">{org}</span></div></div>
+<div><div class="lbl" style="font-size:20px">Тема выступления</div>
+<div class="h" style="font-size:64px;line-height:1">{topic}</div></div></div>""", CO)
+
+
+def em_founder(A):
+    return page(A, f"""
+<div class="ph" style="left:96px;top:176px;width:760px;height:800px;background:{A};display:flex;align-items:center;justify-content:center">
+<div style="font-weight:900;font-size:120px;letter-spacing:-.04em;color:{INK};line-height:.9;text-align:center">Event<br>Mates</div></div>
+<div class="col" style="left:920px;right:96px;top:176px;height:800px;justify-content:space-between">
+<div><div class="kick">Основатель EventMates</div>
+<div class="h" style="font-size:124px;margin-top:22px">Максим<br><span style="color:{A}">Муратов</span></div>
+<div style="margin-top:28px"><span class="pill f" style="font-size:28px;padding:14px 30px">EventMates</span></div></div>
+<div class="card" data-fit="30" data-max="440">{secs([("Кто я", "Основатель EventMates, IT-архитектор и разработчик."),
+ ("Зачем я создал проект", "Чтобы участники находили единомышленников, партнёров и новые возможности для сотрудничества.")])}</div></div>""", CO)
+
+
+def em_product(A):
+    cards = [("AI-нетворкинг", "Поиск людей с учётом интересов и целей участников."),
+             ("Регистрация и бейджи", "Печать именных бейджей прямо на входе."),
+             ("Программа и активности", "Расписание, рассадка, опросы и обратная связь.")]
+    c = "".join(f'<div class="card" style="flex:1;padding:32px 34px"><div style="font-size:56px;font-weight:900;color:{A};line-height:1">0{i+1}</div>'
+                f'<div style="font-size:34px;font-weight:800;margin-top:20px">{t}</div><div class="txt" style="font-size:24px;margin-top:10px;color:rgba(255,255,255,.72)">{d}</div></div>'
+                for i, (t, d) in enumerate(cards))
+    return page(A, f"""
+<div class="col" style="left:96px;width:1060px;top:176px"><div class="kick">EventMates</div>
+<div class="h" style="font-size:72px;margin-top:20px">Больше полезных знакомств.<br><span style="color:{A}">Меньше рутины для организатора.</span></div></div>
+<div class="a" style="left:96px;width:1060px;top:520px;display:flex;gap:24px;z-index:5">{c}</div>
+<div class="a txt" style="left:96px;width:1060px;top:880px;font-size:24px;color:rgba(255,255,255,.6);z-index:5">Скоро: привлечение новых участников — персональные рекомендации ваших событий по интересам.</div>
+<div class="card" style="position:absolute;left:1230px;right:96px;top:176px;height:800px;z-index:5;display:flex;flex-direction:column;justify-content:space-between">
+<div><div class="lbl" style="font-size:20px">Организаторам сообществ и событий</div>
+<div style="font-size:40px;font-weight:800;line-height:1.1">Попробуйте EventMates на вашем следующем мероприятии.</div>
+<div class="txt" style="font-size:24px;margin-top:20px">Для мероприятий со свободным входом до 100 участников — <b style="color:{A}">0 ₾</b></div></div>
+<div class="txt" style="font-size:28px;line-height:1.7"><div><span style="color:{A};font-weight:700">Telegram</span>&nbsp; @muratov_m_a</div>
+<div><span style="color:{A};font-weight:700">Телефон</span>&nbsp; +995 551 126 537</div><div><span style="color:{A};font-weight:700">Сайт</span>&nbsp; eventmates.io</div></div></div>""", CO)
+
+
 # ---------------- контент (из презентации «Диана») ----------------
 S = []
 A = "#A874FF"
@@ -214,7 +267,10 @@ S += [("00-cover", cover(A)),
         "textura_stage.jpg", "T", "50% 50%")),
       ("max-1", max_who(A)),
       ("max-2", what_co(A)),
-      ("max-3", power(A))]
+      ("max-3", power(A)),
+      ("st-1", statement(A, "Люди для людей.", "Для всего остального есть технологии.")),
+      ("st-2", statement(A, "Люди. Идеи.", "Возможности.")),
+      ("lasha", speaker(A, "Лаша", "Чхенкели", "TBC Bank", "Банковские возможности для экспатов", "lasha.jpg", "50% 15%"))]
 # 0. По душам — Анастасия Кулькова
 A = "#A874FF"
 S += [("kul-1", founder(A, "Анастасия", "Кулькова", "По душам",
@@ -338,6 +394,19 @@ S += [("blog-1", founder(A, "Василий и Мария", "Стешенко", 
         "blog_about.jpg", "B")),
       ("blog-3", join(A, "Bloggers &amp; UGC Creators", "Напишите в чат, оплатите первый месяц участия — 40 лари",
         [("Telegram", "@mari_manjari"), ("Instagram", "@mir_vdvoem"), ("Встречи", "Тбилиси, Батуми и онлайн")], "blog_qr.jpg"))]
+# Balance Community — Игорь Копыльцов
+A = "#A874FF"
+S += [("igor-1", founder(A, "Игорь", "Копыльцов", "Balance Community",
+        [("Кто вы", "Проводник свободы. Парус, доска, боевые искусства — разные способы почувствовать один принцип: всё есть баланс. В неустойчивом равновесии можно найти опору в себе и выбирать, как действовать."),
+         ("Зачем собрали сообщество", "Чтобы передать то, что Игорь сам понял через движение и взаимодействие со стихиями, с людьми, с миром. Этот опыт даёт опору, с которой можно найти свою свободу и идти своим путём.")],
+        "igor_founder.jpg", "B", "50% 20%")),
+      ("igor-2", about(A, "Balance Community", "Сообщество свободных людей",
+        [("Наша миссия", "Свобода движения, свобода выбора, свобода личности. На практике человек обнаруживает, что способен на большее, чем привык думать о себе."),
+         ("Что делаем вместе", "Ходим под парусом, встаём на доски, собираем экипажи и едем в кэмпы. В Balance Hub исследуем движение и взаимодействие на тренировках, в импровизации и в разговоре."),
+         ("Для кого", "Для тех, кто хочет стать ближе к себе, найти свои смыслы и понять, куда идти дальше. Кого тянет к движению, к живым людям и к энергии на грани выхода из равновесия.")],
+        "igor_founder.jpg", "B", "50% 25%")),
+      ("igor-3", join(A, "Balance Community", "Вступить в Balance Community. Познакомиться с людьми и выбрать, с чего хочется начать.",
+        [("Telegram", "@Balance_Community_Hub")], "igor_qr.png"))]
 # 10. Бизнес Круг — маджента
 A = "#A874FF"
 S += [("krug-1", founder(A, "Елена", "Пулькина", "Сообщество Бизнес Круг",
@@ -352,6 +421,9 @@ S += [("krug-1", founder(A, "Елена", "Пулькина", "Сообщест�
         "krug_about.jpg", "K", photo2="krug_about2.jpg")),
       ("krug-3", join(A, "Сообщество Бизнес Круг", "Подписывайся на Instagram, пришлю расписание ближайших встреч",
         [("Instagram", "@krug.tbilisi"), ("Встречи", "офлайн, Тбилиси")], "krug_qr.jpg"))]
+
+A = "#A874FF"
+S += [("em-1", em_founder(A)), ("em-2", em_product(A))]
 
 order = []
 for i, (k, h) in enumerate(S, 1):
