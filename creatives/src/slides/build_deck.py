@@ -375,7 +375,7 @@ A = "#A874FF"
 S += [("sami", single(A, "Sami Residence", ["Адаптация в Грузии", "Культурное погружение", "Новые друзья"],
         [("Наша миссия", "Помогаем в адаптации в Грузии"),
          ("О чём сообщество", "Мы изучаем грузинский язык, культуру и историю. Объединяем людей через ивенты со смыслом")],
-        "instagram.com/sami.residence.tbilisi", "sami_photo.jpg", "sami_qr.jpg", "S", "50% 40%", fit=True))]
+        "Страница на Co.Space: cospace.world/ru/communities/sami-residence", "sami_photo.jpg", "sami_qr2.png", "S", "50% 40%", fit=True))]
 # 5. ISOUL — фиолетовый
 A = "#A874FF"
 S += [("isoul-1", founder(A, "Юлия", "Шенгелия", "ISOUL Грузия",
