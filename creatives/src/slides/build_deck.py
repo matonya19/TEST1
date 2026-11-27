@@ -47,10 +47,10 @@ let s=parseFloat(e.dataset.fit);e.style.fontSize=s+'px';const max=parseFloat(e.d
 while(e.scrollHeight>max&&s>24){s-=1;e.style.fontSize=s+'px'}})});</script>"""
 
 
-def page(A, body, motif="Co.", footleft="Найди своих"):
+def page(A, body, motif="Co.", footleft="Найди своих", brand=True):
     glow = ('<div class="glow" style="left:1200px;top:-300px;width:1000px;height:760px"></div>'
             '<div class="glow" style="left:-360px;top:700px;width:900px;height:700px;opacity:.12"></div>')
-    top = (f'<div class="top"><div class="brand">{LOGO}<span>Tbilisi</span></div>'
+    top = (f'<div class="top"><div class="brand">{LOGO if brand else ""}<span>{"Tbilisi" if brand else ""}</span></div>'
            f'<div class="meta">Сила сообществ · 27.11</div></div>')
     foot = f'<div class="foot"><div class="meta">{footleft}</div><div class="meta">cospace.world</div></div>'
     return (f'<!doctype html><html><head><meta charset="utf-8"><style>{css(A)}</style></head><body>{glow}'
@@ -125,8 +125,48 @@ def single(A, name, tags, items, join_t, photo, qr, letter, pos="50% 50%", fit=F
 <div style="padding-bottom:6px"><div class="kick">Как вступить</div><div class="txt" style="margin-top:12px;font-size:28px;word-break:break-word">{join_t}</div></div></div>""", CO)
 
 
+
+def cover(A):
+    motif = '<div class="giant" style="right:-30px;bottom:-70px;font-size:430px">Co.</div>'
+    logo = LOGO.replace('width="96"', 'width="150"').replace('height="47"', 'height="74"')
+    return page(A, f"""
+<div class="a" style="left:1000px;top:0;right:0;bottom:0;background:url(../../poster/audience.jpg) 40% 50%/cover;filter:grayscale(.3) brightness(.55);
+ -webkit-mask-image:linear-gradient(90deg,transparent,#000 45%);z-index:0"></div>
+<div class="col" style="left:96px;top:210px;width:1100px">
+<div style="display:flex;align-items:center;gap:36px">{logo}<span style="font-size:44px;font-weight:300;color:rgba(255,255,255,.5)">×</span>
+<img src="../img/textura_logo.png" style="height:92px"></div>
+<div class="kick" style="margin-top:70px">Вечер сообществ Тбилиси</div>
+<div class="h" style="font-size:190px;margin-top:22px;line-height:.86">Сила<br><span style="color:{A}">сообществ</span></div>
+<div style="margin-top:54px;display:flex;gap:16px;flex-wrap:wrap">
+<span class="pill f" style="font-size:30px;padding:16px 34px">27 ноября</span>
+<span class="pill o" style="font-size:30px;padding:16px 34px">Ginger Hotel, Тбилиси</span></div></div>""", "", brand=False)
+
+
+def founder_stats(A, first, last, community, desc, stats, photo, pos="50% 20%", kick="Ведёт вечер"):
+    st = "".join(f'<div style="flex:1"><div style="font-size:84px;font-weight:900;letter-spacing:-.03em;color:{A};line-height:1">{n}</div>'
+                 f'<div style="font-size:24px;line-height:1.3;color:rgba(255,255,255,.7);margin-top:10px">{t}</div></div>' for n, t in stats)
+    return page(A, f"""
+<div class="ph" style="left:96px;top:176px;width:760px;height:800px"><img src="../img/{photo}" style="object-position:{pos}"></div>
+<div class="col" style="left:920px;right:96px;top:176px;height:800px;justify-content:space-between">
+<div><div class="kick">{kick}</div>
+<div class="h" style="font-size:124px;margin-top:22px">{first}<br><span style="color:{A}">{last}</span></div>
+<div style="margin-top:28px"><span class="pill f" style="font-size:26px;padding:14px 30px">{community}</span></div>
+<div class="txt" style="font-size:30px;margin-top:30px">{desc}</div></div>
+<div style="display:flex;gap:40px;border-top:1.5px solid rgba(255,255,255,.12);padding-top:34px">{st}</div></div>""", CO)
+
+
 # ---------------- контент (из презентации «Диана») ----------------
 S = []
+A = "#A874FF"
+S += [("00-cover", cover(A)),
+      ("pol-1", founder_stats(A, "Полина", "Язвенко", "TEXTURA",
+        "Предприниматель, тренер по публичным выступлениям, эксперт по публичности и медийности. Основатель онлайн-школы TEXTURA с образовательной лицензией.",
+        [("500+", "спикеров обучено за 5 лет"), ("30+", "тренингов и программ"), ("3 года", "в прямом эфире на ТВ")],
+        "polina_portrait.jpg", "50% 18%")),
+      ("pol-2", about(A, "JB Glamping", "Глэмпинг в Грузии",
+        [("Кто", "Полина Язвенко — сооснователь JB Glamping вместе с мужем"),
+         ("Что это", "Глэмпинг в Грузии: купола посреди зелёных полей с видом на горы")],
+        "glamping.jpg", "G", "50% 45%", kick="Сооснователь"))]
 # 0. По душам — Анастасия Кулькова
 A = "#A874FF"
 S += [("kul-1", founder(A, "Анастасия", "Кулькова", "По душам",
