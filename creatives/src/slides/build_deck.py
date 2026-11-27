@@ -262,10 +262,26 @@ def gallery(A, name, imgs):
 <div class="h" style="font-size:84px;margin-top:14px">{name}</div></div>""", CO)
 
 
+
+def networking_qr(A):
+    motif = '<div class="giant" style="left:80px;bottom:96px;font-size:150px">НАЙДИ СВОИХ</div>'
+    steps = ["Наведи камеру на QR", "Зарегистрируйся в EventMates", "Заполни интересы — приложение подскажет, с кем познакомиться"]
+    st = "".join(f'<div style="display:flex;gap:26px;align-items:flex-start;padding:22px 0;border-top:1.5px solid rgba(255,255,255,.10)">'
+                 f'<span style="font-size:44px;font-weight:900;color:{A};line-height:1;width:50px">{i+1}</span><span style="font-size:34px;font-weight:600;line-height:1.25">{t}</span></div>'
+                 for i, t in enumerate(steps))
+    return page(A, f"""
+<div class="col" style="left:96px;width:1060px;top:176px"><div class="kick">Нетворкинг · EventMates</div>
+<div class="h" style="font-size:96px;margin-top:22px">Ты уже<br><span style="color:{A}">зарегистрирован?</span></div>
+<div style="margin-top:44px">{st}</div></div>
+<div class="col" style="left:1264px;width:560px;top:200px"><div class="qr" style="width:560px;height:560px"><img src="../img/qr_eventmates.png"></div>
+<div class="kick" style="margin-top:22px;text-align:center;color:rgba(255,255,255,.6)">Регистрация на нетворкинг</div></div>""", motif, "Наведи камеру на QR")
+
+
 # ---------------- контент (из презентации «Диана») ----------------
 S = []
 A = "#A874FF"
 S += [("00-cover", cover(A)),
+      ("00b-net", networking_qr(A)),
       ("pol-1", founder_stats(A, "Полина", "Язвенко", "TEXTURA",
         "Предприниматель, тренер по публичным выступлениям, эксперт по публичности и медийности. Основатель онлайн-школы TEXTURA с образовательной лицензией.",
         [("500+", "спикеров обучено за 5 лет"), ("30+", "тренингов и программ"), ("3 года", "в прямом эфире на ТВ")],
