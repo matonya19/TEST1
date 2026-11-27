@@ -60,7 +60,7 @@ def founder(A, first, last, community, items, photo, letter, pos="50% 25%"):
     nm = max(len(first), len(last))
     fs = 132 if nm <= 10 else (110 if nm <= 14 else 92)
     return page(A, f"""
-<div class="giant" style="left:-70px;top:140px;font-size:920px">{letter}</div>
+<div class="giant" style="left:-70px;top:140px;font-size:920px">C</div>
 <div class="ph" style="left:150px;top:190px;width:680px;height:800px"><img src="../img/{photo}" style="object-position:{pos}"></div>
 <div class="a" style="left:900px;top:170px;right:80px;z-index:5"><div class="kick">Основатель сообщества</div>
 <div class="h" style="font-size:{fs}px;margin-top:24px">{first}<br><span style="color:{A}">{last}</span></div>
@@ -77,7 +77,7 @@ def about(A, name, tagline, items, photo, letter, pos="50% 50%", photo2=None):
     tg = f'<div class="txt" style="font-size:28px;margin-top:16px;max-width:1000px;color:rgba(255,255,255,.7)">{tagline}</div>' if tagline else ""
     nfs = 88 if len(name) <= 18 else 70
     return page(A, f"""
-<div class="giant" style="right:-90px;top:110px;font-size:900px;opacity:.9">{letter}</div>
+<div class="giant" style="right:-90px;top:110px;font-size:900px;opacity:.9">O</div>
 {ph}
 <div class="a" style="left:80px;top:810px;width:1000px;z-index:5"><div class="kick">О сообществе</div>
 <div class="h" style="font-size:{nfs}px;margin-top:14px">{name}</div>{tg}</div>
@@ -86,21 +86,21 @@ def about(A, name, tagline, items, photo, letter, pos="50% 50%", photo2=None):
 
 def join(A, name, first, rows, qr, caption=""):
     r = "".join(f'<div class="row"><b>{k}</b><span>{v}</span></div>' for k, v in rows)
-    cap = f'<div class="a kick" style="left:1300px;top:900px;width:520px;text-align:center;color:rgba(255,255,255,.6)">{caption}</div>' if caption else ""
+    cap = f'<div class="a kick" style="left:1300px;top:825px;width:500px;text-align:center;color:rgba(255,255,255,.6)">{caption}</div>' if caption else ""
     return page(A, f"""
-<div class="giant" style="left:-40px;bottom:-230px;font-size:620px;opacity:.25">JOIN</div>
+<div class="giant" style="right:40px;bottom:20px;font-size:150px;opacity:.18;white-space:nowrap;line-height:.85">НАЙДИ СВОИХ</div>
 <div class="a" style="left:80px;top:170px;z-index:5"><div class="kick">{name}</div>
 <div class="h" style="font-size:118px;margin-top:22px">Как<br><span style="color:{A}">присоединиться</span></div></div>
-<div class="card" data-fit="28" style="left:80px;top:560px;width:1100px;height:440px">
+<div class="card" data-fit="28" style="left:80px;top:500px;width:1100px;height:420px">
 <div class="sec"><div class="lbl">Первый шаг</div><div class="txt">{first}</div></div>
 <div class="sec"><div class="lbl">Где нас найти</div>{r}</div></div>
-<div class="qr" style="left:1300px;top:340px;width:520px;height:520px"><img src="../img/{qr}"></div>{cap}""")
+<div class="qr" style="left:1300px;top:300px;width:500px;height:500px"><img src="../img/{qr}"></div>{cap}""")
 
 
 def single(A, name, tags, items, join_t, photo, qr, letter, pos="50% 50%", fit=False):
     pills = "".join(f'<span class="pill {"f" if i == 0 else "o"}">{t}</span>' for i, t in enumerate(tags))
     return page(A, f"""
-<div class="giant" style="right:-60px;top:60px;font-size:760px;opacity:.9">{letter}</div>
+<div class="giant" style="right:-60px;top:60px;font-size:760px;opacity:.9">C</div>
 <div class="ph" style="left:80px;top:170px;width:820px;height:600px;{'background:#fff;padding:40px' if fit else ''}"><img src="../img/{photo}" style="object-position:{pos};{'object-fit:contain' if fit else ''}"></div>
 <div class="a" style="left:80px;top:805px;width:900px;z-index:5"><div class="h" style="font-size:72px">{name}</div>
 <div style="margin-top:20px">{pills}</div></div>
@@ -113,7 +113,7 @@ def single(A, name, tags, items, join_t, photo, qr, letter, pos="50% 50%", fit=F
 # ---------------- контент (из презентации «Диана») ----------------
 S = []
 # 1. Ertad — жёлтый
-A = "#FFC83D"
+A = "#A874FF"
 S += [("ertad-1", founder(A, "Ирина", "Ластовка", "Бизнес-сообщество Ertad",
         [("Кто вы", "Основатель и идейный вдохновитель"),
          ("Зачем вы собрали сообщество", "Объединить местных и экспатов, чтобы вместе делать крутой бизнес в Грузии")],
@@ -125,7 +125,7 @@ S += [("ertad-1", founder(A, "Ирина", "Ластовка", "Бизнес-с�
       ("ertad-3", join(A, "Бизнес-сообщество Ertad", "Выбрать интересное для вас мероприятие, заполнить анкету и прийти.",
         [("Telegram", "@ertad_community"), ("Instagram", "@ertad.community"), ("Встречи", "Тбилиси и Батуми")], "ertad_qr.jpg"))]
 # 2. ESTATE HUB — синий
-A = "#4F8BFF"
+A = "#A874FF"
 S += [("estate-1", founder(A, "Diana", "Panieva-Kutateladze", "ESTATE HUB",
         [(None, "Real Estate &amp; Investment Advisor | Real Estate Lawyer"),
          (None, "<b style='color:#fff'>Основала ESTATE HUB</b> — сообщество, усиливающее бизнес в сфере недвижимости.")],
@@ -138,7 +138,7 @@ S += [("estate-1", founder(A, "Diana", "Panieva-Kutateladze", "ESTATE HUB",
       ("estate-3", join(A, "ESTATE HUB", "Заполните анкету (ссылка в шапке профиля в Instagram), далее мы с вами свяжемся для проведения краткого интервью",
         [("Telegram", "@RealEstateDi"), ("Instagram", "@estate_hub_1"), ("Встречи", "Тбилиси и онлайн")], "estate_qr.jpg"))]
 # 3. Tbilisi Running Club — розовый
-A = "#FF5FA2"
+A = "#A874FF"
 S += [("trc-1", founder(A, "Konstantin", "Kocura", "Tbilisi Running Club",
         [("Капитан клуба", "Вместе с друзьями основал Tbilisi Running Club — открытое сообщество для тех, кто любит Грузию через бег")],
         "trc_founder.jpg", "R", "50% 35%")),
@@ -150,7 +150,7 @@ S += [("trc-1", founder(A, "Konstantin", "Kocura", "Tbilisi Running Club",
       ("trc-3", join(A, "Tbilisi Running Club", "Подпишитесь на Telegram: канал или чат (расписание — по понедельникам), выберите тренировку и приходите на старт",
         [("Telegram", "@tbilisirunningclub"), ("Instagram", "@tbilisirunningclub"), ("Strava", "@tbilisirunningclub"), ("Чат", "@tbilisirunningclubtalks")], "trc_qr.jpg"))]
 # 4. Sami Residence — зелёный (1 слайд)
-A = "#3DDC97"
+A = "#A874FF"
 S += [("sami", single(A, "Sami Residence", ["Адаптация в Грузии", "Культурное погружение", "Новые друзья"],
         [("Наша миссия", "Помогаем в адаптации в Грузии"),
          ("О чём сообщество", "Мы изучаем грузинский язык, культуру и историю. Объединяем людей через ивенты со смыслом")],
@@ -170,7 +170,7 @@ S += [("isoul-1", founder(A, "Юлия", "Шенгелия", "ISOUL Грузия
         [("Telegram", "t.me/+N9qDQ3-1Kv0xZmQ6 (чат ISOUL в Грузии)"), ("Instagram", "@isoul.community"), ("Встречи", "Тбилиси, Батуми"), ("Сайт", "isoul.space")],
         "isoul_qr.jpg", "Анкета на вступление"))]
 # 6. Marketing and AI — бирюзовый
-A = "#22D3EE"
+A = "#A874FF"
 S += [("mai-1", founder(A, "Alex", "Kochnev", "Marketing and AI",
         [("Кто вы", "Предприниматель, 20+ лет опыта, более 4 лет внедряю AI в проекты. Помогаю с помощью AI увеличивать прибыль."),
          ("Зачем вы собрали сообщество", "Чтобы любой мог увидеть, что AI — это не сложно, но очень-очень полезно)")],
@@ -183,13 +183,13 @@ S += [("mai-1", founder(A, "Alex", "Kochnev", "Marketing and AI",
       ("mai-3", join(A, "Marketing and AI", "Go в наш чат!",
         [("Telegram", "@martech_ai"), ("Instagram", "@alex.happy.longevity"), ("Встречи", "Tbilisi, Ibis Tbilisi Stadium")], "mai_qr.jpg"))]
 # 7. Tbilisi Coffee Club — оранжевый (1 слайд)
-A = "#FF8A3D"
+A = "#A874FF"
 S += [("coffee", single(A, "Tbilisi Coffee Club", ["Coffee", "Networking", "Community"],
         [("Наша миссия", "Помогать людям находить свой круг общения, друзей и единомышленников в Тбилиси."),
          ("О чём сообщество", "Объединяем любителей кофе и живого общения. Знакомимся за чашкой кофе, каждую неделю встречаемся в разных кофейнях Тбилиси, открываем новые места и проводим время вместе.")],
         "t.me/TbilisiCoffeeClub", "coffee_photo.jpg", "coffee_qr.jpg", "C"))]
 # 8. Mesto — коралловый
-A = "#FF5A5F"
+A = "#A874FF"
 S += [("mesto-1", founder(A, "Ирина", "Сивридкина", "Mesto",
         [(None, "<b style='color:#fff'>Mesto</b> — пространство для настольных игр и мероприятий. Совладелец и идейный вдохновитель Mesto."),
          (None, "Мы хотим показать, насколько увлекательным может быть интеллектуальный досуг. Он помогает людям находить общие интересы, знакомиться, создавать настоящие социальные связи и вместе открывать новое.")],
@@ -202,7 +202,7 @@ S += [("mesto-1", founder(A, "Ирина", "Сивридкина", "Mesto",
       ("mesto-3", join(A, "Mesto настольные игры", "Подпишись на группу в Telegram и бот, выбирай в боте мероприятия и записывайся.",
         [("Telegram", "@mesto_games"), ("Бот", "@mesto123_bot"), ("Instagram", "@mesto.tbilisi"), ("Встречи", "Тбилиси, Вахтанга Бочоришвили 37А")], "mesto_qr.jpg"))]
 # 9. Bloggers & UGC Creators — лайм
-A = "#C6F432"
+A = "#A874FF"
 S += [("blog-1", founder(A, "Василий и Мария", "Стешенко", "Bloggers &amp; UGC Creators",
         [("Кто вы", "Совладельцы маркетингового агентства по продвижению индустрии Wellness, Health &amp; Beauty, эксперты по AI, блогеры"),
          ("Зачем вы собрали сообщество", "Идея содружества по интересу создания контента и развития бизнесов Грузии")],
@@ -215,7 +215,7 @@ S += [("blog-1", founder(A, "Василий и Мария", "Стешенко", 
       ("blog-3", join(A, "Bloggers &amp; UGC Creators", "Напишите в чат, оплатите первый месяц участия — 40 лари",
         [("Telegram", "@mari_manjari"), ("Instagram", "@mir_vdvoem"), ("Встречи", "Тбилиси, Батуми и онлайн")], "blog_qr.jpg"))]
 # 10. Бизнес Круг — маджента
-A = "#FF7AE6"
+A = "#A874FF"
 S += [("krug-1", founder(A, "Елена", "Пулькина", "Сообщество Бизнес Круг",
         [(None, "Сооснователь проекта «Система» (обучение для экспертов и предпринимателей)"),
          (None, "Создаю среду для роста и наполненной жизни для себя и других")],
