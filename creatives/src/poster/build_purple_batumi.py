@@ -51,9 +51,9 @@ def build(fmt):
     W, H = 1080, (1920 if story else 1350)
     # вертикальная раскладка
     if story:
-        top, ghost_y, gs, fy, F, fade, title_y, foot_y, date_y = 150, 300, 250, 640, 178, 1330, 1235, 1730, 470
+        top, ghost_y, gs, fy, F, fade, title_y, foot_y, date_y = 150, 300, 250, 620, 178, 1290, 1150, 1730, 470
     else:
-        top, ghost_y, gs, fy, F, fade, title_y, foot_y, date_y = 50, 140, 220, 410, 128, 830, 760, 1225, 260
+        top, ghost_y, gs, fy, F, fade, title_y, foot_y, date_y = 50, 140, 220, 380, 128, 790, 690, 1225, 240
     logo = LOGO.replace('width="77"', 'width="130"').replace('height="38"', 'height="64"')
     css = FF + f"""*{{margin:0;padding:0;box-sizing:border-box}}
 html,body{{width:{W}px;height:{H}px;overflow:hidden;background:#1A0B3D}}
@@ -78,6 +78,7 @@ body{{font-family:'Onest',sans-serif;color:#fff;position:relative}}
 <div class="pill" style="top:{date_y + 30}px">вход<br>свободный</div>
 <div class="title" style="top:{title_y}px"><div class="kick">СИЛА СООБЩЕСТВ</div>
 <div class="big" style="font-size:{170 if story else 150}px;font-family:'Inter Display',sans-serif;font-weight:800;line-height:.95;margin-top:{26 if story else 22}px">Найди<br>своих</div>
+<div style="font-size:{78 if story else 66}px;font-weight:900;letter-spacing:-.02em;line-height:1;margin-top:{14 if story else 10}px;color:#D9C4FF">в Батуми</div>
 <div class="sub">Полина · TEXTURA &nbsp;/&nbsp; Максим · Co.Space</div></div>
 <div class="foot" style="top:{foot_y}px"><div>Вечер<br>в Батуми</div><div style="text-align:center;font-size:.8em">Регистрация —<br>ссылка в профиле</div><div style="text-align:right">@co.batumi</div></div>"""
     return f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>{body}</body></html>'
