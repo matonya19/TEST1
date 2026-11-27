@@ -99,7 +99,7 @@ def about(A, name, tagline, items, photo, letter, pos="50% 50%", photo2=None, ki
 <div class="col" data-fit="32" data-max="800" style="left:1120px;right:96px;top:176px">{secs(items)}</div>""", CO)
 
 
-def join(A, name, first, rows, qr, caption=""):
+def join(A, name, first, rows, qr, caption="Страница на Co.Space"):
     r = "".join(f'<div class="row"><b>{k}</b><span>{v}</span></div>' for k, v in rows)
     cap = f'<div class="kick" style="margin-top:22px;text-align:center;color:rgba(255,255,255,.6)">{caption}</div>' if caption else ""
     motif = '<div class="giant" style="right:96px;bottom:92px;font-size:150px">НАЙДИ СВОИХ</div>'
@@ -298,7 +298,7 @@ S += [("kul-1", founder(A, "Анастасия", "Кулькова", "Женск
         "kul_group.jpg", "П", "50% 50%")),
       ("kul-3", gallery(A, "По душам", ["kul_g4.jpg", "kul_g1.jpg", "kul_g2.jpg", "kul_g7.jpg", "kul_g5.jpg"])),
       ("kul-4", join(A, "Женское сообщество «По душам»", "Напиши в директ и запишись на первую бесплатную встречу в формате нетворкинг-завтрака",
-        [("Telegram", "t.me/+xSXb7MfEeTA2M2Iy"), ("Instagram", "@tbilisi_events"), ("Встречи", "в Тбилиси")], "kul_qr.jpg"))]
+        [("Telegram", "t.me/+xSXb7MfEeTA2M2Iy"), ("Instagram", "@tbilisi_events"), ("Встречи", "в Тбилиси")], "cs_kul.png"))]
 # 1. Ertad — жёлтый
 A = "#A874FF"
 S += [("ertad-1", founder(A, "Ирина", "Ластовка", "Бизнес-сообщество Ertad",
@@ -310,7 +310,7 @@ S += [("ertad-1", founder(A, "Ирина", "Ластовка", "Бизнес-с�
          ("Что делаем вместе", "Бизнес-завтраки, круглые столы, встречи, конференции, подкаст"),
          ("Для кого мы", "Все, для кого актуальна тема бизнеса в Грузии.")], None, "E")),
       ("ertad-3", join(A, "Бизнес-сообщество Ertad", "Выбрать интересное для вас мероприятие, заполнить анкету и прийти.",
-        [("Telegram", "@ertad_community"), ("Instagram", "@ertad.community"), ("Встречи", "Тбилиси и Батуми")], "ertad_qr.jpg"))]
+        [("Telegram", "@ertad_community"), ("Instagram", "@ertad.community"), ("Встречи", "Тбилиси и Батуми")], "cs_ertad.png"))]
 # 1b. Телеграм о Грузии — Николай Левшиц
 A = "#A874FF"
 S += [("lev-1", founder(A, "Николай", "Левшиц", "Телеграм о Грузии",
@@ -320,7 +320,9 @@ S += [("lev-1", founder(A, "Николай", "Левшиц", "Телеграм �
       ("lev-2", about(A, "Телеграм о Грузии", "Самый популярный телеграм-канал о Грузии",
         [("О чём канал", "Николай рассказывает о Грузии: о жизни, новостях и обо всём, что полезно знать, если ты здесь живёшь или собираешься переехать."),
          ("Для кого", "Для тех, кто живёт в Грузии или собирается переехать.")],
-        "lev_about.jpg", "T", "50% 40%", kick="О канале"))]
+        "lev_about.jpg", "T", "50% 40%", kick="О канале")),
+      ("lev-3", join(A, "Телеграм о Грузии", "Наведи камеру на QR — откроется страница канала на Co.Space, оттуда можно сразу перейти в канал.",
+        [("Co.Space", "cospace.world/ru/communities/pro-georgia-pro-gruziyu")], "cs_lev.png"))]
 # 2. ESTATE HUB — синий
 A = "#A874FF"
 S += [("estate-1", founder(A, "Diana", "Panieva-Kutateladze", "ESTATE HUB",
@@ -333,7 +335,7 @@ S += [("estate-1", founder(A, "Diana", "Panieva-Kutateladze", "ESTATE HUB",
          ("Для кого мы", "Специалистам и компаниям рынка недвижимости Грузии: риэлторам, девелоперам, юристам, инвесторам, а также подрядчикам в сфере ремонта, дизайна, хоумстейджинга и сопровождения сделок.")],
         "estate_about.jpg", "H")),
       ("estate-3", join(A, "ESTATE HUB", "Заполните анкету (ссылка в шапке профиля в Instagram), далее мы с вами свяжемся для проведения краткого интервью",
-        [("Telegram", "@RealEstateDi"), ("Instagram", "@estate_hub_1"), ("Встречи", "Тбилиси и онлайн")], "estate_qr.jpg"))]
+        [("Telegram", "@RealEstateDi"), ("Instagram", "@estate_hub_1"), ("Встречи", "Тбилиси и онлайн")], "cs_estate.png"))]
 # 3. Tbilisi Running Club — розовый
 A = "#A874FF"
 S += [("trc-1", founder(A, "Konstantin", "Kocura", "Tbilisi Running Club",
@@ -345,7 +347,7 @@ S += [("trc-1", founder(A, "Konstantin", "Kocura", "Tbilisi Running Club",
          ("Для кого мы", "Всем, кто уже бегает или только хочет начать: от новичков на лёгких 3 км до марафонцев и ультрабегунов. Тбилисцам, экспатам и гостям города.")],
         "trc_about.jpg", "R")),
       ("trc-3", join(A, "Tbilisi Running Club", "Подпишитесь на Telegram: канал или чат (расписание — по понедельникам), выберите тренировку и приходите на старт",
-        [("Telegram", "@tbilisirunningclub"), ("Instagram", "@tbilisirunningclub"), ("Strava", "@tbilisirunningclub"), ("Чат", "@tbilisirunningclubtalks")], "trc_qr.jpg"))]
+        [("Telegram", "@tbilisirunningclub"), ("Instagram", "@tbilisirunningclub"), ("Strava", "@tbilisirunningclub"), ("Чат", "@tbilisirunningclubtalks")], "cs_trc.png"))]
 # 4. Sami Residence — зелёный (1 слайд)
 A = "#A874FF"
 S += [("sami", single(A, "Sami Residence", ["Адаптация в Грузии", "Культурное погружение", "Новые друзья"],
@@ -365,7 +367,7 @@ S += [("isoul-1", founder(A, "Юлия", "Шенгелия", "ISOUL Грузия
         "isoul_about.jpg", "S")),
       ("isoul-3", join(A, "ISOUL Грузия", "Заполните анкету по QR-коду и пройдите интервью с президентом ISOUL в Грузии Юлией Шенгелия.",
         [("Telegram", "t.me/+N9qDQ3-1Kv0xZmQ6 (чат ISOUL в Грузии)"), ("Instagram", "@isoul.community"), ("Встречи", "Тбилиси, Батуми"), ("Сайт", "isoul.space")],
-        "isoul_qr.jpg", "ISOUL на Co.Space"))]
+        "isoul_qr.jpg"))]
 # 6. Marketing and AI — бирюзовый
 A = "#A874FF"
 S += [("mai-1", founder(A, "Alex", "Kochnev", "Marketing and AI",
@@ -378,13 +380,13 @@ S += [("mai-1", founder(A, "Alex", "Kochnev", "Marketing and AI",
          ("Для кого мы", "Для предпринимателей, маркетологов, AI-энтузиастов, специалистов")],
         "mai_about.jpg", "M")),
       ("mai-3", join(A, "Marketing and AI", "Go в наш чат!",
-        [("Telegram", "@martech_ai"), ("Instagram", "@alex.happy.longevity"), ("Встречи", "Tbilisi, Ibis Tbilisi Stadium")], "mai_qr.jpg"))]
+        [("Telegram", "@martech_ai"), ("Instagram", "@alex.happy.longevity"), ("Встречи", "Tbilisi, Ibis Tbilisi Stadium")], "cs_mai.png"))]
 # 7. Tbilisi Coffee Club — оранжевый (1 слайд)
 A = "#A874FF"
 S += [("coffee", single(A, "Tbilisi Coffee Club", ["Coffee", "Networking", "Community"],
         [("Наша миссия", "Помогать людям находить свой круг общения, друзей и единомышленников в Тбилиси."),
          ("О чём сообщество", "Объединяем любителей кофе и живого общения. Знакомимся за чашкой кофе, каждую неделю встречаемся в разных кофейнях Тбилиси, открываем новые места и проводим время вместе.")],
-        "t.me/TbilisiCoffeeClub", "coffee_photo.jpg", "coffee_qr.jpg", "C"))]
+        "t.me/TbilisiCoffeeClub", "coffee_photo.jpg", "cs_coffee.png", "C"))]
 # 8. Mesto — коралловый
 A = "#A874FF"
 S += [("mesto-1", founder(A, "Ирина", "Сивридкина", "Mesto",
@@ -397,7 +399,7 @@ S += [("mesto-1", founder(A, "Ирина", "Сивридкина", "Mesto",
          ("Для кого мы", "Для тех, кто любит настольные игры, ищет компанию и новые знакомства.")],
         "mesto_about.jpg", "M")),
       ("mesto-3", join(A, "Mesto настольные игры", "Подпишись на группу в Telegram и бот, выбирай в боте мероприятия и записывайся.",
-        [("Telegram", "@mesto_games"), ("Бот", "@mesto123_bot"), ("Instagram", "@mesto.tbilisi"), ("Встречи", "Тбилиси, Вахтанга Бочоришвили 37А")], "mesto_qr.jpg"))]
+        [("Telegram", "@mesto_games"), ("Бот", "@mesto123_bot"), ("Instagram", "@mesto.tbilisi"), ("Встречи", "Тбилиси, Вахтанга Бочоришвили 37А")], "cs_mesto.png"))]
 # 9. Bloggers & UGC Creators — лайм
 A = "#A874FF"
 S += [("blog-1", founder(A, "Василий и Мария", "Стешенко", "Bloggers &amp; UGC Creators",
@@ -410,7 +412,7 @@ S += [("blog-1", founder(A, "Василий и Мария", "Стешенко", 
          ("Для кого мы", "Для лидеров мнений и креаторов, кто любит делиться впечатлениями о посещении ресторанов, отелей, спа и других бизнесов Грузии.")],
         "blog_about.jpg", "B")),
       ("blog-3", join(A, "Bloggers &amp; UGC Creators", "Напишите в чат, оплатите первый месяц участия — 40 лари",
-        [("Telegram", "@mari_manjari"), ("Instagram", "@mir_vdvoem"), ("Встречи", "Тбилиси, Батуми и онлайн")], "blog_qr.jpg"))]
+        [("Telegram", "@mari_manjari"), ("Instagram", "@mir_vdvoem"), ("Встречи", "Тбилиси, Батуми и онлайн")], "cs_blog.png"))]
 # Balance Community — Игорь Копыльцов
 A = "#A874FF"
 S += [("igor-1", founder(A, "Игорь", "Копыльцов", "Balance Community",
@@ -423,7 +425,7 @@ S += [("igor-1", founder(A, "Игорь", "Копыльцов", "Balance Communi
          ("Для кого", "Для тех, кто хочет стать ближе к себе, найти свои смыслы и понять, куда идти дальше. Кого тянет к движению, к живым людям и к энергии на грани выхода из равновесия.")],
         "igor_founder.jpg", "B", "50% 25%")),
       ("igor-3", join(A, "Balance Community", "Вступить в Balance Community. Познакомиться с людьми и выбрать, с чего хочется начать.",
-        [("Telegram", "@Balance_Community_Hub")], "igor_qr.png"))]
+        [("Telegram", "@Balance_Community_Hub")], "cs_igor.png"))]
 # 10. Бизнес Круг — маджента
 A = "#A874FF"
 S += [("krug-1", founder(A, "Елена", "Пулькина", "Сообщество Бизнес Круг",
