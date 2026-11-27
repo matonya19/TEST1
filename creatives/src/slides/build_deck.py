@@ -133,8 +133,7 @@ def cover(A):
 <div class="a" style="left:1000px;top:0;right:0;bottom:0;background:url(../../poster/audience.jpg) 40% 50%/cover;filter:grayscale(.3) brightness(.55);
  -webkit-mask-image:linear-gradient(90deg,transparent,#000 45%);z-index:0"></div>
 <div class="col" style="left:96px;top:210px;width:1100px">
-<div style="display:flex;align-items:center;gap:36px">{logo}<span style="font-size:44px;font-weight:300;color:rgba(255,255,255,.5)">×</span>
-<img src="../img/textura_logo.png" style="height:92px"></div>
+<div style="display:flex;align-items:center;gap:36px">{logo}</div>
 <div class="kick" style="margin-top:70px">Вечер сообществ Тбилиси</div>
 <div class="h" style="font-size:190px;margin-top:22px;line-height:.86">Сила<br><span style="color:{A}">сообществ</span></div>
 <div style="margin-top:54px;display:flex;gap:16px;flex-wrap:wrap">
@@ -166,7 +165,12 @@ S += [("00-cover", cover(A)),
       ("pol-2", about(A, "JB Glamping", "Глэмпинг в Грузии",
         [("Кто", "Полина Язвенко — сооснователь JB Glamping вместе с мужем"),
          ("Что это", "Глэмпинг в Грузии: купола посреди зелёных полей с видом на горы")],
-        "glamping.jpg", "G", "50% 45%", kick="Сооснователь"))]
+        "glamping.jpg", "G", "50% 45%", kick="Сооснователь")),
+      ("tex-1", about(A, '<img src="../img/textura_white.png" style="height:64px;display:block;margin:6px 0 4px">', "",
+        [("О сообществе", "Сообщество людей, которые создают компании, запускают проекты, инвестируют, строят личные бренды и влияют на рынок."),
+         ("Тема", "Бизнес"),
+         ("Формат", "Онлайн + офлайн")],
+        "textura_stage.jpg", "T", "50% 50%"))]
 # 0. По душам — Анастасия Кулькова
 A = "#A874FF"
 S += [("kul-1", founder(A, "Анастасия", "Кулькова", "По душам",
