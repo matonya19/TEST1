@@ -81,7 +81,7 @@ def founder(A, first, last, community, items, photo, letter, pos="50% 25%", kick
 <div class="card" data-fit="32" data-max="420">{secs(items)}</div></div>""", CO)
 
 
-def about(A, name, tagline, items, photo, letter, pos="50% 50%", photo2=None, kick="О сообществе"):
+def about(A, name, tagline, items, photo, letter, pos="50% 50%", photo2=None, kick="О сообществе", qr=None):
     if photo2:
         ph = (f'<div class="ph" style="left:96px;top:176px;width:600px;height:560px"><img src="../img/{photo}" style="object-position:{pos}"></div>'
               f'<div class="ph" style="left:720px;top:176px;width:336px;height:560px"><img src="../img/{photo2}"></div>')
@@ -96,7 +96,7 @@ def about(A, name, tagline, items, photo, letter, pos="50% 50%", photo2=None, ki
 {ph}
 <div class="col" style="left:96px;width:960px;top:776px"><div class="kick">{kick}</div>
 <div class="h" style="font-size:{nfs}px;margin-top:14px">{name}</div>{tg}</div>
-<div class="col" data-fit="32" data-max="800" style="left:1120px;right:96px;top:176px">{secs(items)}</div>""", CO)
+<div class="col" data-fit="32" data-max="{560 if qr else 800}" style="left:1120px;right:96px;top:176px">{secs(items)}</div>{qr_badge(qr[0], qr[1], 1120, 700, 230) if qr else ""}""", CO)
 
 
 def join(A, name, first, rows, qr, caption="Страница на Co.Space"):
@@ -141,7 +141,7 @@ def cover(A):
 <span class="pill o" style="font-size:30px;padding:16px 34px">Ginger Hotel, Тбилиси</span></div></div>""", "", brand=False)
 
 
-def founder_stats(A, first, last, community, desc, stats, photo, pos="50% 20%", kick="Ведёт вечер"):
+def founder_stats(A, first, last, community, desc, stats, photo, pos="50% 20%", kick="Ведёт вечер", qr=None):
     st = "".join(f'<div style="flex:1"><div style="font-size:84px;font-weight:900;letter-spacing:-.03em;color:{A};line-height:1">{n}</div>'
                  f'<div style="font-size:24px;line-height:1.3;color:rgba(255,255,255,.7);margin-top:10px">{t}</div></div>' for n, t in stats)
     return page(A, f"""
@@ -151,7 +151,7 @@ def founder_stats(A, first, last, community, desc, stats, photo, pos="50% 20%", 
 <div class="h" style="font-size:124px;margin-top:22px">{first}<br><span style="color:{A}">{last}</span></div>
 <div style="margin-top:28px"><span class="pill f" style="font-size:26px;padding:14px 30px">{community}</span></div>
 <div class="txt" style="font-size:30px;margin-top:30px">{desc}</div></div>
-<div style="display:flex;gap:40px;border-top:1.5px solid rgba(255,255,255,.12);padding-top:34px">{st}</div></div>""", CO)
+<div style="display:flex;gap:40px;border-top:1.5px solid rgba(255,255,255,.12);padding-top:34px">{st}</div></div>{qr_badge(qr[0], qr[1], 600, 640, 230) if qr else ""}""", CO)
 
 
 
@@ -166,7 +166,7 @@ def max_who(A):
 <div class="h" style="font-size:124px;margin-top:22px">Макс<br><span style="color:{A}">Заикин</span></div>
 <div class="txt" style="font-size:36px;margin-top:26px;color:#fff;font-weight:500">Создаёт инфраструктуру нового образа жизни</div></div>
 <div class="txt" style="font-size:28px">{bl}</div>
-<div style="display:flex;gap:14px;flex-wrap:wrap"><span class="pill f">Недвижимость</span><span class="pill o">×</span><span class="pill f">Сообщества</span><span class="pill o">×</span><span class="pill f">Технологии</span></div></div>""", CO)
+<div style="display:flex;gap:14px;flex-wrap:wrap"><span class="pill f">Недвижимость</span><span class="pill o">×</span><span class="pill f">Сообщества</span><span class="pill o">×</span><span class="pill f">Технологии</span></div></div>{qr_badge("qr_max_ig.png", "Instagram", 600, 640, 230)}""", CO)
 
 
 def what_co(A):
@@ -277,6 +277,14 @@ def networking_qr(A):
 <div class="kick" style="margin-top:22px;text-align:center;color:rgba(255,255,255,.6)">Регистрация на нетворкинг</div></div>""", motif, "Наведи камеру на QR")
 
 
+
+def qr_badge(img, label, left, top, size=230):
+    return (f'<div class="a" style="left:{left}px;top:{top}px;width:{size}px;z-index:6;text-align:center">'
+            f'<div style="background:#fff;border-radius:24px;padding:12px;box-shadow:0 20px 40px rgba(0,0,0,.45)">'
+            f'<img src="../img/{img}" style="width:100%;display:block;border-radius:12px"></div>'
+            f'<div class="meta" style="margin-top:12px;color:rgba(255,255,255,.75)">{label}</div></div>')
+
+
 # ---------------- контент (из презентации «Диана») ----------------
 S = []
 A = "#A874FF"
@@ -285,7 +293,7 @@ S += [("00-cover", cover(A)),
       ("pol-1", founder_stats(A, "Полина", "Язвенко", "TEXTURA",
         "Предприниматель, тренер по публичным выступлениям, эксперт по публичности и медийности. Основатель онлайн-школы TEXTURA с образовательной лицензией.",
         [("500+", "спикеров обучено за 5 лет"), ("30+", "тренингов и программ"), ("3 года", "в прямом эфире на ТВ")],
-        "polina_portrait.jpg", "50% 18%")),
+        "polina_portrait.jpg", "50% 18%", qr=("qr_polina_ig.png", "Instagram"))),
       ("pol-2", about(A, "JB Glamping", "Глэмпинг в Грузии",
         [("Кто", "Полина Язвенко — сооснователь JB Glamping вместе с мужем"),
          ("Что это", "Глэмпинг в Грузии: купола посреди зелёных полей с видом на горы")],
@@ -294,7 +302,7 @@ S += [("00-cover", cover(A)),
         [("О сообществе", "Сообщество людей, которые создают компании, запускают проекты, инвестируют, строят личные бренды и влияют на рынок."),
          ("Тема", "Бизнес"),
          ("Формат", "Онлайн + офлайн")],
-        "textura_stage.jpg", "T", "50% 50%")),
+        "textura_stage.jpg", "T", "50% 50%", qr=("qr_textura.png", "TEXTURA"))),
       ("max-1", max_who(A)),
       ("max-2", what_co(A)),
       ("max-3", power(A)),
