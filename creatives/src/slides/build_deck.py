@@ -69,19 +69,19 @@ CO = '<div class="giant" style="right:-40px;bottom:-60px;font-size:720px">Co.</d
 
 
 # сетка: поля 96, контент 96..1824, верх контента 176, низ 976
-def founder(A, first, last, community, items, photo, letter, pos="50% 25%"):
+def founder(A, first, last, community, items, photo, letter, pos="50% 25%", kick="Основатель сообщества"):
     nm = max(len(first), len(last))
     fs = 124 if nm <= 10 else (104 if nm <= 14 else 84)
     return page(A, f"""
 <div class="ph" style="left:96px;top:176px;width:760px;height:800px"><img src="../img/{photo}" style="object-position:{pos}"></div>
 <div class="col" style="left:920px;right:96px;top:176px;height:800px;justify-content:space-between">
-<div><div class="kick">Основатель сообщества</div>
+<div><div class="kick">{kick}</div>
 <div class="h" style="font-size:{fs}px;margin-top:22px">{first}<br><span style="color:{A}">{last}</span></div>
 <div style="margin-top:28px"><span class="pill f" style="font-size:26px;padding:14px 30px">{community}</span></div></div>
 <div class="card" data-fit="32" data-max="420">{secs(items)}</div></div>""", CO)
 
 
-def about(A, name, tagline, items, photo, letter, pos="50% 50%", photo2=None):
+def about(A, name, tagline, items, photo, letter, pos="50% 50%", photo2=None, kick="О сообществе"):
     if photo2:
         ph = (f'<div class="ph" style="left:96px;top:176px;width:600px;height:560px"><img src="../img/{photo}" style="object-position:{pos}"></div>'
               f'<div class="ph" style="left:720px;top:176px;width:336px;height:560px"><img src="../img/{photo2}"></div>')
@@ -94,7 +94,7 @@ def about(A, name, tagline, items, photo, letter, pos="50% 50%", photo2=None):
     nfs = 84 if len(name) <= 18 else 64
     return page(A, f"""
 {ph}
-<div class="col" style="left:96px;width:960px;top:776px"><div class="kick">О сообществе</div>
+<div class="col" style="left:96px;width:960px;top:776px"><div class="kick">{kick}</div>
 <div class="h" style="font-size:{nfs}px;margin-top:14px">{name}</div>{tg}</div>
 <div class="col" data-fit="32" data-max="800" style="left:1120px;right:96px;top:176px">{secs(items)}</div>""", CO)
 
@@ -139,6 +139,16 @@ S += [("ertad-1", founder(A, "Ирина", "Ластовка", "Бизнес-с�
          ("Для кого мы", "Все, для кого актуальна тема бизнеса в Грузии.")], None, "E")),
       ("ertad-3", join(A, "Бизнес-сообщество Ertad", "Выбрать интересное для вас мероприятие, заполнить анкету и прийти.",
         [("Telegram", "@ertad_community"), ("Instagram", "@ertad.community"), ("Встречи", "Тбилиси и Батуми")], "ertad_qr.jpg"))]
+# 1b. Телеграм о Грузии — Николай Левшиц
+A = "#A874FF"
+S += [("lev-1", founder(A, "Николай", "Левшиц", "Телеграм о Грузии",
+        [("Кто он", "Основатель и автор телеграм-канала «Телеграм о Грузии»"),
+         (None, "Создал многочисленные ресурсы и проекты о Грузии. Блогер, активный участник сообществ по спорту и IT.")],
+        "lev_founder.jpg", "T", "40% 30%", kick="Спикер · основатель канала")),
+      ("lev-2", about(A, "Телеграм о Грузии", "Самый популярный телеграм-канал о Грузии",
+        [("О чём канал", "Николай рассказывает о Грузии: о жизни, новостях и обо всём, что полезно знать, если ты здесь живёшь или собираешься переехать."),
+         ("Для кого", "Для тех, кто живёт в Грузии или собирается переехать.")],
+        "lev_about.jpg", "T", "50% 40%", kick="О канале"))]
 # 2. ESTATE HUB — синий
 A = "#A874FF"
 S += [("estate-1", founder(A, "Diana", "Panieva-Kutateladze", "ESTATE HUB",
