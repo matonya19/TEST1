@@ -129,13 +129,15 @@ function slide3(L, v, rnd, page = 3, ckey) {         // лидер
   const m = v.lead.mirror;
   const [first, ...rest] = L.leader.toUpperCase().split(' ');
   const last = rest.join(' ');
+  const nsz = Math.min(84, Math.floor(900 / (0.66 * Math.max(first.length, last.length) + 0.9)));
+  const step = Math.max(0, Math.min(v.lead.step, W - 130 - Math.ceil(last.length * 0.7 * nsz + 80)));
   const sx = m ? 45 : 355;
   const nameL = m ? null : 65;
   const pills = m
-    ? pill(first, '', `right:65px;top:560px;height:118px;padding:0 36px;font-size:84px;border-radius:30px`) +
-      pill(last, '', `right:${v.lead.step + 65}px;top:675px;height:118px;padding:0 36px;font-size:84px;border-radius:30px`)
-    : pill(first, '', `left:65px;top:560px;height:118px;padding:0 36px;font-size:84px;border-radius:30px`) +
-      pill(last, '', `left:${v.lead.step + 65}px;top:675px;height:118px;padding:0 36px;font-size:84px;border-radius:30px`);
+    ? pill(first, '', `right:65px;top:560px;height:118px;padding:0 36px;font-size:${nsz}px;border-radius:30px`) +
+      pill(last, '', `right:${step + 65}px;top:675px;height:118px;padding:0 36px;font-size:${nsz}px;border-radius:30px`)
+    : pill(first, '', `left:65px;top:560px;height:118px;padding:0 36px;font-size:${nsz}px;border-radius:30px`) +
+      pill(last, '', `left:${step + 65}px;top:675px;height:118px;padding:0 36px;font-size:${nsz}px;border-radius:30px`);
   const cx0 = m ? 50 : 295, cx1 = m ? 785 : 1030;
   const cpts = m ? [[cx0, 905], [cx1, 840], [cx1, 1255], [cx0 + 6, 1250]] : [[cx0, 840], [cx1, 905], [cx1 - 6, 1250], [cx0, 1255]];
   const tx = cx0 + 58;
