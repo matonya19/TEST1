@@ -365,7 +365,7 @@ S += [("isoul-1", founder(A, "Юлия", "Шенгелия", "ISOUL Грузия
         "isoul_about.jpg", "S")),
       ("isoul-3", join(A, "ISOUL Грузия", "Заполните анкету по QR-коду и пройдите интервью с президентом ISOUL в Грузии Юлией Шенгелия.",
         [("Telegram", "t.me/+N9qDQ3-1Kv0xZmQ6 (чат ISOUL в Грузии)"), ("Instagram", "@isoul.community"), ("Встречи", "Тбилиси, Батуми"), ("Сайт", "isoul.space")],
-        "isoul_qr.jpg", "Анкета на вступление"))]
+        "isoul_qr.jpg", "ISOUL на Co.Space"))]
 # 6. Marketing and AI — бирюзовый
 A = "#A874FF"
 S += [("mai-1", founder(A, "Alex", "Kochnev", "Marketing and AI",
