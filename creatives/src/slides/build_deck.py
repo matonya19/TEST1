@@ -96,7 +96,7 @@ def about(A, name, tagline, items, photo, letter, pos="50% 50%", photo2=None, ki
 {ph}
 <div class="col" style="left:96px;width:960px;top:776px"><div class="kick">{kick}</div>
 <div class="h" style="font-size:{nfs}px;margin-top:14px">{name}</div>{tg}</div>
-<div class="col" data-fit="32" data-max="{560 if qr else 800}" style="left:1120px;right:96px;top:176px">{secs(items)}</div>{qr_badge(qr[0], qr[1], 1120, 700, 230) if qr else ""}""", CO)
+<div class="col" data-fit="32" data-max="{200 if qr else 800}" style="left:1120px;right:96px;top:176px">{secs(items)}</div>{qr_badge(qr[0], qr[1], 1120, 400, 440) if qr else ""}""", CO)
 
 
 def join(A, name, first, rows, qr, caption="Страница на Co.Space"):
@@ -299,10 +299,8 @@ S += [("00-cover", cover(A)),
          ("Что это", "Глэмпинг в Грузии: купола посреди зелёных полей с видом на горы")],
         "glamping.jpg", "G", "50% 45%", kick="Сооснователь")),
       ("tex-1", about(A, '<img src="../img/textura_white.png" style="height:64px;display:block;margin:6px 0 4px">', "",
-        [("О сообществе", "Сообщество людей, которые создают компании, запускают проекты, инвестируют, строят личные бренды и влияют на рынок."),
-         ("Тема", "Бизнес"),
-         ("Формат", "Онлайн + офлайн")],
-        "textura_stage.jpg", "T", "50% 50%", qr=("qr_textura.png", "TEXTURA"))),
+        [("О сообществе", "Сообщество людей, которые создают компании, запускают проекты, инвестируют, строят личные бренды и влияют на рынок.")],
+        "textura_stage.jpg", "T", "50% 50%", qr=("qr_textura_big.png", "TEXTURA"))),
       ("max-1", max_who(A)),
       ("max-2", what_co(A)),
       ("max-3", power(A)),
