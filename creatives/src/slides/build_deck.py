@@ -15,37 +15,46 @@ def css(A):
 html,body{{width:1920px;height:1080px;overflow:hidden}}
 body{{font-family:'Onest',sans-serif;background:{BG};color:#fff;position:relative}}
 .a{{position:absolute}}
-.glow{{position:absolute;border-radius:50%;filter:blur(120px);background:{A};opacity:.22}}
-.giant{{position:absolute;font-weight:900;color:{A};line-height:.78;letter-spacing:-.05em}}
-.brand{{position:absolute;left:80px;top:64px;display:flex;align-items:center;gap:14px;font-size:34px;font-weight:500;z-index:9}}
-.ph{{position:absolute;border-radius:44px;overflow:hidden;z-index:3;background:#1C1530}}
+.glow{{position:absolute;border-radius:50%;filter:blur(140px);background:{A};opacity:.20}}
+/* фоновый мотив — контурные буквы бренда, а не заливка: читаются как буквы, не спорят с фото */
+.giant{{position:absolute;font-weight:900;line-height:.8;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:2px {A}66;white-space:nowrap;z-index:1}}
+.top{{position:absolute;left:96px;right:96px;top:64px;display:flex;justify-content:space-between;align-items:center;z-index:9}}
+.top .brand{{display:flex;align-items:center;gap:14px;font-size:32px;font-weight:500}}
+.meta{{font-size:18px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.45)}}
+.foot{{position:absolute;left:96px;right:96px;bottom:48px;display:flex;justify-content:space-between;z-index:9}}
+.ph{{position:absolute;border-radius:40px;overflow:hidden;z-index:3;background:#1C1530}}
 .ph img{{width:100%;height:100%;object-fit:cover;display:block}}
-.kick{{font-size:22px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:{A}}}
-.h{{font-weight:900;letter-spacing:-.04em;line-height:.92;text-transform:uppercase}}
-.card{{position:absolute;background:#17121F;border:1.5px solid {A}55;border-radius:40px;padding:44px 48px;z-index:4;overflow:hidden}}
-.lbl{{font-size:1em;font-weight:800;color:{A};margin-bottom:.35em}}
-.txt{{font-size:1em;line-height:1.38;color:rgba(255,255,255,.86);font-weight:400}}
-.sec+.sec{{margin-top:1.1em}}
+.kick{{font-size:20px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:{A}}}
+.h{{font-weight:900;letter-spacing:-.035em;line-height:.92;text-transform:uppercase}}
+.col{{position:absolute;z-index:5;display:flex;flex-direction:column}}
+.lbl{{font-size:.62em;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:{A};margin-bottom:.55em}}
+.txt{{font-size:1em;line-height:1.4;color:rgba(255,255,255,.88);font-weight:400}}
+.sec{{padding:1em 0;border-top:1.5px solid rgba(255,255,255,.10)}}
+.sec:first-child{{border-top:none;padding-top:0}}
+.card{{background:#17121F;border:1.5px solid {A}40;border-radius:32px;padding:40px 44px}}
 .pill{{display:inline-block;border-radius:60px;padding:12px 26px;font-size:24px;font-weight:700;margin:0 10px 12px 0}}
 .pill.f{{background:{A};color:{INK}}}
-.pill.o{{border:2px solid {A}99;background:{A}1f}}
-.qr{{position:absolute;background:#fff;border-radius:32px;z-index:4;overflow:hidden;padding:22px}}
+.pill.o{{border:2px solid {A}88;background:{A}18}}
+.qr{{background:#fff;border-radius:28px;overflow:hidden;padding:22px}}
 .qr img{{width:100%;height:100%;object-fit:contain;display:block}}
-.row{{display:flex;gap:20px;font-size:1em;line-height:1.55}}
-.row b{{flex:none;width:7.2em;color:{A};font-weight:700}}
+.row{{display:flex;gap:24px;line-height:1.55}}
+.row b{{flex:none;width:6.4em;color:{A};font-weight:700}}
 """
 
 
 FIT = """<script>document.fonts.ready.then(()=>{document.querySelectorAll('[data-fit]').forEach(e=>{
-let s=parseFloat(e.dataset.fit);e.style.fontSize=s+'px';const max=e.clientHeight;
-while(e.scrollHeight>max+1&&s>16){s-=1;e.style.fontSize=s+'px'}})});</script>"""
+let s=parseFloat(e.dataset.fit);e.style.fontSize=s+'px';const max=parseFloat(e.dataset.max);
+while(e.scrollHeight>max&&s>24){s-=1;e.style.fontSize=s+'px'}})});</script>"""
 
 
-def page(A, body):
-    glow = (f'<div class="glow" style="left:1250px;top:-250px;width:900px;height:700px"></div>'
-            f'<div class="glow" style="left:-300px;top:650px;width:900px;height:700px;opacity:.14"></div>')
+def page(A, body, motif="Co.", footleft="Найди своих"):
+    glow = ('<div class="glow" style="left:1200px;top:-300px;width:1000px;height:760px"></div>'
+            '<div class="glow" style="left:-360px;top:700px;width:900px;height:700px;opacity:.12"></div>')
+    top = (f'<div class="top"><div class="brand">{LOGO}<span>Tbilisi</span></div>'
+           f'<div class="meta">Сила сообществ · 27.11</div></div>')
+    foot = f'<div class="foot"><div class="meta">{footleft}</div><div class="meta">cospace.world</div></div>'
     return (f'<!doctype html><html><head><meta charset="utf-8"><style>{css(A)}</style></head><body>{glow}'
-            f'<div class="brand">{LOGO}<span>Tbilisi</span></div>{body}{FIT}</body></html>')
+            f'{motif}{top}{body}{foot}{FIT}</body></html>')
 
 
 def secs(items):
@@ -56,58 +65,64 @@ def secs(items):
     return "".join(out)
 
 
+CO = '<div class="giant" style="right:-40px;bottom:-60px;font-size:720px">Co.</div>'
+
+
+# сетка: поля 96, контент 96..1824, верх контента 176, низ 976
 def founder(A, first, last, community, items, photo, letter, pos="50% 25%"):
     nm = max(len(first), len(last))
-    fs = 132 if nm <= 10 else (110 if nm <= 14 else 92)
+    fs = 124 if nm <= 10 else (104 if nm <= 14 else 84)
     return page(A, f"""
-<div class="giant" style="left:-70px;top:140px;font-size:920px">C</div>
-<div class="ph" style="left:150px;top:190px;width:680px;height:800px"><img src="../img/{photo}" style="object-position:{pos}"></div>
-<div class="a" style="left:900px;top:170px;right:80px;z-index:5"><div class="kick">Основатель сообщества</div>
-<div class="h" style="font-size:{fs}px;margin-top:24px">{first}<br><span style="color:{A}">{last}</span></div>
-<div style="margin-top:30px"><span class="pill f" style="font-size:28px;padding:14px 30px">{community}</span></div></div>
-<div class="card" data-fit="30" style="left:900px;top:600px;width:940px;height:400px">{secs(items)}</div>""")
+<div class="ph" style="left:96px;top:176px;width:760px;height:800px"><img src="../img/{photo}" style="object-position:{pos}"></div>
+<div class="col" style="left:920px;right:96px;top:176px;height:800px;justify-content:space-between">
+<div><div class="kick">Основатель сообщества</div>
+<div class="h" style="font-size:{fs}px;margin-top:22px">{first}<br><span style="color:{A}">{last}</span></div>
+<div style="margin-top:28px"><span class="pill f" style="font-size:26px;padding:14px 30px">{community}</span></div></div>
+<div class="card" data-fit="32" data-max="420">{secs(items)}</div></div>""", CO)
 
 
 def about(A, name, tagline, items, photo, letter, pos="50% 50%", photo2=None):
-    ph = (f'<div class="ph" style="left:80px;top:170px;width:1000px;height:600px"><img src="../img/{photo}" style="object-position:{pos}"></div>' if photo
-          else f'<div class="ph" style="left:80px;top:170px;width:1000px;height:600px;background:{A};display:flex;align-items:center;justify-content:center"><div style="font-weight:900;font-size:300px;letter-spacing:-.05em;color:{INK};line-height:.8">{name.split()[-1].upper()}</div></div>')
     if photo2:
-        ph = (f'<div class="ph" style="left:80px;top:170px;width:600px;height:600px"><img src="../img/{photo}" style="object-position:{pos}"></div>'
-              f'<div class="ph" style="left:700px;top:170px;width:380px;height:600px"><img src="../img/{photo2}"></div>')
-    tg = f'<div class="txt" style="font-size:28px;margin-top:16px;max-width:1000px;color:rgba(255,255,255,.7)">{tagline}</div>' if tagline else ""
-    nfs = 88 if len(name) <= 18 else 70
+        ph = (f'<div class="ph" style="left:96px;top:176px;width:600px;height:560px"><img src="../img/{photo}" style="object-position:{pos}"></div>'
+              f'<div class="ph" style="left:720px;top:176px;width:336px;height:560px"><img src="../img/{photo2}"></div>')
+    elif photo:
+        ph = f'<div class="ph" style="left:96px;top:176px;width:960px;height:560px"><img src="../img/{photo}" style="object-position:{pos}"></div>'
+    else:
+        ph = (f'<div class="ph" style="left:96px;top:176px;width:960px;height:560px;background:#1C1530;border:1.5px solid {A}40;display:flex;align-items:center;justify-content:center">'
+              f'<div style="font-weight:900;font-size:260px;letter-spacing:-.05em;color:{A};line-height:.8">{name.split()[-1].upper()}</div></div>')
+    tg = f'<div class="txt" style="font-size:28px;margin-top:14px;color:rgba(255,255,255,.65)">{tagline}</div>' if tagline else ""
+    nfs = 84 if len(name) <= 18 else 64
     return page(A, f"""
-<div class="giant" style="right:-90px;top:110px;font-size:900px;opacity:.9">O</div>
 {ph}
-<div class="a" style="left:80px;top:810px;width:1000px;z-index:5"><div class="kick">О сообществе</div>
+<div class="col" style="left:96px;width:960px;top:776px"><div class="kick">О сообществе</div>
 <div class="h" style="font-size:{nfs}px;margin-top:14px">{name}</div>{tg}</div>
-<div class="card" data-fit="28" style="left:1140px;top:170px;width:700px;height:840px">{secs(items)}</div>""")
+<div class="col" data-fit="32" data-max="800" style="left:1120px;right:96px;top:176px">{secs(items)}</div>""", CO)
 
 
 def join(A, name, first, rows, qr, caption=""):
     r = "".join(f'<div class="row"><b>{k}</b><span>{v}</span></div>' for k, v in rows)
-    cap = f'<div class="a kick" style="left:1300px;top:825px;width:500px;text-align:center;color:rgba(255,255,255,.6)">{caption}</div>' if caption else ""
+    cap = f'<div class="kick" style="margin-top:22px;text-align:center;color:rgba(255,255,255,.6)">{caption}</div>' if caption else ""
+    motif = '<div class="giant" style="right:96px;bottom:92px;font-size:150px">НАЙДИ СВОИХ</div>'
     return page(A, f"""
-<div class="giant" style="right:40px;bottom:20px;font-size:150px;opacity:.18;white-space:nowrap;line-height:.85">НАЙДИ СВОИХ</div>
-<div class="a" style="left:80px;top:170px;z-index:5"><div class="kick">{name}</div>
-<div class="h" style="font-size:118px;margin-top:22px">Как<br><span style="color:{A}">присоединиться</span></div></div>
-<div class="card" data-fit="28" style="left:80px;top:500px;width:1100px;height:420px">
+<div class="col" style="left:96px;width:1060px;top:176px"><div class="kick">{name}</div>
+<div class="h" style="font-size:100px;margin-top:20px">Как<br><span style="color:{A}">присоединиться</span></div>
+<div data-fit="32" data-max="470" style="margin-top:40px">
 <div class="sec"><div class="lbl">Первый шаг</div><div class="txt">{first}</div></div>
-<div class="sec"><div class="lbl">Где нас найти</div>{r}</div></div>
-<div class="qr" style="left:1300px;top:300px;width:500px;height:500px"><img src="../img/{qr}"></div>{cap}""")
+<div class="sec"><div class="lbl">Где нас найти</div><div class="txt">{r}</div></div></div></div>
+<div class="col" style="left:1264px;width:560px;top:200px"><div class="qr" style="width:560px;height:560px"><img src="../img/{qr}"></div>{cap}</div>""", motif, "Наведи камеру на QR")
 
 
 def single(A, name, tags, items, join_t, photo, qr, letter, pos="50% 50%", fit=False):
     pills = "".join(f'<span class="pill {"f" if i == 0 else "o"}">{t}</span>' for i, t in enumerate(tags))
+    bg = 'background:#fff;padding:36px;' if fit else ''
     return page(A, f"""
-<div class="giant" style="right:-60px;top:60px;font-size:760px;opacity:.9">C</div>
-<div class="ph" style="left:80px;top:170px;width:820px;height:600px;{'background:#fff;padding:40px' if fit else ''}"><img src="../img/{photo}" style="object-position:{pos};{'object-fit:contain' if fit else ''}"></div>
-<div class="a" style="left:80px;top:805px;width:900px;z-index:5"><div class="h" style="font-size:72px">{name}</div>
-<div style="margin-top:20px">{pills}</div></div>
-<div class="card" data-fit="28" style="left:980px;top:170px;width:860px;height:480px">{secs(items)}</div>
-<div class="a" style="left:980px;top:700px;width:470px;z-index:5"><span class="pill f" style="background:#fff">Как вступить</span>
-<div class="txt" style="margin-top:10px;font-size:26px;word-break:break-word">{join_t}</div></div>
-<div class="qr" style="left:1500px;top:690px;width:340px;height:340px;padding:16px"><img src="../img/{qr}"></div>""")
+<div class="ph" style="left:96px;top:176px;width:840px;height:560px;{bg}"><img src="../img/{photo}" style="object-position:{pos};{'object-fit:contain' if fit else ''}"></div>
+<div class="col" style="left:96px;width:840px;top:776px"><div class="h" style="font-size:76px">{name}</div>
+<div style="margin-top:22px">{pills}</div></div>
+<div class="col" data-fit="32" data-max="500" style="left:1000px;right:96px;top:176px">{secs(items)}</div>
+<div class="col" style="left:1000px;right:96px;top:716px;height:260px;flex-direction:row;gap:40px;align-items:flex-end">
+<div class="qr" style="width:260px;height:260px;padding:14px;flex:none"><img src="../img/{qr}"></div>
+<div style="padding-bottom:6px"><div class="kick">Как вступить</div><div class="txt" style="margin-top:12px;font-size:28px;word-break:break-word">{join_t}</div></div></div>""", CO)
 
 
 # ---------------- контент (из презентации «Диана») ----------------
