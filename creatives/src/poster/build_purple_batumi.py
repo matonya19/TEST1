@@ -16,8 +16,9 @@ def person(p, F, fx, fy, fade_y, H):
     s = F / p["fw"]
     w, h = p["w"] * s, p["h"] * s
     left, top = fx - p["cx"] * s, fy - p["cy"] * s
-    a = (fade_y - top) / h * 100
-    b = (fade_y + 230 - top) / h * 100
+    end = min(fade_y + 230, top + h - 4)   # растушёвка заканчивается до края вырезки
+    a = (end - 260 - top) / h * 100
+    b = (end - top) / h * 100
     return (f'<img src="{p["img"]}" style="position:absolute;left:{left:.0f}px;top:{top:.0f}px;width:{w:.0f}px;'
             f'-webkit-mask-image:linear-gradient(180deg,#000 {a:.1f}%,transparent {b:.1f}%);'
             f'filter:drop-shadow(0 30px 60px rgba(15,5,40,.55));z-index:3">')
@@ -75,8 +76,8 @@ body{{font-family:'Onest',sans-serif;color:#fff;position:relative}}
 <div class="abs" style="left:0;right:0;top:{fade - 120}px;height:{H - fade + 120}px;background:linear-gradient(180deg,rgba(26,11,61,0),rgba(26,11,61,.55) 40%,rgba(20,8,50,.85));z-index:4"></div>
 <div class="date" style="top:{date_y}px">30.11<br>ПН</div>
 <div class="pill" style="top:{date_y + 30}px">вход<br>свободный</div>
-<div class="title" style="top:{title_y}px"><div class="kick">СИЛА СООБЩЕСТВ</div><div class="dash"></div>
-<div class="big" style="font-size:{170 if story else 150}px">Найди<br>своих</div>
+<div class="title" style="top:{title_y}px"><div class="kick">СИЛА СООБЩЕСТВ</div>
+<div class="big" style="font-size:{170 if story else 150}px;font-family:'Inter Display',sans-serif;font-weight:800;line-height:.95;margin-top:{26 if story else 22}px">Найди<br>своих</div>
 <div class="sub">Полина · TEXTURA &nbsp;/&nbsp; Максим · Co.Space</div></div>
 <div class="foot" style="top:{foot_y}px"><div>Вечер<br>в Батуми</div><div style="text-align:center;font-size:.8em">Регистрация —<br>ссылка в профиле</div><div style="text-align:right">@co.batumi</div></div>"""
     return f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>{body}</body></html>'
