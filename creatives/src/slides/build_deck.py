@@ -154,6 +154,47 @@ def founder_stats(A, first, last, community, desc, stats, photo, pos="50% 20%", 
 <div style="display:flex;gap:40px;border-top:1.5px solid rgba(255,255,255,.12);padding-top:34px">{st}</div></div>""", CO)
 
 
+
+def max_who(A):
+    bl = "".join(f'<div style="display:flex;gap:22px;padding:14px 0;border-top:1.5px solid rgba(255,255,255,.10)"><span style="color:{A};font-weight:800">—</span><span>{t}</span></div>'
+                 for t in ["Предприниматель, основатель Co.", "Создавал коливинги и сообщества в Турции.",
+                           "Развивает глобальную экосистему community hubs.", "Строит Y Mirissa — жилой комплекс с community hub на Шри-Ланке."])
+    return page(A, f"""
+<div class="ph" style="left:96px;top:176px;width:760px;height:800px"><img src="../img/max_portrait2.jpg" style="object-position:50% 25%"></div>
+<div class="col" style="left:920px;right:96px;top:176px;height:800px;justify-content:space-between">
+<div><div class="kick">Основатель Co.</div>
+<div class="h" style="font-size:124px;margin-top:22px">Макс<br><span style="color:{A}">Заикин</span></div>
+<div class="txt" style="font-size:36px;margin-top:26px;color:#fff;font-weight:500">Создаёт инфраструктуру нового образа жизни</div></div>
+<div class="txt" style="font-size:28px">{bl}</div>
+<div style="display:flex;gap:14px;flex-wrap:wrap"><span class="pill f">Недвижимость</span><span class="pill o">×</span><span class="pill f">Сообщества</span><span class="pill o">×</span><span class="pill f">Технологии</span></div></div>""", CO)
+
+
+def what_co(A):
+    cards = [("Сообщества", "Люди по интересам и ценностям"), ("Города", "Локальная инфраструктура жизни"),
+             ("Хабы", "Пространства для жизни и работы"), ("События", "Знакомства и новый опыт")]
+    c = "".join(f'<div class="card" style="flex:1;padding:36px 36px 40px"><div style="font-size:64px;font-weight:900;color:{A};line-height:1;letter-spacing:-.04em">0{i + 1}</div>'
+                f'<div style="font-size:40px;font-weight:800;margin-top:26px;letter-spacing:-.02em">{t}</div>'
+                f'<div class="txt" style="font-size:26px;margin-top:12px;color:rgba(255,255,255,.7)">{d}</div></div>' for i, (t, d) in enumerate(cards))
+    return page(A, f"""
+<div class="col" style="left:96px;right:96px;top:176px"><div class="kick">Что такое Co.</div>
+<div class="h" style="font-size:132px;margin-top:22px">Найди своих.<br><span style="color:{A}">Найдёшь своё.</span></div>
+<div class="txt" style="font-size:36px;margin-top:30px;color:#fff">Глобальная экосистема людей, сообществ и пространств.</div></div>
+<div class="a" style="left:96px;right:96px;top:690px;display:flex;gap:28px;z-index:5">{c}</div>""", CO)
+
+
+def power(A):
+    items = ["Сообщества и их лидеры", "Хабы и пространства", "Люди, идеи и возможности"]
+    it = "".join(f'<div style="display:flex;align-items:center;gap:28px;padding:26px 0;border-top:1.5px solid rgba(255,255,255,.12)">'
+                 f'<span style="width:22px;height:22px;border-radius:50%;background:{A};flex:none"></span><span style="font-size:40px;font-weight:700">{t}</span></div>' for t in items)
+    motif = '<div class="giant" style="right:-30px;bottom:-70px;font-size:430px">Co.</div>'
+    return page(A, f"""
+<div class="col" style="left:96px;width:900px;top:176px"><div class="kick">Сила сообществ</div>
+<div class="h" style="font-size:124px;margin-top:22px;line-height:.86">Сила<br><span style="color:{A}">сообществ</span></div>
+<div class="txt" style="font-size:36px;margin-top:34px;color:#fff">Объединяем тех, кто создаёт среду города.</div></div>
+<div class="col" style="left:1120px;right:96px;top:250px">{it}<div style="border-top:1.5px solid rgba(255,255,255,.12)"></div></div>
+<div class="a" style="left:96px;top:800px;z-index:5"><span class="pill f" style="font-size:40px;padding:22px 44px">Не конкурировать. Объединяться.</span></div>""", motif)
+
+
 # ---------------- контент (из презентации «Диана») ----------------
 S = []
 A = "#A874FF"
@@ -170,7 +211,10 @@ S += [("00-cover", cover(A)),
         [("О сообществе", "Сообщество людей, которые создают компании, запускают проекты, инвестируют, строят личные бренды и влияют на рынок."),
          ("Тема", "Бизнес"),
          ("Формат", "Онлайн + офлайн")],
-        "textura_stage.jpg", "T", "50% 50%"))]
+        "textura_stage.jpg", "T", "50% 50%")),
+      ("max-1", max_who(A)),
+      ("max-2", what_co(A)),
+      ("max-3", power(A))]
 # 0. По душам — Анастасия Кулькова
 A = "#A874FF"
 S += [("kul-1", founder(A, "Анастасия", "Кулькова", "По душам",
